@@ -1,0 +1,11 @@
+lr: 0.001
+weight_decay: 0.0001
+epochs: 10
+resize_shape: [160, 160]
+devices: [0,1,2,3]
+n_classes: 2
+loss_type: ce # ce or focal
+dataset_dir: /home/vrb230004/media/datasets/nuscenes
+labels_dir: /home/vrb230004/media/datasets/cvt_labels_nuscenes
+num_workers: 4
+batch_size: 8

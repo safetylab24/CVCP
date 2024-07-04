@@ -1,0 +1,1410 @@
+====================================================================================================
+Layer (type:depth-idx)                                                      Param #
+====================================================================================================
+Model                                                                       --
+├─CVTModel: 1-1                                                             --
+│    └─backbone.module.encoder.backbone.layers.0.0.weight                   ├─1,296
+│    └─backbone.module.encoder.backbone.layers.0.1.weight                   ├─48
+│    └─backbone.module.encoder.backbone.layers.0.1.bias                     ├─48
+│    └─backbone.module.encoder.backbone.layers.1.0._depthwise_conv.weight   ├─432
+│    └─backbone.module.encoder.backbone.layers.1.0._bn1.weight              ├─48
+│    └─backbone.module.encoder.backbone.layers.1.0._bn1.bias                ├─48
+│    └─backbone.module.encoder.backbone.layers.1.0._se_reduce.weight        ├─576
+│    └─backbone.module.encoder.backbone.layers.1.0._se_reduce.bias          ├─12
+│    └─backbone.module.encoder.backbone.layers.1.0._se_expand.weight        ├─576
+│    └─backbone.module.encoder.backbone.layers.1.0._se_expand.bias          ├─48
+│    └─backbone.module.encoder.backbone.layers.1.0._project_conv.weight     ├─1,152
+│    └─backbone.module.encoder.backbone.layers.1.0._bn2.weight              ├─24
+│    └─backbone.module.encoder.backbone.layers.1.0._bn2.bias                ├─24
+│    └─backbone.module.encoder.backbone.layers.1.1._depthwise_conv.weight   ├─216
+│    └─backbone.module.encoder.backbone.layers.1.1._bn1.weight              ├─24
+│    └─backbone.module.encoder.backbone.layers.1.1._bn1.bias                ├─24
+│    └─backbone.module.encoder.backbone.layers.1.1._se_reduce.weight        ├─144
+│    └─backbone.module.encoder.backbone.layers.1.1._se_reduce.bias          ├─6
+│    └─backbone.module.encoder.backbone.layers.1.1._se_expand.weight        ├─144
+│    └─backbone.module.encoder.backbone.layers.1.1._se_expand.bias          ├─24
+│    └─backbone.module.encoder.backbone.layers.1.1._project_conv.weight     ├─576
+│    └─backbone.module.encoder.backbone.layers.1.1._bn2.weight              ├─24
+│    └─backbone.module.encoder.backbone.layers.1.1._bn2.bias                ├─24
+│    └─backbone.module.encoder.backbone.layers.1.2._expand_conv.weight      ├─3,456
+│    └─backbone.module.encoder.backbone.layers.1.2._bn0.weight              ├─144
+│    └─backbone.module.encoder.backbone.layers.1.2._bn0.bias                ├─144
+│    └─backbone.module.encoder.backbone.layers.1.2._depthwise_conv.weight   ├─1,296
+│    └─backbone.module.encoder.backbone.layers.1.2._bn1.weight              ├─144
+│    └─backbone.module.encoder.backbone.layers.1.2._bn1.bias                ├─144
+│    └─backbone.module.encoder.backbone.layers.1.2._se_reduce.weight        ├─864
+│    └─backbone.module.encoder.backbone.layers.1.2._se_reduce.bias          ├─6
+│    └─backbone.module.encoder.backbone.layers.1.2._se_expand.weight        ├─864
+│    └─backbone.module.encoder.backbone.layers.1.2._se_expand.bias          ├─144
+│    └─backbone.module.encoder.backbone.layers.1.2._project_conv.weight     ├─4,608
+│    └─backbone.module.encoder.backbone.layers.1.2._bn2.weight              ├─32
+│    └─backbone.module.encoder.backbone.layers.1.2._bn2.bias                ├─32
+│    └─backbone.module.encoder.backbone.layers.2.0._expand_conv.weight      ├─6,144
+│    └─backbone.module.encoder.backbone.layers.2.0._bn0.weight              ├─192
+│    └─backbone.module.encoder.backbone.layers.2.0._bn0.bias                ├─192
+│    └─backbone.module.encoder.backbone.layers.2.0._depthwise_conv.weight   ├─1,728
+│    └─backbone.module.encoder.backbone.layers.2.0._bn1.weight              ├─192
+│    └─backbone.module.encoder.backbone.layers.2.0._bn1.bias                ├─192
+│    └─backbone.module.encoder.backbone.layers.2.0._se_reduce.weight        ├─1,536
+│    └─backbone.module.encoder.backbone.layers.2.0._se_reduce.bias          ├─8
+│    └─backbone.module.encoder.backbone.layers.2.0._se_expand.weight        ├─1,536
+│    └─backbone.module.encoder.backbone.layers.2.0._se_expand.bias          ├─192
+│    └─backbone.module.encoder.backbone.layers.2.0._project_conv.weight     ├─6,144
+│    └─backbone.module.encoder.backbone.layers.2.0._bn2.weight              ├─32
+│    └─backbone.module.encoder.backbone.layers.2.0._bn2.bias                ├─32
+│    └─backbone.module.encoder.backbone.layers.2.1._expand_conv.weight      ├─6,144
+│    └─backbone.module.encoder.backbone.layers.2.1._bn0.weight              ├─192
+│    └─backbone.module.encoder.backbone.layers.2.1._bn0.bias                ├─192
+│    └─backbone.module.encoder.backbone.layers.2.1._depthwise_conv.weight   ├─1,728
+│    └─backbone.module.encoder.backbone.layers.2.1._bn1.weight              ├─192
+│    └─backbone.module.encoder.backbone.layers.2.1._bn1.bias                ├─192
+│    └─backbone.module.encoder.backbone.layers.2.1._se_reduce.weight        ├─1,536
+│    └─backbone.module.encoder.backbone.layers.2.1._se_reduce.bias          ├─8
+│    └─backbone.module.encoder.backbone.layers.2.1._se_expand.weight        ├─1,536
+│    └─backbone.module.encoder.backbone.layers.2.1._se_expand.bias          ├─192
+│    └─backbone.module.encoder.backbone.layers.2.1._project_conv.weight     ├─6,144
+│    └─backbone.module.encoder.backbone.layers.2.1._bn2.weight              ├─32
+│    └─backbone.module.encoder.backbone.layers.2.1._bn2.bias                ├─32
+│    └─backbone.module.encoder.backbone.layers.2.2._expand_conv.weight      ├─6,144
+│    └─backbone.module.encoder.backbone.layers.2.2._bn0.weight              ├─192
+│    └─backbone.module.encoder.backbone.layers.2.2._bn0.bias                ├─192
+│    └─backbone.module.encoder.backbone.layers.2.2._depthwise_conv.weight   ├─1,728
+│    └─backbone.module.encoder.backbone.layers.2.2._bn1.weight              ├─192
+│    └─backbone.module.encoder.backbone.layers.2.2._bn1.bias                ├─192
+│    └─backbone.module.encoder.backbone.layers.2.2._se_reduce.weight        ├─1,536
+│    └─backbone.module.encoder.backbone.layers.2.2._se_reduce.bias          ├─8
+│    └─backbone.module.encoder.backbone.layers.2.2._se_expand.weight        ├─1,536
+│    └─backbone.module.encoder.backbone.layers.2.2._se_expand.bias          ├─192
+│    └─backbone.module.encoder.backbone.layers.2.2._project_conv.weight     ├─6,144
+│    └─backbone.module.encoder.backbone.layers.2.2._bn2.weight              ├─32
+│    └─backbone.module.encoder.backbone.layers.2.2._bn2.bias                ├─32
+│    └─backbone.module.encoder.backbone.layers.2.3._expand_conv.weight      ├─6,144
+│    └─backbone.module.encoder.backbone.layers.2.3._bn0.weight              ├─192
+│    └─backbone.module.encoder.backbone.layers.2.3._bn0.bias                ├─192
+│    └─backbone.module.encoder.backbone.layers.2.3._depthwise_conv.weight   ├─4,800
+│    └─backbone.module.encoder.backbone.layers.2.3._bn1.weight              ├─192
+│    └─backbone.module.encoder.backbone.layers.2.3._bn1.bias                ├─192
+│    └─backbone.module.encoder.backbone.layers.2.3._se_reduce.weight        ├─1,536
+│    └─backbone.module.encoder.backbone.layers.2.3._se_reduce.bias          ├─8
+│    └─backbone.module.encoder.backbone.layers.2.3._se_expand.weight        ├─1,536
+│    └─backbone.module.encoder.backbone.layers.2.3._se_expand.bias          ├─192
+│    └─backbone.module.encoder.backbone.layers.2.3._project_conv.weight     ├─10,752
+│    └─backbone.module.encoder.backbone.layers.2.3._bn2.weight              ├─56
+│    └─backbone.module.encoder.backbone.layers.2.3._bn2.bias                ├─56
+│    └─backbone.module.encoder.backbone.layers.3.0._expand_conv.weight      ├─18,816
+│    └─backbone.module.encoder.backbone.layers.3.0._bn0.weight              ├─336
+│    └─backbone.module.encoder.backbone.layers.3.0._bn0.bias                ├─336
+│    └─backbone.module.encoder.backbone.layers.3.0._depthwise_conv.weight   ├─8,400
+│    └─backbone.module.encoder.backbone.layers.3.0._bn1.weight              ├─336
+│    └─backbone.module.encoder.backbone.layers.3.0._bn1.bias                ├─336
+│    └─backbone.module.encoder.backbone.layers.3.0._se_reduce.weight        ├─4,704
+│    └─backbone.module.encoder.backbone.layers.3.0._se_reduce.bias          ├─14
+│    └─backbone.module.encoder.backbone.layers.3.0._se_expand.weight        ├─4,704
+│    └─backbone.module.encoder.backbone.layers.3.0._se_expand.bias          ├─336
+│    └─backbone.module.encoder.backbone.layers.3.0._project_conv.weight     ├─18,816
+│    └─backbone.module.encoder.backbone.layers.3.0._bn2.weight              ├─56
+│    └─backbone.module.encoder.backbone.layers.3.0._bn2.bias                ├─56
+│    └─backbone.module.encoder.backbone.layers.3.1._expand_conv.weight      ├─18,816
+│    └─backbone.module.encoder.backbone.layers.3.1._bn0.weight              ├─336
+│    └─backbone.module.encoder.backbone.layers.3.1._bn0.bias                ├─336
+│    └─backbone.module.encoder.backbone.layers.3.1._depthwise_conv.weight   ├─8,400
+│    └─backbone.module.encoder.backbone.layers.3.1._bn1.weight              ├─336
+│    └─backbone.module.encoder.backbone.layers.3.1._bn1.bias                ├─336
+│    └─backbone.module.encoder.backbone.layers.3.1._se_reduce.weight        ├─4,704
+│    └─backbone.module.encoder.backbone.layers.3.1._se_reduce.bias          ├─14
+│    └─backbone.module.encoder.backbone.layers.3.1._se_expand.weight        ├─4,704
+│    └─backbone.module.encoder.backbone.layers.3.1._se_expand.bias          ├─336
+│    └─backbone.module.encoder.backbone.layers.3.1._project_conv.weight     ├─18,816
+│    └─backbone.module.encoder.backbone.layers.3.1._bn2.weight              ├─56
+│    └─backbone.module.encoder.backbone.layers.3.1._bn2.bias                ├─56
+│    └─backbone.module.encoder.backbone.layers.3.2._expand_conv.weight      ├─18,816
+│    └─backbone.module.encoder.backbone.layers.3.2._bn0.weight              ├─336
+│    └─backbone.module.encoder.backbone.layers.3.2._bn0.bias                ├─336
+│    └─backbone.module.encoder.backbone.layers.3.2._depthwise_conv.weight   ├─8,400
+│    └─backbone.module.encoder.backbone.layers.3.2._bn1.weight              ├─336
+│    └─backbone.module.encoder.backbone.layers.3.2._bn1.bias                ├─336
+│    └─backbone.module.encoder.backbone.layers.3.2._se_reduce.weight        ├─4,704
+│    └─backbone.module.encoder.backbone.layers.3.2._se_reduce.bias          ├─14
+│    └─backbone.module.encoder.backbone.layers.3.2._se_expand.weight        ├─4,704
+│    └─backbone.module.encoder.backbone.layers.3.2._se_expand.bias          ├─336
+│    └─backbone.module.encoder.backbone.layers.3.2._project_conv.weight     ├─18,816
+│    └─backbone.module.encoder.backbone.layers.3.2._bn2.weight              ├─56
+│    └─backbone.module.encoder.backbone.layers.3.2._bn2.bias                ├─56
+│    └─backbone.module.encoder.backbone.layers.3.3._expand_conv.weight      ├─18,816
+│    └─backbone.module.encoder.backbone.layers.3.3._bn0.weight              ├─336
+│    └─backbone.module.encoder.backbone.layers.3.3._bn0.bias                ├─336
+│    └─backbone.module.encoder.backbone.layers.3.3._depthwise_conv.weight   ├─3,024
+│    └─backbone.module.encoder.backbone.layers.3.3._bn1.weight              ├─336
+│    └─backbone.module.encoder.backbone.layers.3.3._bn1.bias                ├─336
+│    └─backbone.module.encoder.backbone.layers.3.3._se_reduce.weight        ├─4,704
+│    └─backbone.module.encoder.backbone.layers.3.3._se_reduce.bias          ├─14
+│    └─backbone.module.encoder.backbone.layers.3.3._se_expand.weight        ├─4,704
+│    └─backbone.module.encoder.backbone.layers.3.3._se_expand.bias          ├─336
+│    └─backbone.module.encoder.backbone.layers.3.3._project_conv.weight     ├─37,632
+│    └─backbone.module.encoder.backbone.layers.3.3._bn2.weight              ├─112
+│    └─backbone.module.encoder.backbone.layers.3.3._bn2.bias                ├─112
+│    └─backbone.module.encoder.bev_embedding.learned_features               ├─80,000
+│    └─backbone.module.encoder.cross_views.0.feature_linear.0.weight        ├─32
+│    └─backbone.module.encoder.cross_views.0.feature_linear.0.bias          ├─32
+│    └─backbone.module.encoder.cross_views.0.feature_linear.2.weight        ├─4,096
+│    └─backbone.module.encoder.cross_views.0.feature_proj.0.weight          ├─32
+│    └─backbone.module.encoder.cross_views.0.feature_proj.0.bias            ├─32
+│    └─backbone.module.encoder.cross_views.0.feature_proj.2.weight          ├─4,096
+│    └─backbone.module.encoder.cross_views.0.bev_embed.weight               ├─256
+│    └─backbone.module.encoder.cross_views.0.bev_embed.bias                 ├─128
+│    └─backbone.module.encoder.cross_views.0.img_embed.weight               ├─512
+│    └─backbone.module.encoder.cross_views.0.cam_embed.weight               ├─512
+│    └─backbone.module.encoder.cross_views.0.cross_attend.to_q.0.weight     ├─128
+│    └─backbone.module.encoder.cross_views.0.cross_attend.to_q.0.bias       ├─128
+│    └─backbone.module.encoder.cross_views.0.cross_attend.to_q.1.weight     ├─16,384
+│    └─backbone.module.encoder.cross_views.0.cross_attend.to_q.1.bias       ├─128
+│    └─backbone.module.encoder.cross_views.0.cross_attend.to_k.0.weight     ├─128
+│    └─backbone.module.encoder.cross_views.0.cross_attend.to_k.0.bias       ├─128
+│    └─backbone.module.encoder.cross_views.0.cross_attend.to_k.1.weight     ├─16,384
+│    └─backbone.module.encoder.cross_views.0.cross_attend.to_k.1.bias       ├─128
+│    └─backbone.module.encoder.cross_views.0.cross_attend.to_v.0.weight     ├─128
+│    └─backbone.module.encoder.cross_views.0.cross_attend.to_v.0.bias       ├─128
+│    └─backbone.module.encoder.cross_views.0.cross_attend.to_v.1.weight     ├─16,384
+│    └─backbone.module.encoder.cross_views.0.cross_attend.to_v.1.bias       ├─128
+│    └─backbone.module.encoder.cross_views.0.cross_attend.proj.weight       ├─16,384
+│    └─backbone.module.encoder.cross_views.0.cross_attend.proj.bias         ├─128
+│    └─backbone.module.encoder.cross_views.0.cross_attend.prenorm.weight    ├─128
+│    └─backbone.module.encoder.cross_views.0.cross_attend.prenorm.bias      ├─128
+│    └─backbone.module.encoder.cross_views.0.cross_attend.mlp.0.weight      ├─32,768
+│    └─backbone.module.encoder.cross_views.0.cross_attend.mlp.0.bias        ├─256
+│    └─backbone.module.encoder.cross_views.0.cross_attend.mlp.2.weight      ├─32,768
+│    └─backbone.module.encoder.cross_views.0.cross_attend.mlp.2.bias        ├─128
+│    └─backbone.module.encoder.cross_views.0.cross_attend.postnorm.weight   ├─128
+│    └─backbone.module.encoder.cross_views.0.cross_attend.postnorm.bias     ├─128
+│    └─backbone.module.encoder.cross_views.1.feature_linear.0.weight        ├─112
+│    └─backbone.module.encoder.cross_views.1.feature_linear.0.bias          ├─112
+│    └─backbone.module.encoder.cross_views.1.feature_linear.2.weight        ├─14,336
+│    └─backbone.module.encoder.cross_views.1.feature_proj.0.weight          ├─112
+│    └─backbone.module.encoder.cross_views.1.feature_proj.0.bias            ├─112
+│    └─backbone.module.encoder.cross_views.1.feature_proj.2.weight          ├─14,336
+│    └─backbone.module.encoder.cross_views.1.bev_embed.weight               ├─256
+│    └─backbone.module.encoder.cross_views.1.bev_embed.bias                 ├─128
+│    └─backbone.module.encoder.cross_views.1.img_embed.weight               ├─512
+│    └─backbone.module.encoder.cross_views.1.cam_embed.weight               ├─512
+│    └─backbone.module.encoder.cross_views.1.cross_attend.to_q.0.weight     ├─128
+│    └─backbone.module.encoder.cross_views.1.cross_attend.to_q.0.bias       ├─128
+│    └─backbone.module.encoder.cross_views.1.cross_attend.to_q.1.weight     ├─16,384
+│    └─backbone.module.encoder.cross_views.1.cross_attend.to_q.1.bias       ├─128
+│    └─backbone.module.encoder.cross_views.1.cross_attend.to_k.0.weight     ├─128
+│    └─backbone.module.encoder.cross_views.1.cross_attend.to_k.0.bias       ├─128
+│    └─backbone.module.encoder.cross_views.1.cross_attend.to_k.1.weight     ├─16,384
+│    └─backbone.module.encoder.cross_views.1.cross_attend.to_k.1.bias       ├─128
+│    └─backbone.module.encoder.cross_views.1.cross_attend.to_v.0.weight     ├─128
+│    └─backbone.module.encoder.cross_views.1.cross_attend.to_v.0.bias       ├─128
+│    └─backbone.module.encoder.cross_views.1.cross_attend.to_v.1.weight     ├─16,384
+│    └─backbone.module.encoder.cross_views.1.cross_attend.to_v.1.bias       ├─128
+│    └─backbone.module.encoder.cross_views.1.cross_attend.proj.weight       ├─16,384
+│    └─backbone.module.encoder.cross_views.1.cross_attend.proj.bias         ├─128
+│    └─backbone.module.encoder.cross_views.1.cross_attend.prenorm.weight    ├─128
+│    └─backbone.module.encoder.cross_views.1.cross_attend.prenorm.bias      ├─128
+│    └─backbone.module.encoder.cross_views.1.cross_attend.mlp.0.weight      ├─32,768
+│    └─backbone.module.encoder.cross_views.1.cross_attend.mlp.0.bias        ├─256
+│    └─backbone.module.encoder.cross_views.1.cross_attend.mlp.2.weight      ├─32,768
+│    └─backbone.module.encoder.cross_views.1.cross_attend.mlp.2.bias        ├─128
+│    └─backbone.module.encoder.cross_views.1.cross_attend.postnorm.weight   ├─128
+│    └─backbone.module.encoder.cross_views.1.cross_attend.postnorm.bias     ├─128
+│    └─backbone.module.encoder.layers.0.0.conv1.weight                      ├─4,096
+│    └─backbone.module.encoder.layers.0.0.bn1.weight                        ├─32
+│    └─backbone.module.encoder.layers.0.0.bn1.bias                          ├─32
+│    └─backbone.module.encoder.layers.0.0.conv2.weight                      ├─9,216
+│    └─backbone.module.encoder.layers.0.0.bn2.weight                        ├─32
+│    └─backbone.module.encoder.layers.0.0.bn2.bias                          ├─32
+│    └─backbone.module.encoder.layers.0.0.conv3.weight                      ├─4,096
+│    └─backbone.module.encoder.layers.0.0.bn3.weight                        ├─128
+│    └─backbone.module.encoder.layers.0.0.bn3.bias                          ├─128
+│    └─backbone.module.encoder.layers.0.1.conv1.weight                      ├─4,096
+│    └─backbone.module.encoder.layers.0.1.bn1.weight                        ├─32
+│    └─backbone.module.encoder.layers.0.1.bn1.bias                          ├─32
+│    └─backbone.module.encoder.layers.0.1.conv2.weight                      ├─9,216
+│    └─backbone.module.encoder.layers.0.1.bn2.weight                        ├─32
+│    └─backbone.module.encoder.layers.0.1.bn2.bias                          ├─32
+│    └─backbone.module.encoder.layers.0.1.conv3.weight                      ├─4,096
+│    └─backbone.module.encoder.layers.0.1.bn3.weight                        ├─128
+│    └─backbone.module.encoder.layers.0.1.bn3.bias                          ├─128
+│    └─backbone.module.encoder.layers.1.0.conv1.weight                      ├─4,096
+│    └─backbone.module.encoder.layers.1.0.bn1.weight                        ├─32
+│    └─backbone.module.encoder.layers.1.0.bn1.bias                          ├─32
+│    └─backbone.module.encoder.layers.1.0.conv2.weight                      ├─9,216
+│    └─backbone.module.encoder.layers.1.0.bn2.weight                        ├─32
+│    └─backbone.module.encoder.layers.1.0.bn2.bias                          ├─32
+│    └─backbone.module.encoder.layers.1.0.conv3.weight                      ├─4,096
+│    └─backbone.module.encoder.layers.1.0.bn3.weight                        ├─128
+│    └─backbone.module.encoder.layers.1.0.bn3.bias                          ├─128
+│    └─backbone.module.encoder.layers.1.1.conv1.weight                      ├─4,096
+│    └─backbone.module.encoder.layers.1.1.bn1.weight                        ├─32
+│    └─backbone.module.encoder.layers.1.1.bn1.bias                          ├─32
+│    └─backbone.module.encoder.layers.1.1.conv2.weight                      ├─9,216
+│    └─backbone.module.encoder.layers.1.1.bn2.weight                        ├─32
+│    └─backbone.module.encoder.layers.1.1.bn2.bias                          ├─32
+│    └─backbone.module.encoder.layers.1.1.conv3.weight                      ├─4,096
+│    └─backbone.module.encoder.layers.1.1.bn3.weight                        ├─128
+│    └─backbone.module.encoder.layers.1.1.bn3.bias                          └─128
+│    └─DataParallel: 2-1                                                    --
+│    │    └─module.encoder.backbone.layers.0.0.weight                       ├─1,296
+│    │    └─module.encoder.backbone.layers.0.1.weight                       ├─48
+│    │    └─module.encoder.backbone.layers.0.1.bias                         ├─48
+│    │    └─module.encoder.backbone.layers.1.0._depthwise_conv.weight       ├─432
+│    │    └─module.encoder.backbone.layers.1.0._bn1.weight                  ├─48
+│    │    └─module.encoder.backbone.layers.1.0._bn1.bias                    ├─48
+│    │    └─module.encoder.backbone.layers.1.0._se_reduce.weight            ├─576
+│    │    └─module.encoder.backbone.layers.1.0._se_reduce.bias              ├─12
+│    │    └─module.encoder.backbone.layers.1.0._se_expand.weight            ├─576
+│    │    └─module.encoder.backbone.layers.1.0._se_expand.bias              ├─48
+│    │    └─module.encoder.backbone.layers.1.0._project_conv.weight         ├─1,152
+│    │    └─module.encoder.backbone.layers.1.0._bn2.weight                  ├─24
+│    │    └─module.encoder.backbone.layers.1.0._bn2.bias                    ├─24
+│    │    └─module.encoder.backbone.layers.1.1._depthwise_conv.weight       ├─216
+│    │    └─module.encoder.backbone.layers.1.1._bn1.weight                  ├─24
+│    │    └─module.encoder.backbone.layers.1.1._bn1.bias                    ├─24
+│    │    └─module.encoder.backbone.layers.1.1._se_reduce.weight            ├─144
+│    │    └─module.encoder.backbone.layers.1.1._se_reduce.bias              ├─6
+│    │    └─module.encoder.backbone.layers.1.1._se_expand.weight            ├─144
+│    │    └─module.encoder.backbone.layers.1.1._se_expand.bias              ├─24
+│    │    └─module.encoder.backbone.layers.1.1._project_conv.weight         ├─576
+│    │    └─module.encoder.backbone.layers.1.1._bn2.weight                  ├─24
+│    │    └─module.encoder.backbone.layers.1.1._bn2.bias                    ├─24
+│    │    └─module.encoder.backbone.layers.1.2._expand_conv.weight          ├─3,456
+│    │    └─module.encoder.backbone.layers.1.2._bn0.weight                  ├─144
+│    │    └─module.encoder.backbone.layers.1.2._bn0.bias                    ├─144
+│    │    └─module.encoder.backbone.layers.1.2._depthwise_conv.weight       ├─1,296
+│    │    └─module.encoder.backbone.layers.1.2._bn1.weight                  ├─144
+│    │    └─module.encoder.backbone.layers.1.2._bn1.bias                    ├─144
+│    │    └─module.encoder.backbone.layers.1.2._se_reduce.weight            ├─864
+│    │    └─module.encoder.backbone.layers.1.2._se_reduce.bias              ├─6
+│    │    └─module.encoder.backbone.layers.1.2._se_expand.weight            ├─864
+│    │    └─module.encoder.backbone.layers.1.2._se_expand.bias              ├─144
+│    │    └─module.encoder.backbone.layers.1.2._project_conv.weight         ├─4,608
+│    │    └─module.encoder.backbone.layers.1.2._bn2.weight                  ├─32
+│    │    └─module.encoder.backbone.layers.1.2._bn2.bias                    ├─32
+│    │    └─module.encoder.backbone.layers.2.0._expand_conv.weight          ├─6,144
+│    │    └─module.encoder.backbone.layers.2.0._bn0.weight                  ├─192
+│    │    └─module.encoder.backbone.layers.2.0._bn0.bias                    ├─192
+│    │    └─module.encoder.backbone.layers.2.0._depthwise_conv.weight       ├─1,728
+│    │    └─module.encoder.backbone.layers.2.0._bn1.weight                  ├─192
+│    │    └─module.encoder.backbone.layers.2.0._bn1.bias                    ├─192
+│    │    └─module.encoder.backbone.layers.2.0._se_reduce.weight            ├─1,536
+│    │    └─module.encoder.backbone.layers.2.0._se_reduce.bias              ├─8
+│    │    └─module.encoder.backbone.layers.2.0._se_expand.weight            ├─1,536
+│    │    └─module.encoder.backbone.layers.2.0._se_expand.bias              ├─192
+│    │    └─module.encoder.backbone.layers.2.0._project_conv.weight         ├─6,144
+│    │    └─module.encoder.backbone.layers.2.0._bn2.weight                  ├─32
+│    │    └─module.encoder.backbone.layers.2.0._bn2.bias                    ├─32
+│    │    └─module.encoder.backbone.layers.2.1._expand_conv.weight          ├─6,144
+│    │    └─module.encoder.backbone.layers.2.1._bn0.weight                  ├─192
+│    │    └─module.encoder.backbone.layers.2.1._bn0.bias                    ├─192
+│    │    └─module.encoder.backbone.layers.2.1._depthwise_conv.weight       ├─1,728
+│    │    └─module.encoder.backbone.layers.2.1._bn1.weight                  ├─192
+│    │    └─module.encoder.backbone.layers.2.1._bn1.bias                    ├─192
+│    │    └─module.encoder.backbone.layers.2.1._se_reduce.weight            ├─1,536
+│    │    └─module.encoder.backbone.layers.2.1._se_reduce.bias              ├─8
+│    │    └─module.encoder.backbone.layers.2.1._se_expand.weight            ├─1,536
+│    │    └─module.encoder.backbone.layers.2.1._se_expand.bias              ├─192
+│    │    └─module.encoder.backbone.layers.2.1._project_conv.weight         ├─6,144
+│    │    └─module.encoder.backbone.layers.2.1._bn2.weight                  ├─32
+│    │    └─module.encoder.backbone.layers.2.1._bn2.bias                    ├─32
+│    │    └─module.encoder.backbone.layers.2.2._expand_conv.weight          ├─6,144
+│    │    └─module.encoder.backbone.layers.2.2._bn0.weight                  ├─192
+│    │    └─module.encoder.backbone.layers.2.2._bn0.bias                    ├─192
+│    │    └─module.encoder.backbone.layers.2.2._depthwise_conv.weight       ├─1,728
+│    │    └─module.encoder.backbone.layers.2.2._bn1.weight                  ├─192
+│    │    └─module.encoder.backbone.layers.2.2._bn1.bias                    ├─192
+│    │    └─module.encoder.backbone.layers.2.2._se_reduce.weight            ├─1,536
+│    │    └─module.encoder.backbone.layers.2.2._se_reduce.bias              ├─8
+│    │    └─module.encoder.backbone.layers.2.2._se_expand.weight            ├─1,536
+│    │    └─module.encoder.backbone.layers.2.2._se_expand.bias              ├─192
+│    │    └─module.encoder.backbone.layers.2.2._project_conv.weight         ├─6,144
+│    │    └─module.encoder.backbone.layers.2.2._bn2.weight                  ├─32
+│    │    └─module.encoder.backbone.layers.2.2._bn2.bias                    ├─32
+│    │    └─module.encoder.backbone.layers.2.3._expand_conv.weight          ├─6,144
+│    │    └─module.encoder.backbone.layers.2.3._bn0.weight                  ├─192
+│    │    └─module.encoder.backbone.layers.2.3._bn0.bias                    ├─192
+│    │    └─module.encoder.backbone.layers.2.3._depthwise_conv.weight       ├─4,800
+│    │    └─module.encoder.backbone.layers.2.3._bn1.weight                  ├─192
+│    │    └─module.encoder.backbone.layers.2.3._bn1.bias                    ├─192
+│    │    └─module.encoder.backbone.layers.2.3._se_reduce.weight            ├─1,536
+│    │    └─module.encoder.backbone.layers.2.3._se_reduce.bias              ├─8
+│    │    └─module.encoder.backbone.layers.2.3._se_expand.weight            ├─1,536
+│    │    └─module.encoder.backbone.layers.2.3._se_expand.bias              ├─192
+│    │    └─module.encoder.backbone.layers.2.3._project_conv.weight         ├─10,752
+│    │    └─module.encoder.backbone.layers.2.3._bn2.weight                  ├─56
+│    │    └─module.encoder.backbone.layers.2.3._bn2.bias                    ├─56
+│    │    └─module.encoder.backbone.layers.3.0._expand_conv.weight          ├─18,816
+│    │    └─module.encoder.backbone.layers.3.0._bn0.weight                  ├─336
+│    │    └─module.encoder.backbone.layers.3.0._bn0.bias                    ├─336
+│    │    └─module.encoder.backbone.layers.3.0._depthwise_conv.weight       ├─8,400
+│    │    └─module.encoder.backbone.layers.3.0._bn1.weight                  ├─336
+│    │    └─module.encoder.backbone.layers.3.0._bn1.bias                    ├─336
+│    │    └─module.encoder.backbone.layers.3.0._se_reduce.weight            ├─4,704
+│    │    └─module.encoder.backbone.layers.3.0._se_reduce.bias              ├─14
+│    │    └─module.encoder.backbone.layers.3.0._se_expand.weight            ├─4,704
+│    │    └─module.encoder.backbone.layers.3.0._se_expand.bias              ├─336
+│    │    └─module.encoder.backbone.layers.3.0._project_conv.weight         ├─18,816
+│    │    └─module.encoder.backbone.layers.3.0._bn2.weight                  ├─56
+│    │    └─module.encoder.backbone.layers.3.0._bn2.bias                    ├─56
+│    │    └─module.encoder.backbone.layers.3.1._expand_conv.weight          ├─18,816
+│    │    └─module.encoder.backbone.layers.3.1._bn0.weight                  ├─336
+│    │    └─module.encoder.backbone.layers.3.1._bn0.bias                    ├─336
+│    │    └─module.encoder.backbone.layers.3.1._depthwise_conv.weight       ├─8,400
+│    │    └─module.encoder.backbone.layers.3.1._bn1.weight                  ├─336
+│    │    └─module.encoder.backbone.layers.3.1._bn1.bias                    ├─336
+│    │    └─module.encoder.backbone.layers.3.1._se_reduce.weight            ├─4,704
+│    │    └─module.encoder.backbone.layers.3.1._se_reduce.bias              ├─14
+│    │    └─module.encoder.backbone.layers.3.1._se_expand.weight            ├─4,704
+│    │    └─module.encoder.backbone.layers.3.1._se_expand.bias              ├─336
+│    │    └─module.encoder.backbone.layers.3.1._project_conv.weight         ├─18,816
+│    │    └─module.encoder.backbone.layers.3.1._bn2.weight                  ├─56
+│    │    └─module.encoder.backbone.layers.3.1._bn2.bias                    ├─56
+│    │    └─module.encoder.backbone.layers.3.2._expand_conv.weight          ├─18,816
+│    │    └─module.encoder.backbone.layers.3.2._bn0.weight                  ├─336
+│    │    └─module.encoder.backbone.layers.3.2._bn0.bias                    ├─336
+│    │    └─module.encoder.backbone.layers.3.2._depthwise_conv.weight       ├─8,400
+│    │    └─module.encoder.backbone.layers.3.2._bn1.weight                  ├─336
+│    │    └─module.encoder.backbone.layers.3.2._bn1.bias                    ├─336
+│    │    └─module.encoder.backbone.layers.3.2._se_reduce.weight            ├─4,704
+│    │    └─module.encoder.backbone.layers.3.2._se_reduce.bias              ├─14
+│    │    └─module.encoder.backbone.layers.3.2._se_expand.weight            ├─4,704
+│    │    └─module.encoder.backbone.layers.3.2._se_expand.bias              ├─336
+│    │    └─module.encoder.backbone.layers.3.2._project_conv.weight         ├─18,816
+│    │    └─module.encoder.backbone.layers.3.2._bn2.weight                  ├─56
+│    │    └─module.encoder.backbone.layers.3.2._bn2.bias                    ├─56
+│    │    └─module.encoder.backbone.layers.3.3._expand_conv.weight          ├─18,816
+│    │    └─module.encoder.backbone.layers.3.3._bn0.weight                  ├─336
+│    │    └─module.encoder.backbone.layers.3.3._bn0.bias                    ├─336
+│    │    └─module.encoder.backbone.layers.3.3._depthwise_conv.weight       ├─3,024
+│    │    └─module.encoder.backbone.layers.3.3._bn1.weight                  ├─336
+│    │    └─module.encoder.backbone.layers.3.3._bn1.bias                    ├─336
+│    │    └─module.encoder.backbone.layers.3.3._se_reduce.weight            ├─4,704
+│    │    └─module.encoder.backbone.layers.3.3._se_reduce.bias              ├─14
+│    │    └─module.encoder.backbone.layers.3.3._se_expand.weight            ├─4,704
+│    │    └─module.encoder.backbone.layers.3.3._se_expand.bias              ├─336
+│    │    └─module.encoder.backbone.layers.3.3._project_conv.weight         ├─37,632
+│    │    └─module.encoder.backbone.layers.3.3._bn2.weight                  ├─112
+│    │    └─module.encoder.backbone.layers.3.3._bn2.bias                    ├─112
+│    │    └─module.encoder.bev_embedding.learned_features                   ├─80,000
+│    │    └─module.encoder.cross_views.0.feature_linear.0.weight            ├─32
+│    │    └─module.encoder.cross_views.0.feature_linear.0.bias              ├─32
+│    │    └─module.encoder.cross_views.0.feature_linear.2.weight            ├─4,096
+│    │    └─module.encoder.cross_views.0.feature_proj.0.weight              ├─32
+│    │    └─module.encoder.cross_views.0.feature_proj.0.bias                ├─32
+│    │    └─module.encoder.cross_views.0.feature_proj.2.weight              ├─4,096
+│    │    └─module.encoder.cross_views.0.bev_embed.weight                   ├─256
+│    │    └─module.encoder.cross_views.0.bev_embed.bias                     ├─128
+│    │    └─module.encoder.cross_views.0.img_embed.weight                   ├─512
+│    │    └─module.encoder.cross_views.0.cam_embed.weight                   ├─512
+│    │    └─module.encoder.cross_views.0.cross_attend.to_q.0.weight         ├─128
+│    │    └─module.encoder.cross_views.0.cross_attend.to_q.0.bias           ├─128
+│    │    └─module.encoder.cross_views.0.cross_attend.to_q.1.weight         ├─16,384
+│    │    └─module.encoder.cross_views.0.cross_attend.to_q.1.bias           ├─128
+│    │    └─module.encoder.cross_views.0.cross_attend.to_k.0.weight         ├─128
+│    │    └─module.encoder.cross_views.0.cross_attend.to_k.0.bias           ├─128
+│    │    └─module.encoder.cross_views.0.cross_attend.to_k.1.weight         ├─16,384
+│    │    └─module.encoder.cross_views.0.cross_attend.to_k.1.bias           ├─128
+│    │    └─module.encoder.cross_views.0.cross_attend.to_v.0.weight         ├─128
+│    │    └─module.encoder.cross_views.0.cross_attend.to_v.0.bias           ├─128
+│    │    └─module.encoder.cross_views.0.cross_attend.to_v.1.weight         ├─16,384
+│    │    └─module.encoder.cross_views.0.cross_attend.to_v.1.bias           ├─128
+│    │    └─module.encoder.cross_views.0.cross_attend.proj.weight           ├─16,384
+│    │    └─module.encoder.cross_views.0.cross_attend.proj.bias             ├─128
+│    │    └─module.encoder.cross_views.0.cross_attend.prenorm.weight        ├─128
+│    │    └─module.encoder.cross_views.0.cross_attend.prenorm.bias          ├─128
+│    │    └─module.encoder.cross_views.0.cross_attend.mlp.0.weight          ├─32,768
+│    │    └─module.encoder.cross_views.0.cross_attend.mlp.0.bias            ├─256
+│    │    └─module.encoder.cross_views.0.cross_attend.mlp.2.weight          ├─32,768
+│    │    └─module.encoder.cross_views.0.cross_attend.mlp.2.bias            ├─128
+│    │    └─module.encoder.cross_views.0.cross_attend.postnorm.weight       ├─128
+│    │    └─module.encoder.cross_views.0.cross_attend.postnorm.bias         ├─128
+│    │    └─module.encoder.cross_views.1.feature_linear.0.weight            ├─112
+│    │    └─module.encoder.cross_views.1.feature_linear.0.bias              ├─112
+│    │    └─module.encoder.cross_views.1.feature_linear.2.weight            ├─14,336
+│    │    └─module.encoder.cross_views.1.feature_proj.0.weight              ├─112
+│    │    └─module.encoder.cross_views.1.feature_proj.0.bias                ├─112
+│    │    └─module.encoder.cross_views.1.feature_proj.2.weight              ├─14,336
+│    │    └─module.encoder.cross_views.1.bev_embed.weight                   ├─256
+│    │    └─module.encoder.cross_views.1.bev_embed.bias                     ├─128
+│    │    └─module.encoder.cross_views.1.img_embed.weight                   ├─512
+│    │    └─module.encoder.cross_views.1.cam_embed.weight                   ├─512
+│    │    └─module.encoder.cross_views.1.cross_attend.to_q.0.weight         ├─128
+│    │    └─module.encoder.cross_views.1.cross_attend.to_q.0.bias           ├─128
+│    │    └─module.encoder.cross_views.1.cross_attend.to_q.1.weight         ├─16,384
+│    │    └─module.encoder.cross_views.1.cross_attend.to_q.1.bias           ├─128
+│    │    └─module.encoder.cross_views.1.cross_attend.to_k.0.weight         ├─128
+│    │    └─module.encoder.cross_views.1.cross_attend.to_k.0.bias           ├─128
+│    │    └─module.encoder.cross_views.1.cross_attend.to_k.1.weight         ├─16,384
+│    │    └─module.encoder.cross_views.1.cross_attend.to_k.1.bias           ├─128
+│    │    └─module.encoder.cross_views.1.cross_attend.to_v.0.weight         ├─128
+│    │    └─module.encoder.cross_views.1.cross_attend.to_v.0.bias           ├─128
+│    │    └─module.encoder.cross_views.1.cross_attend.to_v.1.weight         ├─16,384
+│    │    └─module.encoder.cross_views.1.cross_attend.to_v.1.bias           ├─128
+│    │    └─module.encoder.cross_views.1.cross_attend.proj.weight           ├─16,384
+│    │    └─module.encoder.cross_views.1.cross_attend.proj.bias             ├─128
+│    │    └─module.encoder.cross_views.1.cross_attend.prenorm.weight        ├─128
+│    │    └─module.encoder.cross_views.1.cross_attend.prenorm.bias          ├─128
+│    │    └─module.encoder.cross_views.1.cross_attend.mlp.0.weight          ├─32,768
+│    │    └─module.encoder.cross_views.1.cross_attend.mlp.0.bias            ├─256
+│    │    └─module.encoder.cross_views.1.cross_attend.mlp.2.weight          ├─32,768
+│    │    └─module.encoder.cross_views.1.cross_attend.mlp.2.bias            ├─128
+│    │    └─module.encoder.cross_views.1.cross_attend.postnorm.weight       ├─128
+│    │    └─module.encoder.cross_views.1.cross_attend.postnorm.bias         ├─128
+│    │    └─module.encoder.layers.0.0.conv1.weight                          ├─4,096
+│    │    └─module.encoder.layers.0.0.bn1.weight                            ├─32
+│    │    └─module.encoder.layers.0.0.bn1.bias                              ├─32
+│    │    └─module.encoder.layers.0.0.conv2.weight                          ├─9,216
+│    │    └─module.encoder.layers.0.0.bn2.weight                            ├─32
+│    │    └─module.encoder.layers.0.0.bn2.bias                              ├─32
+│    │    └─module.encoder.layers.0.0.conv3.weight                          ├─4,096
+│    │    └─module.encoder.layers.0.0.bn3.weight                            ├─128
+│    │    └─module.encoder.layers.0.0.bn3.bias                              ├─128
+│    │    └─module.encoder.layers.0.1.conv1.weight                          ├─4,096
+│    │    └─module.encoder.layers.0.1.bn1.weight                            ├─32
+│    │    └─module.encoder.layers.0.1.bn1.bias                              ├─32
+│    │    └─module.encoder.layers.0.1.conv2.weight                          ├─9,216
+│    │    └─module.encoder.layers.0.1.bn2.weight                            ├─32
+│    │    └─module.encoder.layers.0.1.bn2.bias                              ├─32
+│    │    └─module.encoder.layers.0.1.conv3.weight                          ├─4,096
+│    │    └─module.encoder.layers.0.1.bn3.weight                            ├─128
+│    │    └─module.encoder.layers.0.1.bn3.bias                              ├─128
+│    │    └─module.encoder.layers.1.0.conv1.weight                          ├─4,096
+│    │    └─module.encoder.layers.1.0.bn1.weight                            ├─32
+│    │    └─module.encoder.layers.1.0.bn1.bias                              ├─32
+│    │    └─module.encoder.layers.1.0.conv2.weight                          ├─9,216
+│    │    └─module.encoder.layers.1.0.bn2.weight                            ├─32
+│    │    └─module.encoder.layers.1.0.bn2.bias                              ├─32
+│    │    └─module.encoder.layers.1.0.conv3.weight                          ├─4,096
+│    │    └─module.encoder.layers.1.0.bn3.weight                            ├─128
+│    │    └─module.encoder.layers.1.0.bn3.bias                              ├─128
+│    │    └─module.encoder.layers.1.1.conv1.weight                          ├─4,096
+│    │    └─module.encoder.layers.1.1.bn1.weight                            ├─32
+│    │    └─module.encoder.layers.1.1.bn1.bias                              ├─32
+│    │    └─module.encoder.layers.1.1.conv2.weight                          ├─9,216
+│    │    └─module.encoder.layers.1.1.bn2.weight                            ├─32
+│    │    └─module.encoder.layers.1.1.bn2.bias                              ├─32
+│    │    └─module.encoder.layers.1.1.conv3.weight                          ├─4,096
+│    │    └─module.encoder.layers.1.1.bn3.weight                            ├─128
+│    │    └─module.encoder.layers.1.1.bn3.bias                              └─128
+│    │    └─CrossViewTransformer: 3-1                                       798,080
+│    │    │    └─encoder.backbone.layers.0.0.weight                         ├─1,296
+│    │    │    └─encoder.backbone.layers.0.1.weight                         ├─48
+│    │    │    └─encoder.backbone.layers.0.1.bias                           ├─48
+│    │    │    └─encoder.backbone.layers.1.0._depthwise_conv.weight         ├─432
+│    │    │    └─encoder.backbone.layers.1.0._bn1.weight                    ├─48
+│    │    │    └─encoder.backbone.layers.1.0._bn1.bias                      ├─48
+│    │    │    └─encoder.backbone.layers.1.0._se_reduce.weight              ├─576
+│    │    │    └─encoder.backbone.layers.1.0._se_reduce.bias                ├─12
+│    │    │    └─encoder.backbone.layers.1.0._se_expand.weight              ├─576
+│    │    │    └─encoder.backbone.layers.1.0._se_expand.bias                ├─48
+│    │    │    └─encoder.backbone.layers.1.0._project_conv.weight           ├─1,152
+│    │    │    └─encoder.backbone.layers.1.0._bn2.weight                    ├─24
+│    │    │    └─encoder.backbone.layers.1.0._bn2.bias                      ├─24
+│    │    │    └─encoder.backbone.layers.1.1._depthwise_conv.weight         ├─216
+│    │    │    └─encoder.backbone.layers.1.1._bn1.weight                    ├─24
+│    │    │    └─encoder.backbone.layers.1.1._bn1.bias                      ├─24
+│    │    │    └─encoder.backbone.layers.1.1._se_reduce.weight              ├─144
+│    │    │    └─encoder.backbone.layers.1.1._se_reduce.bias                ├─6
+│    │    │    └─encoder.backbone.layers.1.1._se_expand.weight              ├─144
+│    │    │    └─encoder.backbone.layers.1.1._se_expand.bias                ├─24
+│    │    │    └─encoder.backbone.layers.1.1._project_conv.weight           ├─576
+│    │    │    └─encoder.backbone.layers.1.1._bn2.weight                    ├─24
+│    │    │    └─encoder.backbone.layers.1.1._bn2.bias                      ├─24
+│    │    │    └─encoder.backbone.layers.1.2._expand_conv.weight            ├─3,456
+│    │    │    └─encoder.backbone.layers.1.2._bn0.weight                    ├─144
+│    │    │    └─encoder.backbone.layers.1.2._bn0.bias                      ├─144
+│    │    │    └─encoder.backbone.layers.1.2._depthwise_conv.weight         ├─1,296
+│    │    │    └─encoder.backbone.layers.1.2._bn1.weight                    ├─144
+│    │    │    └─encoder.backbone.layers.1.2._bn1.bias                      ├─144
+│    │    │    └─encoder.backbone.layers.1.2._se_reduce.weight              ├─864
+│    │    │    └─encoder.backbone.layers.1.2._se_reduce.bias                ├─6
+│    │    │    └─encoder.backbone.layers.1.2._se_expand.weight              ├─864
+│    │    │    └─encoder.backbone.layers.1.2._se_expand.bias                ├─144
+│    │    │    └─encoder.backbone.layers.1.2._project_conv.weight           ├─4,608
+│    │    │    └─encoder.backbone.layers.1.2._bn2.weight                    ├─32
+│    │    │    └─encoder.backbone.layers.1.2._bn2.bias                      ├─32
+│    │    │    └─encoder.backbone.layers.2.0._expand_conv.weight            ├─6,144
+│    │    │    └─encoder.backbone.layers.2.0._bn0.weight                    ├─192
+│    │    │    └─encoder.backbone.layers.2.0._bn0.bias                      ├─192
+│    │    │    └─encoder.backbone.layers.2.0._depthwise_conv.weight         ├─1,728
+│    │    │    └─encoder.backbone.layers.2.0._bn1.weight                    ├─192
+│    │    │    └─encoder.backbone.layers.2.0._bn1.bias                      ├─192
+│    │    │    └─encoder.backbone.layers.2.0._se_reduce.weight              ├─1,536
+│    │    │    └─encoder.backbone.layers.2.0._se_reduce.bias                ├─8
+│    │    │    └─encoder.backbone.layers.2.0._se_expand.weight              ├─1,536
+│    │    │    └─encoder.backbone.layers.2.0._se_expand.bias                ├─192
+│    │    │    └─encoder.backbone.layers.2.0._project_conv.weight           ├─6,144
+│    │    │    └─encoder.backbone.layers.2.0._bn2.weight                    ├─32
+│    │    │    └─encoder.backbone.layers.2.0._bn2.bias                      ├─32
+│    │    │    └─encoder.backbone.layers.2.1._expand_conv.weight            ├─6,144
+│    │    │    └─encoder.backbone.layers.2.1._bn0.weight                    ├─192
+│    │    │    └─encoder.backbone.layers.2.1._bn0.bias                      ├─192
+│    │    │    └─encoder.backbone.layers.2.1._depthwise_conv.weight         ├─1,728
+│    │    │    └─encoder.backbone.layers.2.1._bn1.weight                    ├─192
+│    │    │    └─encoder.backbone.layers.2.1._bn1.bias                      ├─192
+│    │    │    └─encoder.backbone.layers.2.1._se_reduce.weight              ├─1,536
+│    │    │    └─encoder.backbone.layers.2.1._se_reduce.bias                ├─8
+│    │    │    └─encoder.backbone.layers.2.1._se_expand.weight              ├─1,536
+│    │    │    └─encoder.backbone.layers.2.1._se_expand.bias                ├─192
+│    │    │    └─encoder.backbone.layers.2.1._project_conv.weight           ├─6,144
+│    │    │    └─encoder.backbone.layers.2.1._bn2.weight                    ├─32
+│    │    │    └─encoder.backbone.layers.2.1._bn2.bias                      ├─32
+│    │    │    └─encoder.backbone.layers.2.2._expand_conv.weight            ├─6,144
+│    │    │    └─encoder.backbone.layers.2.2._bn0.weight                    ├─192
+│    │    │    └─encoder.backbone.layers.2.2._bn0.bias                      ├─192
+│    │    │    └─encoder.backbone.layers.2.2._depthwise_conv.weight         ├─1,728
+│    │    │    └─encoder.backbone.layers.2.2._bn1.weight                    ├─192
+│    │    │    └─encoder.backbone.layers.2.2._bn1.bias                      ├─192
+│    │    │    └─encoder.backbone.layers.2.2._se_reduce.weight              ├─1,536
+│    │    │    └─encoder.backbone.layers.2.2._se_reduce.bias                ├─8
+│    │    │    └─encoder.backbone.layers.2.2._se_expand.weight              ├─1,536
+│    │    │    └─encoder.backbone.layers.2.2._se_expand.bias                ├─192
+│    │    │    └─encoder.backbone.layers.2.2._project_conv.weight           ├─6,144
+│    │    │    └─encoder.backbone.layers.2.2._bn2.weight                    ├─32
+│    │    │    └─encoder.backbone.layers.2.2._bn2.bias                      ├─32
+│    │    │    └─encoder.backbone.layers.2.3._expand_conv.weight            ├─6,144
+│    │    │    └─encoder.backbone.layers.2.3._bn0.weight                    ├─192
+│    │    │    └─encoder.backbone.layers.2.3._bn0.bias                      ├─192
+│    │    │    └─encoder.backbone.layers.2.3._depthwise_conv.weight         ├─4,800
+│    │    │    └─encoder.backbone.layers.2.3._bn1.weight                    ├─192
+│    │    │    └─encoder.backbone.layers.2.3._bn1.bias                      ├─192
+│    │    │    └─encoder.backbone.layers.2.3._se_reduce.weight              ├─1,536
+│    │    │    └─encoder.backbone.layers.2.3._se_reduce.bias                ├─8
+│    │    │    └─encoder.backbone.layers.2.3._se_expand.weight              ├─1,536
+│    │    │    └─encoder.backbone.layers.2.3._se_expand.bias                ├─192
+│    │    │    └─encoder.backbone.layers.2.3._project_conv.weight           ├─10,752
+│    │    │    └─encoder.backbone.layers.2.3._bn2.weight                    ├─56
+│    │    │    └─encoder.backbone.layers.2.3._bn2.bias                      ├─56
+│    │    │    └─encoder.backbone.layers.3.0._expand_conv.weight            ├─18,816
+│    │    │    └─encoder.backbone.layers.3.0._bn0.weight                    ├─336
+│    │    │    └─encoder.backbone.layers.3.0._bn0.bias                      ├─336
+│    │    │    └─encoder.backbone.layers.3.0._depthwise_conv.weight         ├─8,400
+│    │    │    └─encoder.backbone.layers.3.0._bn1.weight                    ├─336
+│    │    │    └─encoder.backbone.layers.3.0._bn1.bias                      ├─336
+│    │    │    └─encoder.backbone.layers.3.0._se_reduce.weight              ├─4,704
+│    │    │    └─encoder.backbone.layers.3.0._se_reduce.bias                ├─14
+│    │    │    └─encoder.backbone.layers.3.0._se_expand.weight              ├─4,704
+│    │    │    └─encoder.backbone.layers.3.0._se_expand.bias                ├─336
+│    │    │    └─encoder.backbone.layers.3.0._project_conv.weight           ├─18,816
+│    │    │    └─encoder.backbone.layers.3.0._bn2.weight                    ├─56
+│    │    │    └─encoder.backbone.layers.3.0._bn2.bias                      ├─56
+│    │    │    └─encoder.backbone.layers.3.1._expand_conv.weight            ├─18,816
+│    │    │    └─encoder.backbone.layers.3.1._bn0.weight                    ├─336
+│    │    │    └─encoder.backbone.layers.3.1._bn0.bias                      ├─336
+│    │    │    └─encoder.backbone.layers.3.1._depthwise_conv.weight         ├─8,400
+│    │    │    └─encoder.backbone.layers.3.1._bn1.weight                    ├─336
+│    │    │    └─encoder.backbone.layers.3.1._bn1.bias                      ├─336
+│    │    │    └─encoder.backbone.layers.3.1._se_reduce.weight              ├─4,704
+│    │    │    └─encoder.backbone.layers.3.1._se_reduce.bias                ├─14
+│    │    │    └─encoder.backbone.layers.3.1._se_expand.weight              ├─4,704
+│    │    │    └─encoder.backbone.layers.3.1._se_expand.bias                ├─336
+│    │    │    └─encoder.backbone.layers.3.1._project_conv.weight           ├─18,816
+│    │    │    └─encoder.backbone.layers.3.1._bn2.weight                    ├─56
+│    │    │    └─encoder.backbone.layers.3.1._bn2.bias                      ├─56
+│    │    │    └─encoder.backbone.layers.3.2._expand_conv.weight            ├─18,816
+│    │    │    └─encoder.backbone.layers.3.2._bn0.weight                    ├─336
+│    │    │    └─encoder.backbone.layers.3.2._bn0.bias                      ├─336
+│    │    │    └─encoder.backbone.layers.3.2._depthwise_conv.weight         ├─8,400
+│    │    │    └─encoder.backbone.layers.3.2._bn1.weight                    ├─336
+│    │    │    └─encoder.backbone.layers.3.2._bn1.bias                      ├─336
+│    │    │    └─encoder.backbone.layers.3.2._se_reduce.weight              ├─4,704
+│    │    │    └─encoder.backbone.layers.3.2._se_reduce.bias                ├─14
+│    │    │    └─encoder.backbone.layers.3.2._se_expand.weight              ├─4,704
+│    │    │    └─encoder.backbone.layers.3.2._se_expand.bias                ├─336
+│    │    │    └─encoder.backbone.layers.3.2._project_conv.weight           ├─18,816
+│    │    │    └─encoder.backbone.layers.3.2._bn2.weight                    ├─56
+│    │    │    └─encoder.backbone.layers.3.2._bn2.bias                      ├─56
+│    │    │    └─encoder.backbone.layers.3.3._expand_conv.weight            ├─18,816
+│    │    │    └─encoder.backbone.layers.3.3._bn0.weight                    ├─336
+│    │    │    └─encoder.backbone.layers.3.3._bn0.bias                      ├─336
+│    │    │    └─encoder.backbone.layers.3.3._depthwise_conv.weight         ├─3,024
+│    │    │    └─encoder.backbone.layers.3.3._bn1.weight                    ├─336
+│    │    │    └─encoder.backbone.layers.3.3._bn1.bias                      ├─336
+│    │    │    └─encoder.backbone.layers.3.3._se_reduce.weight              ├─4,704
+│    │    │    └─encoder.backbone.layers.3.3._se_reduce.bias                ├─14
+│    │    │    └─encoder.backbone.layers.3.3._se_expand.weight              ├─4,704
+│    │    │    └─encoder.backbone.layers.3.3._se_expand.bias                ├─336
+│    │    │    └─encoder.backbone.layers.3.3._project_conv.weight           ├─37,632
+│    │    │    └─encoder.backbone.layers.3.3._bn2.weight                    ├─112
+│    │    │    └─encoder.backbone.layers.3.3._bn2.bias                      ├─112
+│    │    │    └─encoder.bev_embedding.learned_features                     ├─80,000
+│    │    │    └─encoder.cross_views.0.feature_linear.0.weight              ├─32
+│    │    │    └─encoder.cross_views.0.feature_linear.0.bias                ├─32
+│    │    │    └─encoder.cross_views.0.feature_linear.2.weight              ├─4,096
+│    │    │    └─encoder.cross_views.0.feature_proj.0.weight                ├─32
+│    │    │    └─encoder.cross_views.0.feature_proj.0.bias                  ├─32
+│    │    │    └─encoder.cross_views.0.feature_proj.2.weight                ├─4,096
+│    │    │    └─encoder.cross_views.0.bev_embed.weight                     ├─256
+│    │    │    └─encoder.cross_views.0.bev_embed.bias                       ├─128
+│    │    │    └─encoder.cross_views.0.img_embed.weight                     ├─512
+│    │    │    └─encoder.cross_views.0.cam_embed.weight                     ├─512
+│    │    │    └─encoder.cross_views.0.cross_attend.to_q.0.weight           ├─128
+│    │    │    └─encoder.cross_views.0.cross_attend.to_q.0.bias             ├─128
+│    │    │    └─encoder.cross_views.0.cross_attend.to_q.1.weight           ├─16,384
+│    │    │    └─encoder.cross_views.0.cross_attend.to_q.1.bias             ├─128
+│    │    │    └─encoder.cross_views.0.cross_attend.to_k.0.weight           ├─128
+│    │    │    └─encoder.cross_views.0.cross_attend.to_k.0.bias             ├─128
+│    │    │    └─encoder.cross_views.0.cross_attend.to_k.1.weight           ├─16,384
+│    │    │    └─encoder.cross_views.0.cross_attend.to_k.1.bias             ├─128
+│    │    │    └─encoder.cross_views.0.cross_attend.to_v.0.weight           ├─128
+│    │    │    └─encoder.cross_views.0.cross_attend.to_v.0.bias             ├─128
+│    │    │    └─encoder.cross_views.0.cross_attend.to_v.1.weight           ├─16,384
+│    │    │    └─encoder.cross_views.0.cross_attend.to_v.1.bias             ├─128
+│    │    │    └─encoder.cross_views.0.cross_attend.proj.weight             ├─16,384
+│    │    │    └─encoder.cross_views.0.cross_attend.proj.bias               ├─128
+│    │    │    └─encoder.cross_views.0.cross_attend.prenorm.weight          ├─128
+│    │    │    └─encoder.cross_views.0.cross_attend.prenorm.bias            ├─128
+│    │    │    └─encoder.cross_views.0.cross_attend.mlp.0.weight            ├─32,768
+│    │    │    └─encoder.cross_views.0.cross_attend.mlp.0.bias              ├─256
+│    │    │    └─encoder.cross_views.0.cross_attend.mlp.2.weight            ├─32,768
+│    │    │    └─encoder.cross_views.0.cross_attend.mlp.2.bias              ├─128
+│    │    │    └─encoder.cross_views.0.cross_attend.postnorm.weight         ├─128
+│    │    │    └─encoder.cross_views.0.cross_attend.postnorm.bias           ├─128
+│    │    │    └─encoder.cross_views.1.feature_linear.0.weight              ├─112
+│    │    │    └─encoder.cross_views.1.feature_linear.0.bias                ├─112
+│    │    │    └─encoder.cross_views.1.feature_linear.2.weight              ├─14,336
+│    │    │    └─encoder.cross_views.1.feature_proj.0.weight                ├─112
+│    │    │    └─encoder.cross_views.1.feature_proj.0.bias                  ├─112
+│    │    │    └─encoder.cross_views.1.feature_proj.2.weight                ├─14,336
+│    │    │    └─encoder.cross_views.1.bev_embed.weight                     ├─256
+│    │    │    └─encoder.cross_views.1.bev_embed.bias                       ├─128
+│    │    │    └─encoder.cross_views.1.img_embed.weight                     ├─512
+│    │    │    └─encoder.cross_views.1.cam_embed.weight                     ├─512
+│    │    │    └─encoder.cross_views.1.cross_attend.to_q.0.weight           ├─128
+│    │    │    └─encoder.cross_views.1.cross_attend.to_q.0.bias             ├─128
+│    │    │    └─encoder.cross_views.1.cross_attend.to_q.1.weight           ├─16,384
+│    │    │    └─encoder.cross_views.1.cross_attend.to_q.1.bias             ├─128
+│    │    │    └─encoder.cross_views.1.cross_attend.to_k.0.weight           ├─128
+│    │    │    └─encoder.cross_views.1.cross_attend.to_k.0.bias             ├─128
+│    │    │    └─encoder.cross_views.1.cross_attend.to_k.1.weight           ├─16,384
+│    │    │    └─encoder.cross_views.1.cross_attend.to_k.1.bias             ├─128
+│    │    │    └─encoder.cross_views.1.cross_attend.to_v.0.weight           ├─128
+│    │    │    └─encoder.cross_views.1.cross_attend.to_v.0.bias             ├─128
+│    │    │    └─encoder.cross_views.1.cross_attend.to_v.1.weight           ├─16,384
+│    │    │    └─encoder.cross_views.1.cross_attend.to_v.1.bias             ├─128
+│    │    │    └─encoder.cross_views.1.cross_attend.proj.weight             ├─16,384
+│    │    │    └─encoder.cross_views.1.cross_attend.proj.bias               ├─128
+│    │    │    └─encoder.cross_views.1.cross_attend.prenorm.weight          ├─128
+│    │    │    └─encoder.cross_views.1.cross_attend.prenorm.bias            ├─128
+│    │    │    └─encoder.cross_views.1.cross_attend.mlp.0.weight            ├─32,768
+│    │    │    └─encoder.cross_views.1.cross_attend.mlp.0.bias              ├─256
+│    │    │    └─encoder.cross_views.1.cross_attend.mlp.2.weight            ├─32,768
+│    │    │    └─encoder.cross_views.1.cross_attend.mlp.2.bias              ├─128
+│    │    │    └─encoder.cross_views.1.cross_attend.postnorm.weight         ├─128
+│    │    │    └─encoder.cross_views.1.cross_attend.postnorm.bias           ├─128
+│    │    │    └─encoder.layers.0.0.conv1.weight                            ├─4,096
+│    │    │    └─encoder.layers.0.0.bn1.weight                              ├─32
+│    │    │    └─encoder.layers.0.0.bn1.bias                                ├─32
+│    │    │    └─encoder.layers.0.0.conv2.weight                            ├─9,216
+│    │    │    └─encoder.layers.0.0.bn2.weight                              ├─32
+│    │    │    └─encoder.layers.0.0.bn2.bias                                ├─32
+│    │    │    └─encoder.layers.0.0.conv3.weight                            ├─4,096
+│    │    │    └─encoder.layers.0.0.bn3.weight                              ├─128
+│    │    │    └─encoder.layers.0.0.bn3.bias                                ├─128
+│    │    │    └─encoder.layers.0.1.conv1.weight                            ├─4,096
+│    │    │    └─encoder.layers.0.1.bn1.weight                              ├─32
+│    │    │    └─encoder.layers.0.1.bn1.bias                                ├─32
+│    │    │    └─encoder.layers.0.1.conv2.weight                            ├─9,216
+│    │    │    └─encoder.layers.0.1.bn2.weight                              ├─32
+│    │    │    └─encoder.layers.0.1.bn2.bias                                ├─32
+│    │    │    └─encoder.layers.0.1.conv3.weight                            ├─4,096
+│    │    │    └─encoder.layers.0.1.bn3.weight                              ├─128
+│    │    │    └─encoder.layers.0.1.bn3.bias                                ├─128
+│    │    │    └─encoder.layers.1.0.conv1.weight                            ├─4,096
+│    │    │    └─encoder.layers.1.0.bn1.weight                              ├─32
+│    │    │    └─encoder.layers.1.0.bn1.bias                                ├─32
+│    │    │    └─encoder.layers.1.0.conv2.weight                            ├─9,216
+│    │    │    └─encoder.layers.1.0.bn2.weight                              ├─32
+│    │    │    └─encoder.layers.1.0.bn2.bias                                ├─32
+│    │    │    └─encoder.layers.1.0.conv3.weight                            ├─4,096
+│    │    │    └─encoder.layers.1.0.bn3.weight                              ├─128
+│    │    │    └─encoder.layers.1.0.bn3.bias                                ├─128
+│    │    │    └─encoder.layers.1.1.conv1.weight                            ├─4,096
+│    │    │    └─encoder.layers.1.1.bn1.weight                              ├─32
+│    │    │    └─encoder.layers.1.1.bn1.bias                                ├─32
+│    │    │    └─encoder.layers.1.1.conv2.weight                            ├─9,216
+│    │    │    └─encoder.layers.1.1.bn2.weight                              ├─32
+│    │    │    └─encoder.layers.1.1.bn2.bias                                ├─32
+│    │    │    └─encoder.layers.1.1.conv3.weight                            ├─4,096
+│    │    │    └─encoder.layers.1.1.bn3.weight                              ├─128
+│    │    │    └─encoder.layers.1.1.bn3.bias                                └─128
+├─CenterHead: 1-2                                                           --
+│    └─shared_conv.0.weight                                                 ├─73,728
+│    └─shared_conv.0.bias                                                   ├─64
+│    └─shared_conv.1.weight                                                 ├─64
+│    └─shared_conv.1.bias                                                   ├─64
+│    └─tasks.0.reg.0.weight                                                 ├─36,864
+│    └─tasks.0.reg.0.bias                                                   ├─64
+│    └─tasks.0.reg.1.weight                                                 ├─64
+│    └─tasks.0.reg.1.bias                                                   ├─64
+│    └─tasks.0.reg.3.weight                                                 ├─1,152
+│    └─tasks.0.reg.3.bias                                                   ├─2
+│    └─tasks.0.height.0.weight                                              ├─36,864
+│    └─tasks.0.height.0.bias                                                ├─64
+│    └─tasks.0.height.1.weight                                              ├─64
+│    └─tasks.0.height.1.bias                                                ├─64
+│    └─tasks.0.height.3.weight                                              ├─576
+│    └─tasks.0.height.3.bias                                                ├─1
+│    └─tasks.0.dim.0.weight                                                 ├─36,864
+│    └─tasks.0.dim.0.bias                                                   ├─64
+│    └─tasks.0.dim.1.weight                                                 ├─64
+│    └─tasks.0.dim.1.bias                                                   ├─64
+│    └─tasks.0.dim.3.weight                                                 ├─1,728
+│    └─tasks.0.dim.3.bias                                                   ├─3
+│    └─tasks.0.rot.0.weight                                                 ├─36,864
+│    └─tasks.0.rot.0.bias                                                   ├─64
+│    └─tasks.0.rot.1.weight                                                 ├─64
+│    └─tasks.0.rot.1.bias                                                   ├─64
+│    └─tasks.0.rot.3.weight                                                 ├─1,152
+│    └─tasks.0.rot.3.bias                                                   ├─2
+│    └─tasks.0.vel.0.weight                                                 ├─36,864
+│    └─tasks.0.vel.0.bias                                                   ├─64
+│    └─tasks.0.vel.1.weight                                                 ├─64
+│    └─tasks.0.vel.1.bias                                                   ├─64
+│    └─tasks.0.vel.3.weight                                                 ├─1,152
+│    └─tasks.0.vel.3.bias                                                   ├─2
+│    └─tasks.0.hm.0.weight                                                  ├─36,864
+│    └─tasks.0.hm.0.bias                                                    ├─64
+│    └─tasks.0.hm.1.weight                                                  ├─64
+│    └─tasks.0.hm.1.bias                                                    ├─64
+│    └─tasks.0.hm.3.weight                                                  ├─576
+│    └─tasks.0.hm.3.bias                                                    ├─1
+│    └─tasks.1.reg.0.weight                                                 ├─36,864
+│    └─tasks.1.reg.0.bias                                                   ├─64
+│    └─tasks.1.reg.1.weight                                                 ├─64
+│    └─tasks.1.reg.1.bias                                                   ├─64
+│    └─tasks.1.reg.3.weight                                                 ├─1,152
+│    └─tasks.1.reg.3.bias                                                   ├─2
+│    └─tasks.1.height.0.weight                                              ├─36,864
+│    └─tasks.1.height.0.bias                                                ├─64
+│    └─tasks.1.height.1.weight                                              ├─64
+│    └─tasks.1.height.1.bias                                                ├─64
+│    └─tasks.1.height.3.weight                                              ├─576
+│    └─tasks.1.height.3.bias                                                ├─1
+│    └─tasks.1.dim.0.weight                                                 ├─36,864
+│    └─tasks.1.dim.0.bias                                                   ├─64
+│    └─tasks.1.dim.1.weight                                                 ├─64
+│    └─tasks.1.dim.1.bias                                                   ├─64
+│    └─tasks.1.dim.3.weight                                                 ├─1,728
+│    └─tasks.1.dim.3.bias                                                   ├─3
+│    └─tasks.1.rot.0.weight                                                 ├─36,864
+│    └─tasks.1.rot.0.bias                                                   ├─64
+│    └─tasks.1.rot.1.weight                                                 ├─64
+│    └─tasks.1.rot.1.bias                                                   ├─64
+│    └─tasks.1.rot.3.weight                                                 ├─1,152
+│    └─tasks.1.rot.3.bias                                                   ├─2
+│    └─tasks.1.vel.0.weight                                                 ├─36,864
+│    └─tasks.1.vel.0.bias                                                   ├─64
+│    └─tasks.1.vel.1.weight                                                 ├─64
+│    └─tasks.1.vel.1.bias                                                   ├─64
+│    └─tasks.1.vel.3.weight                                                 ├─1,152
+│    └─tasks.1.vel.3.bias                                                   ├─2
+│    └─tasks.1.hm.0.weight                                                  ├─36,864
+│    └─tasks.1.hm.0.bias                                                    ├─64
+│    └─tasks.1.hm.1.weight                                                  ├─64
+│    └─tasks.1.hm.1.bias                                                    ├─64
+│    └─tasks.1.hm.3.weight                                                  ├─1,152
+│    └─tasks.1.hm.3.bias                                                    ├─2
+│    └─tasks.2.reg.0.weight                                                 ├─36,864
+│    └─tasks.2.reg.0.bias                                                   ├─64
+│    └─tasks.2.reg.1.weight                                                 ├─64
+│    └─tasks.2.reg.1.bias                                                   ├─64
+│    └─tasks.2.reg.3.weight                                                 ├─1,152
+│    └─tasks.2.reg.3.bias                                                   ├─2
+│    └─tasks.2.height.0.weight                                              ├─36,864
+│    └─tasks.2.height.0.bias                                                ├─64
+│    └─tasks.2.height.1.weight                                              ├─64
+│    └─tasks.2.height.1.bias                                                ├─64
+│    └─tasks.2.height.3.weight                                              ├─576
+│    └─tasks.2.height.3.bias                                                ├─1
+│    └─tasks.2.dim.0.weight                                                 ├─36,864
+│    └─tasks.2.dim.0.bias                                                   ├─64
+│    └─tasks.2.dim.1.weight                                                 ├─64
+│    └─tasks.2.dim.1.bias                                                   ├─64
+│    └─tasks.2.dim.3.weight                                                 ├─1,728
+│    └─tasks.2.dim.3.bias                                                   ├─3
+│    └─tasks.2.rot.0.weight                                                 ├─36,864
+│    └─tasks.2.rot.0.bias                                                   ├─64
+│    └─tasks.2.rot.1.weight                                                 ├─64
+│    └─tasks.2.rot.1.bias                                                   ├─64
+│    └─tasks.2.rot.3.weight                                                 ├─1,152
+│    └─tasks.2.rot.3.bias                                                   ├─2
+│    └─tasks.2.vel.0.weight                                                 ├─36,864
+│    └─tasks.2.vel.0.bias                                                   ├─64
+│    └─tasks.2.vel.1.weight                                                 ├─64
+│    └─tasks.2.vel.1.bias                                                   ├─64
+│    └─tasks.2.vel.3.weight                                                 ├─1,152
+│    └─tasks.2.vel.3.bias                                                   ├─2
+│    └─tasks.2.hm.0.weight                                                  ├─36,864
+│    └─tasks.2.hm.0.bias                                                    ├─64
+│    └─tasks.2.hm.1.weight                                                  ├─64
+│    └─tasks.2.hm.1.bias                                                    ├─64
+│    └─tasks.2.hm.3.weight                                                  ├─1,152
+│    └─tasks.2.hm.3.bias                                                    ├─2
+│    └─tasks.3.reg.0.weight                                                 ├─36,864
+│    └─tasks.3.reg.0.bias                                                   ├─64
+│    └─tasks.3.reg.1.weight                                                 ├─64
+│    └─tasks.3.reg.1.bias                                                   ├─64
+│    └─tasks.3.reg.3.weight                                                 ├─1,152
+│    └─tasks.3.reg.3.bias                                                   ├─2
+│    └─tasks.3.height.0.weight                                              ├─36,864
+│    └─tasks.3.height.0.bias                                                ├─64
+│    └─tasks.3.height.1.weight                                              ├─64
+│    └─tasks.3.height.1.bias                                                ├─64
+│    └─tasks.3.height.3.weight                                              ├─576
+│    └─tasks.3.height.3.bias                                                ├─1
+│    └─tasks.3.dim.0.weight                                                 ├─36,864
+│    └─tasks.3.dim.0.bias                                                   ├─64
+│    └─tasks.3.dim.1.weight                                                 ├─64
+│    └─tasks.3.dim.1.bias                                                   ├─64
+│    └─tasks.3.dim.3.weight                                                 ├─1,728
+│    └─tasks.3.dim.3.bias                                                   ├─3
+│    └─tasks.3.rot.0.weight                                                 ├─36,864
+│    └─tasks.3.rot.0.bias                                                   ├─64
+│    └─tasks.3.rot.1.weight                                                 ├─64
+│    └─tasks.3.rot.1.bias                                                   ├─64
+│    └─tasks.3.rot.3.weight                                                 ├─1,152
+│    └─tasks.3.rot.3.bias                                                   ├─2
+│    └─tasks.3.vel.0.weight                                                 ├─36,864
+│    └─tasks.3.vel.0.bias                                                   ├─64
+│    └─tasks.3.vel.1.weight                                                 ├─64
+│    └─tasks.3.vel.1.bias                                                   ├─64
+│    └─tasks.3.vel.3.weight                                                 ├─1,152
+│    └─tasks.3.vel.3.bias                                                   ├─2
+│    └─tasks.3.hm.0.weight                                                  ├─36,864
+│    └─tasks.3.hm.0.bias                                                    ├─64
+│    └─tasks.3.hm.1.weight                                                  ├─64
+│    └─tasks.3.hm.1.bias                                                    ├─64
+│    └─tasks.3.hm.3.weight                                                  ├─576
+│    └─tasks.3.hm.3.bias                                                    ├─1
+│    └─tasks.4.reg.0.weight                                                 ├─36,864
+│    └─tasks.4.reg.0.bias                                                   ├─64
+│    └─tasks.4.reg.1.weight                                                 ├─64
+│    └─tasks.4.reg.1.bias                                                   ├─64
+│    └─tasks.4.reg.3.weight                                                 ├─1,152
+│    └─tasks.4.reg.3.bias                                                   ├─2
+│    └─tasks.4.height.0.weight                                              ├─36,864
+│    └─tasks.4.height.0.bias                                                ├─64
+│    └─tasks.4.height.1.weight                                              ├─64
+│    └─tasks.4.height.1.bias                                                ├─64
+│    └─tasks.4.height.3.weight                                              ├─576
+│    └─tasks.4.height.3.bias                                                ├─1
+│    └─tasks.4.dim.0.weight                                                 ├─36,864
+│    └─tasks.4.dim.0.bias                                                   ├─64
+│    └─tasks.4.dim.1.weight                                                 ├─64
+│    └─tasks.4.dim.1.bias                                                   ├─64
+│    └─tasks.4.dim.3.weight                                                 ├─1,728
+│    └─tasks.4.dim.3.bias                                                   ├─3
+│    └─tasks.4.rot.0.weight                                                 ├─36,864
+│    └─tasks.4.rot.0.bias                                                   ├─64
+│    └─tasks.4.rot.1.weight                                                 ├─64
+│    └─tasks.4.rot.1.bias                                                   ├─64
+│    └─tasks.4.rot.3.weight                                                 ├─1,152
+│    └─tasks.4.rot.3.bias                                                   ├─2
+│    └─tasks.4.vel.0.weight                                                 ├─36,864
+│    └─tasks.4.vel.0.bias                                                   ├─64
+│    └─tasks.4.vel.1.weight                                                 ├─64
+│    └─tasks.4.vel.1.bias                                                   ├─64
+│    └─tasks.4.vel.3.weight                                                 ├─1,152
+│    └─tasks.4.vel.3.bias                                                   ├─2
+│    └─tasks.4.hm.0.weight                                                  ├─36,864
+│    └─tasks.4.hm.0.bias                                                    ├─64
+│    └─tasks.4.hm.1.weight                                                  ├─64
+│    └─tasks.4.hm.1.bias                                                    ├─64
+│    └─tasks.4.hm.3.weight                                                  ├─1,152
+│    └─tasks.4.hm.3.bias                                                    ├─2
+│    └─tasks.5.reg.0.weight                                                 ├─36,864
+│    └─tasks.5.reg.0.bias                                                   ├─64
+│    └─tasks.5.reg.1.weight                                                 ├─64
+│    └─tasks.5.reg.1.bias                                                   ├─64
+│    └─tasks.5.reg.3.weight                                                 ├─1,152
+│    └─tasks.5.reg.3.bias                                                   ├─2
+│    └─tasks.5.height.0.weight                                              ├─36,864
+│    └─tasks.5.height.0.bias                                                ├─64
+│    └─tasks.5.height.1.weight                                              ├─64
+│    └─tasks.5.height.1.bias                                                ├─64
+│    └─tasks.5.height.3.weight                                              ├─576
+│    └─tasks.5.height.3.bias                                                ├─1
+│    └─tasks.5.dim.0.weight                                                 ├─36,864
+│    └─tasks.5.dim.0.bias                                                   ├─64
+│    └─tasks.5.dim.1.weight                                                 ├─64
+│    └─tasks.5.dim.1.bias                                                   ├─64
+│    └─tasks.5.dim.3.weight                                                 ├─1,728
+│    └─tasks.5.dim.3.bias                                                   ├─3
+│    └─tasks.5.rot.0.weight                                                 ├─36,864
+│    └─tasks.5.rot.0.bias                                                   ├─64
+│    └─tasks.5.rot.1.weight                                                 ├─64
+│    └─tasks.5.rot.1.bias                                                   ├─64
+│    └─tasks.5.rot.3.weight                                                 ├─1,152
+│    └─tasks.5.rot.3.bias                                                   ├─2
+│    └─tasks.5.vel.0.weight                                                 ├─36,864
+│    └─tasks.5.vel.0.bias                                                   ├─64
+│    └─tasks.5.vel.1.weight                                                 ├─64
+│    └─tasks.5.vel.1.bias                                                   ├─64
+│    └─tasks.5.vel.3.weight                                                 ├─1,152
+│    └─tasks.5.vel.3.bias                                                   ├─2
+│    └─tasks.5.hm.0.weight                                                  ├─36,864
+│    └─tasks.5.hm.0.bias                                                    ├─64
+│    └─tasks.5.hm.1.weight                                                  ├─64
+│    └─tasks.5.hm.1.bias                                                    ├─64
+│    └─tasks.5.hm.3.weight                                                  ├─1,152
+│    └─tasks.5.hm.3.bias                                                    └─2
+│    └─FastFocalLoss: 2-2                                                   --
+│    └─RegLoss: 2-3                                                         --
+│    └─Sequential: 2-4                                                      --
+│    │    └─0.weight                                                        ├─73,728
+│    │    └─0.bias                                                          ├─64
+│    │    └─1.weight                                                        ├─64
+│    │    └─1.bias                                                          └─64
+│    │    └─Conv2d: 3-2                                                     73,792
+│    │    │    └─weight                                                     ├─73,728
+│    │    │    └─bias                                                       └─64
+│    │    └─BatchNorm2d: 3-3                                                128
+│    │    │    └─weight                                                     ├─64
+│    │    │    └─bias                                                       └─64
+│    │    └─ReLU: 3-4                                                       --
+│    └─ModuleList: 2-5                                                      --
+│    │    └─0.reg.0.weight                                                  ├─36,864
+│    │    └─0.reg.0.bias                                                    ├─64
+│    │    └─0.reg.1.weight                                                  ├─64
+│    │    └─0.reg.1.bias                                                    ├─64
+│    │    └─0.reg.3.weight                                                  ├─1,152
+│    │    └─0.reg.3.bias                                                    ├─2
+│    │    └─0.height.0.weight                                               ├─36,864
+│    │    └─0.height.0.bias                                                 ├─64
+│    │    └─0.height.1.weight                                               ├─64
+│    │    └─0.height.1.bias                                                 ├─64
+│    │    └─0.height.3.weight                                               ├─576
+│    │    └─0.height.3.bias                                                 ├─1
+│    │    └─0.dim.0.weight                                                  ├─36,864
+│    │    └─0.dim.0.bias                                                    ├─64
+│    │    └─0.dim.1.weight                                                  ├─64
+│    │    └─0.dim.1.bias                                                    ├─64
+│    │    └─0.dim.3.weight                                                  ├─1,728
+│    │    └─0.dim.3.bias                                                    ├─3
+│    │    └─0.rot.0.weight                                                  ├─36,864
+│    │    └─0.rot.0.bias                                                    ├─64
+│    │    └─0.rot.1.weight                                                  ├─64
+│    │    └─0.rot.1.bias                                                    ├─64
+│    │    └─0.rot.3.weight                                                  ├─1,152
+│    │    └─0.rot.3.bias                                                    ├─2
+│    │    └─0.vel.0.weight                                                  ├─36,864
+│    │    └─0.vel.0.bias                                                    ├─64
+│    │    └─0.vel.1.weight                                                  ├─64
+│    │    └─0.vel.1.bias                                                    ├─64
+│    │    └─0.vel.3.weight                                                  ├─1,152
+│    │    └─0.vel.3.bias                                                    ├─2
+│    │    └─0.hm.0.weight                                                   ├─36,864
+│    │    └─0.hm.0.bias                                                     ├─64
+│    │    └─0.hm.1.weight                                                   ├─64
+│    │    └─0.hm.1.bias                                                     ├─64
+│    │    └─0.hm.3.weight                                                   ├─576
+│    │    └─0.hm.3.bias                                                     ├─1
+│    │    └─1.reg.0.weight                                                  ├─36,864
+│    │    └─1.reg.0.bias                                                    ├─64
+│    │    └─1.reg.1.weight                                                  ├─64
+│    │    └─1.reg.1.bias                                                    ├─64
+│    │    └─1.reg.3.weight                                                  ├─1,152
+│    │    └─1.reg.3.bias                                                    ├─2
+│    │    └─1.height.0.weight                                               ├─36,864
+│    │    └─1.height.0.bias                                                 ├─64
+│    │    └─1.height.1.weight                                               ├─64
+│    │    └─1.height.1.bias                                                 ├─64
+│    │    └─1.height.3.weight                                               ├─576
+│    │    └─1.height.3.bias                                                 ├─1
+│    │    └─1.dim.0.weight                                                  ├─36,864
+│    │    └─1.dim.0.bias                                                    ├─64
+│    │    └─1.dim.1.weight                                                  ├─64
+│    │    └─1.dim.1.bias                                                    ├─64
+│    │    └─1.dim.3.weight                                                  ├─1,728
+│    │    └─1.dim.3.bias                                                    ├─3
+│    │    └─1.rot.0.weight                                                  ├─36,864
+│    │    └─1.rot.0.bias                                                    ├─64
+│    │    └─1.rot.1.weight                                                  ├─64
+│    │    └─1.rot.1.bias                                                    ├─64
+│    │    └─1.rot.3.weight                                                  ├─1,152
+│    │    └─1.rot.3.bias                                                    ├─2
+│    │    └─1.vel.0.weight                                                  ├─36,864
+│    │    └─1.vel.0.bias                                                    ├─64
+│    │    └─1.vel.1.weight                                                  ├─64
+│    │    └─1.vel.1.bias                                                    ├─64
+│    │    └─1.vel.3.weight                                                  ├─1,152
+│    │    └─1.vel.3.bias                                                    ├─2
+│    │    └─1.hm.0.weight                                                   ├─36,864
+│    │    └─1.hm.0.bias                                                     ├─64
+│    │    └─1.hm.1.weight                                                   ├─64
+│    │    └─1.hm.1.bias                                                     ├─64
+│    │    └─1.hm.3.weight                                                   ├─1,152
+│    │    └─1.hm.3.bias                                                     ├─2
+│    │    └─2.reg.0.weight                                                  ├─36,864
+│    │    └─2.reg.0.bias                                                    ├─64
+│    │    └─2.reg.1.weight                                                  ├─64
+│    │    └─2.reg.1.bias                                                    ├─64
+│    │    └─2.reg.3.weight                                                  ├─1,152
+│    │    └─2.reg.3.bias                                                    ├─2
+│    │    └─2.height.0.weight                                               ├─36,864
+│    │    └─2.height.0.bias                                                 ├─64
+│    │    └─2.height.1.weight                                               ├─64
+│    │    └─2.height.1.bias                                                 ├─64
+│    │    └─2.height.3.weight                                               ├─576
+│    │    └─2.height.3.bias                                                 ├─1
+│    │    └─2.dim.0.weight                                                  ├─36,864
+│    │    └─2.dim.0.bias                                                    ├─64
+│    │    └─2.dim.1.weight                                                  ├─64
+│    │    └─2.dim.1.bias                                                    ├─64
+│    │    └─2.dim.3.weight                                                  ├─1,728
+│    │    └─2.dim.3.bias                                                    ├─3
+│    │    └─2.rot.0.weight                                                  ├─36,864
+│    │    └─2.rot.0.bias                                                    ├─64
+│    │    └─2.rot.1.weight                                                  ├─64
+│    │    └─2.rot.1.bias                                                    ├─64
+│    │    └─2.rot.3.weight                                                  ├─1,152
+│    │    └─2.rot.3.bias                                                    ├─2
+│    │    └─2.vel.0.weight                                                  ├─36,864
+│    │    └─2.vel.0.bias                                                    ├─64
+│    │    └─2.vel.1.weight                                                  ├─64
+│    │    └─2.vel.1.bias                                                    ├─64
+│    │    └─2.vel.3.weight                                                  ├─1,152
+│    │    └─2.vel.3.bias                                                    ├─2
+│    │    └─2.hm.0.weight                                                   ├─36,864
+│    │    └─2.hm.0.bias                                                     ├─64
+│    │    └─2.hm.1.weight                                                   ├─64
+│    │    └─2.hm.1.bias                                                     ├─64
+│    │    └─2.hm.3.weight                                                   ├─1,152
+│    │    └─2.hm.3.bias                                                     ├─2
+│    │    └─3.reg.0.weight                                                  ├─36,864
+│    │    └─3.reg.0.bias                                                    ├─64
+│    │    └─3.reg.1.weight                                                  ├─64
+│    │    └─3.reg.1.bias                                                    ├─64
+│    │    └─3.reg.3.weight                                                  ├─1,152
+│    │    └─3.reg.3.bias                                                    ├─2
+│    │    └─3.height.0.weight                                               ├─36,864
+│    │    └─3.height.0.bias                                                 ├─64
+│    │    └─3.height.1.weight                                               ├─64
+│    │    └─3.height.1.bias                                                 ├─64
+│    │    └─3.height.3.weight                                               ├─576
+│    │    └─3.height.3.bias                                                 ├─1
+│    │    └─3.dim.0.weight                                                  ├─36,864
+│    │    └─3.dim.0.bias                                                    ├─64
+│    │    └─3.dim.1.weight                                                  ├─64
+│    │    └─3.dim.1.bias                                                    ├─64
+│    │    └─3.dim.3.weight                                                  ├─1,728
+│    │    └─3.dim.3.bias                                                    ├─3
+│    │    └─3.rot.0.weight                                                  ├─36,864
+│    │    └─3.rot.0.bias                                                    ├─64
+│    │    └─3.rot.1.weight                                                  ├─64
+│    │    └─3.rot.1.bias                                                    ├─64
+│    │    └─3.rot.3.weight                                                  ├─1,152
+│    │    └─3.rot.3.bias                                                    ├─2
+│    │    └─3.vel.0.weight                                                  ├─36,864
+│    │    └─3.vel.0.bias                                                    ├─64
+│    │    └─3.vel.1.weight                                                  ├─64
+│    │    └─3.vel.1.bias                                                    ├─64
+│    │    └─3.vel.3.weight                                                  ├─1,152
+│    │    └─3.vel.3.bias                                                    ├─2
+│    │    └─3.hm.0.weight                                                   ├─36,864
+│    │    └─3.hm.0.bias                                                     ├─64
+│    │    └─3.hm.1.weight                                                   ├─64
+│    │    └─3.hm.1.bias                                                     ├─64
+│    │    └─3.hm.3.weight                                                   ├─576
+│    │    └─3.hm.3.bias                                                     ├─1
+│    │    └─4.reg.0.weight                                                  ├─36,864
+│    │    └─4.reg.0.bias                                                    ├─64
+│    │    └─4.reg.1.weight                                                  ├─64
+│    │    └─4.reg.1.bias                                                    ├─64
+│    │    └─4.reg.3.weight                                                  ├─1,152
+│    │    └─4.reg.3.bias                                                    ├─2
+│    │    └─4.height.0.weight                                               ├─36,864
+│    │    └─4.height.0.bias                                                 ├─64
+│    │    └─4.height.1.weight                                               ├─64
+│    │    └─4.height.1.bias                                                 ├─64
+│    │    └─4.height.3.weight                                               ├─576
+│    │    └─4.height.3.bias                                                 ├─1
+│    │    └─4.dim.0.weight                                                  ├─36,864
+│    │    └─4.dim.0.bias                                                    ├─64
+│    │    └─4.dim.1.weight                                                  ├─64
+│    │    └─4.dim.1.bias                                                    ├─64
+│    │    └─4.dim.3.weight                                                  ├─1,728
+│    │    └─4.dim.3.bias                                                    ├─3
+│    │    └─4.rot.0.weight                                                  ├─36,864
+│    │    └─4.rot.0.bias                                                    ├─64
+│    │    └─4.rot.1.weight                                                  ├─64
+│    │    └─4.rot.1.bias                                                    ├─64
+│    │    └─4.rot.3.weight                                                  ├─1,152
+│    │    └─4.rot.3.bias                                                    ├─2
+│    │    └─4.vel.0.weight                                                  ├─36,864
+│    │    └─4.vel.0.bias                                                    ├─64
+│    │    └─4.vel.1.weight                                                  ├─64
+│    │    └─4.vel.1.bias                                                    ├─64
+│    │    └─4.vel.3.weight                                                  ├─1,152
+│    │    └─4.vel.3.bias                                                    ├─2
+│    │    └─4.hm.0.weight                                                   ├─36,864
+│    │    └─4.hm.0.bias                                                     ├─64
+│    │    └─4.hm.1.weight                                                   ├─64
+│    │    └─4.hm.1.bias                                                     ├─64
+│    │    └─4.hm.3.weight                                                   ├─1,152
+│    │    └─4.hm.3.bias                                                     ├─2
+│    │    └─5.reg.0.weight                                                  ├─36,864
+│    │    └─5.reg.0.bias                                                    ├─64
+│    │    └─5.reg.1.weight                                                  ├─64
+│    │    └─5.reg.1.bias                                                    ├─64
+│    │    └─5.reg.3.weight                                                  ├─1,152
+│    │    └─5.reg.3.bias                                                    ├─2
+│    │    └─5.height.0.weight                                               ├─36,864
+│    │    └─5.height.0.bias                                                 ├─64
+│    │    └─5.height.1.weight                                               ├─64
+│    │    └─5.height.1.bias                                                 ├─64
+│    │    └─5.height.3.weight                                               ├─576
+│    │    └─5.height.3.bias                                                 ├─1
+│    │    └─5.dim.0.weight                                                  ├─36,864
+│    │    └─5.dim.0.bias                                                    ├─64
+│    │    └─5.dim.1.weight                                                  ├─64
+│    │    └─5.dim.1.bias                                                    ├─64
+│    │    └─5.dim.3.weight                                                  ├─1,728
+│    │    └─5.dim.3.bias                                                    ├─3
+│    │    └─5.rot.0.weight                                                  ├─36,864
+│    │    └─5.rot.0.bias                                                    ├─64
+│    │    └─5.rot.1.weight                                                  ├─64
+│    │    └─5.rot.1.bias                                                    ├─64
+│    │    └─5.rot.3.weight                                                  ├─1,152
+│    │    └─5.rot.3.bias                                                    ├─2
+│    │    └─5.vel.0.weight                                                  ├─36,864
+│    │    └─5.vel.0.bias                                                    ├─64
+│    │    └─5.vel.1.weight                                                  ├─64
+│    │    └─5.vel.1.bias                                                    ├─64
+│    │    └─5.vel.3.weight                                                  ├─1,152
+│    │    └─5.vel.3.bias                                                    ├─2
+│    │    └─5.hm.0.weight                                                   ├─36,864
+│    │    └─5.hm.0.bias                                                     ├─64
+│    │    └─5.hm.1.weight                                                   ├─64
+│    │    └─5.hm.1.bias                                                     ├─64
+│    │    └─5.hm.3.weight                                                   ├─1,152
+│    │    └─5.hm.3.bias                                                     └─2
+│    │    └─SepHead: 3-5                                                    228,683
+│    │    │    └─reg.0.weight                                               ├─36,864
+│    │    │    └─reg.0.bias                                                 ├─64
+│    │    │    └─reg.1.weight                                               ├─64
+│    │    │    └─reg.1.bias                                                 ├─64
+│    │    │    └─reg.3.weight                                               ├─1,152
+│    │    │    └─reg.3.bias                                                 ├─2
+│    │    │    └─height.0.weight                                            ├─36,864
+│    │    │    └─height.0.bias                                              ├─64
+│    │    │    └─height.1.weight                                            ├─64
+│    │    │    └─height.1.bias                                              ├─64
+│    │    │    └─height.3.weight                                            ├─576
+│    │    │    └─height.3.bias                                              ├─1
+│    │    │    └─dim.0.weight                                               ├─36,864
+│    │    │    └─dim.0.bias                                                 ├─64
+│    │    │    └─dim.1.weight                                               ├─64
+│    │    │    └─dim.1.bias                                                 ├─64
+│    │    │    └─dim.3.weight                                               ├─1,728
+│    │    │    └─dim.3.bias                                                 ├─3
+│    │    │    └─rot.0.weight                                               ├─36,864
+│    │    │    └─rot.0.bias                                                 ├─64
+│    │    │    └─rot.1.weight                                               ├─64
+│    │    │    └─rot.1.bias                                                 ├─64
+│    │    │    └─rot.3.weight                                               ├─1,152
+│    │    │    └─rot.3.bias                                                 ├─2
+│    │    │    └─vel.0.weight                                               ├─36,864
+│    │    │    └─vel.0.bias                                                 ├─64
+│    │    │    └─vel.1.weight                                               ├─64
+│    │    │    └─vel.1.bias                                                 ├─64
+│    │    │    └─vel.3.weight                                               ├─1,152
+│    │    │    └─vel.3.bias                                                 ├─2
+│    │    │    └─hm.0.weight                                                ├─36,864
+│    │    │    └─hm.0.bias                                                  ├─64
+│    │    │    └─hm.1.weight                                                ├─64
+│    │    │    └─hm.1.bias                                                  ├─64
+│    │    │    └─hm.3.weight                                                ├─576
+│    │    │    └─hm.3.bias                                                  └─1
+│    │    └─SepHead: 3-6                                                    229,260
+│    │    │    └─reg.0.weight                                               ├─36,864
+│    │    │    └─reg.0.bias                                                 ├─64
+│    │    │    └─reg.1.weight                                               ├─64
+│    │    │    └─reg.1.bias                                                 ├─64
+│    │    │    └─reg.3.weight                                               ├─1,152
+│    │    │    └─reg.3.bias                                                 ├─2
+│    │    │    └─height.0.weight                                            ├─36,864
+│    │    │    └─height.0.bias                                              ├─64
+│    │    │    └─height.1.weight                                            ├─64
+│    │    │    └─height.1.bias                                              ├─64
+│    │    │    └─height.3.weight                                            ├─576
+│    │    │    └─height.3.bias                                              ├─1
+│    │    │    └─dim.0.weight                                               ├─36,864
+│    │    │    └─dim.0.bias                                                 ├─64
+│    │    │    └─dim.1.weight                                               ├─64
+│    │    │    └─dim.1.bias                                                 ├─64
+│    │    │    └─dim.3.weight                                               ├─1,728
+│    │    │    └─dim.3.bias                                                 ├─3
+│    │    │    └─rot.0.weight                                               ├─36,864
+│    │    │    └─rot.0.bias                                                 ├─64
+│    │    │    └─rot.1.weight                                               ├─64
+│    │    │    └─rot.1.bias                                                 ├─64
+│    │    │    └─rot.3.weight                                               ├─1,152
+│    │    │    └─rot.3.bias                                                 ├─2
+│    │    │    └─vel.0.weight                                               ├─36,864
+│    │    │    └─vel.0.bias                                                 ├─64
+│    │    │    └─vel.1.weight                                               ├─64
+│    │    │    └─vel.1.bias                                                 ├─64
+│    │    │    └─vel.3.weight                                               ├─1,152
+│    │    │    └─vel.3.bias                                                 ├─2
+│    │    │    └─hm.0.weight                                                ├─36,864
+│    │    │    └─hm.0.bias                                                  ├─64
+│    │    │    └─hm.1.weight                                                ├─64
+│    │    │    └─hm.1.bias                                                  ├─64
+│    │    │    └─hm.3.weight                                                ├─1,152
+│    │    │    └─hm.3.bias                                                  └─2
+│    │    └─SepHead: 3-7                                                    229,260
+│    │    │    └─reg.0.weight                                               ├─36,864
+│    │    │    └─reg.0.bias                                                 ├─64
+│    │    │    └─reg.1.weight                                               ├─64
+│    │    │    └─reg.1.bias                                                 ├─64
+│    │    │    └─reg.3.weight                                               ├─1,152
+│    │    │    └─reg.3.bias                                                 ├─2
+│    │    │    └─height.0.weight                                            ├─36,864
+│    │    │    └─height.0.bias                                              ├─64
+│    │    │    └─height.1.weight                                            ├─64
+│    │    │    └─height.1.bias                                              ├─64
+│    │    │    └─height.3.weight                                            ├─576
+│    │    │    └─height.3.bias                                              ├─1
+│    │    │    └─dim.0.weight                                               ├─36,864
+│    │    │    └─dim.0.bias                                                 ├─64
+│    │    │    └─dim.1.weight                                               ├─64
+│    │    │    └─dim.1.bias                                                 ├─64
+│    │    │    └─dim.3.weight                                               ├─1,728
+│    │    │    └─dim.3.bias                                                 ├─3
+│    │    │    └─rot.0.weight                                               ├─36,864
+│    │    │    └─rot.0.bias                                                 ├─64
+│    │    │    └─rot.1.weight                                               ├─64
+│    │    │    └─rot.1.bias                                                 ├─64
+│    │    │    └─rot.3.weight                                               ├─1,152
+│    │    │    └─rot.3.bias                                                 ├─2
+│    │    │    └─vel.0.weight                                               ├─36,864
+│    │    │    └─vel.0.bias                                                 ├─64
+│    │    │    └─vel.1.weight                                               ├─64
+│    │    │    └─vel.1.bias                                                 ├─64
+│    │    │    └─vel.3.weight                                               ├─1,152
+│    │    │    └─vel.3.bias                                                 ├─2
+│    │    │    └─hm.0.weight                                                ├─36,864
+│    │    │    └─hm.0.bias                                                  ├─64
+│    │    │    └─hm.1.weight                                                ├─64
+│    │    │    └─hm.1.bias                                                  ├─64
+│    │    │    └─hm.3.weight                                                ├─1,152
+│    │    │    └─hm.3.bias                                                  └─2
+│    │    └─SepHead: 3-8                                                    228,683
+│    │    │    └─reg.0.weight                                               ├─36,864
+│    │    │    └─reg.0.bias                                                 ├─64
+│    │    │    └─reg.1.weight                                               ├─64
+│    │    │    └─reg.1.bias                                                 ├─64
+│    │    │    └─reg.3.weight                                               ├─1,152
+│    │    │    └─reg.3.bias                                                 ├─2
+│    │    │    └─height.0.weight                                            ├─36,864
+│    │    │    └─height.0.bias                                              ├─64
+│    │    │    └─height.1.weight                                            ├─64
+│    │    │    └─height.1.bias                                              ├─64
+│    │    │    └─height.3.weight                                            ├─576
+│    │    │    └─height.3.bias                                              ├─1
+│    │    │    └─dim.0.weight                                               ├─36,864
+│    │    │    └─dim.0.bias                                                 ├─64
+│    │    │    └─dim.1.weight                                               ├─64
+│    │    │    └─dim.1.bias                                                 ├─64
+│    │    │    └─dim.3.weight                                               ├─1,728
+│    │    │    └─dim.3.bias                                                 ├─3
+│    │    │    └─rot.0.weight                                               ├─36,864
+│    │    │    └─rot.0.bias                                                 ├─64
+│    │    │    └─rot.1.weight                                               ├─64
+│    │    │    └─rot.1.bias                                                 ├─64
+│    │    │    └─rot.3.weight                                               ├─1,152
+│    │    │    └─rot.3.bias                                                 ├─2
+│    │    │    └─vel.0.weight                                               ├─36,864
+│    │    │    └─vel.0.bias                                                 ├─64
+│    │    │    └─vel.1.weight                                               ├─64
+│    │    │    └─vel.1.bias                                                 ├─64
+│    │    │    └─vel.3.weight                                               ├─1,152
+│    │    │    └─vel.3.bias                                                 ├─2
+│    │    │    └─hm.0.weight                                                ├─36,864
+│    │    │    └─hm.0.bias                                                  ├─64
+│    │    │    └─hm.1.weight                                                ├─64
+│    │    │    └─hm.1.bias                                                  ├─64
+│    │    │    └─hm.3.weight                                                ├─576
+│    │    │    └─hm.3.bias                                                  └─1
+│    │    └─SepHead: 3-9                                                    229,260
+│    │    │    └─reg.0.weight                                               ├─36,864
+│    │    │    └─reg.0.bias                                                 ├─64
+│    │    │    └─reg.1.weight                                               ├─64
+│    │    │    └─reg.1.bias                                                 ├─64
+│    │    │    └─reg.3.weight                                               ├─1,152
+│    │    │    └─reg.3.bias                                                 ├─2
+│    │    │    └─height.0.weight                                            ├─36,864
+│    │    │    └─height.0.bias                                              ├─64
+│    │    │    └─height.1.weight                                            ├─64
+│    │    │    └─height.1.bias                                              ├─64
+│    │    │    └─height.3.weight                                            ├─576
+│    │    │    └─height.3.bias                                              ├─1
+│    │    │    └─dim.0.weight                                               ├─36,864
+│    │    │    └─dim.0.bias                                                 ├─64
+│    │    │    └─dim.1.weight                                               ├─64
+│    │    │    └─dim.1.bias                                                 ├─64
+│    │    │    └─dim.3.weight                                               ├─1,728
+│    │    │    └─dim.3.bias                                                 ├─3
+│    │    │    └─rot.0.weight                                               ├─36,864
+│    │    │    └─rot.0.bias                                                 ├─64
+│    │    │    └─rot.1.weight                                               ├─64
+│    │    │    └─rot.1.bias                                                 ├─64
+│    │    │    └─rot.3.weight                                               ├─1,152
+│    │    │    └─rot.3.bias                                                 ├─2
+│    │    │    └─vel.0.weight                                               ├─36,864
+│    │    │    └─vel.0.bias                                                 ├─64
+│    │    │    └─vel.1.weight                                               ├─64
+│    │    │    └─vel.1.bias                                                 ├─64
+│    │    │    └─vel.3.weight                                               ├─1,152
+│    │    │    └─vel.3.bias                                                 ├─2
+│    │    │    └─hm.0.weight                                                ├─36,864
+│    │    │    └─hm.0.bias                                                  ├─64
+│    │    │    └─hm.1.weight                                                ├─64
+│    │    │    └─hm.1.bias                                                  ├─64
+│    │    │    └─hm.3.weight                                                ├─1,152
+│    │    │    └─hm.3.bias                                                  └─2
+│    │    └─SepHead: 3-10                                                   229,260
+│    │    │    └─reg.0.weight                                               ├─36,864
+│    │    │    └─reg.0.bias                                                 ├─64
+│    │    │    └─reg.1.weight                                               ├─64
+│    │    │    └─reg.1.bias                                                 ├─64
+│    │    │    └─reg.3.weight                                               ├─1,152
+│    │    │    └─reg.3.bias                                                 ├─2
+│    │    │    └─height.0.weight                                            ├─36,864
+│    │    │    └─height.0.bias                                              ├─64
+│    │    │    └─height.1.weight                                            ├─64
+│    │    │    └─height.1.bias                                              ├─64
+│    │    │    └─height.3.weight                                            ├─576
+│    │    │    └─height.3.bias                                              ├─1
+│    │    │    └─dim.0.weight                                               ├─36,864
+│    │    │    └─dim.0.bias                                                 ├─64
+│    │    │    └─dim.1.weight                                               ├─64
+│    │    │    └─dim.1.bias                                                 ├─64
+│    │    │    └─dim.3.weight                                               ├─1,728
+│    │    │    └─dim.3.bias                                                 ├─3
+│    │    │    └─rot.0.weight                                               ├─36,864
+│    │    │    └─rot.0.bias                                                 ├─64
+│    │    │    └─rot.1.weight                                               ├─64
+│    │    │    └─rot.1.bias                                                 ├─64
+│    │    │    └─rot.3.weight                                               ├─1,152
+│    │    │    └─rot.3.bias                                                 ├─2
+│    │    │    └─vel.0.weight                                               ├─36,864
+│    │    │    └─vel.0.bias                                                 ├─64
+│    │    │    └─vel.1.weight                                               ├─64
+│    │    │    └─vel.1.bias                                                 ├─64
+│    │    │    └─vel.3.weight                                               ├─1,152
+│    │    │    └─vel.3.bias                                                 ├─2
+│    │    │    └─hm.0.weight                                                ├─36,864
+│    │    │    └─hm.0.bias                                                  ├─64
+│    │    │    └─hm.1.weight                                                ├─64
+│    │    │    └─hm.1.bias                                                  ├─64
+│    │    │    └─hm.3.weight                                                ├─1,152
+│    │    │    └─hm.3.bias                                                  └─2
+├─CrossEntropyLoss: 1-3                                                     --
+====================================================================================================
+Total params: 2,246,406
+Trainable params: 2,246,406
+Non-trainable params: 0
+====================================================================================================
