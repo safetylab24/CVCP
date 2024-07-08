@@ -91,7 +91,7 @@ class NuScenesGeneratedDataset(torch.utils.data.Dataset):
 def get_train_dataloader(dataset_dir=None, labels_dir=None, version='v1.0-trainval', batch_size=1, num_workers=1, num_classes=2):
     datasets = get_data(
         dataset_dir=dataset_dir,
-        labels_dir=dataset_dir,
+        labels_dir=labels_dir,
         split='train',
         version=version,
         num_classes=num_classes,
@@ -113,7 +113,7 @@ def get_train_dataloader(dataset_dir=None, labels_dir=None, version='v1.0-trainv
 def get_val_dataloader(dataset_dir=None, labels_dir=None, version='v1.0-trainval', batch_size=1, num_workers=1, num_classes=2):
     datasets = get_data(
         dataset_dir=dataset_dir,
-        labels_dir=dataset_dir,
+        labels_dir=labels_dir,
         split='val',
         version=version,
         num_classes=num_classes,

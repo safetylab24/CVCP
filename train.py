@@ -64,7 +64,7 @@ def main():
     print(f"Train length: {len(train_loader)}")
     print(f"Val length: {len(val_loader)}")
 
-    for epoch in range(5):
+    for epoch in range(config.get('epochs')):
         # training
         for batch in tqdm(train_loader):
             loss = model.train_step(batch)

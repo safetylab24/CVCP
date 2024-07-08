@@ -7,5 +7,5 @@ n_classes: 2
 loss_type: ce # ce or focal
 dataset_dir: /home/vrb230004/media/datasets/nuscenes
 labels_dir: /home/vrb230004/media/datasets/cvt_labels_nuscenes
-num_workers: 4
-batch_size: 8
+num_workers: 1
+batch_size: 1

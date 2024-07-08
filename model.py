@@ -1,25 +1,10 @@
-import sys
-from os.path import abspath, dirname, join
-
-sys.path.insert(0, abspath(join(dirname(dirname(__file__)), 'CenterPoint')))
-
-sys.path.insert(0, abspath(join(dirname(dirname(__file__)), 'CVT')))
-
 import logging
-from det3d.models.bbox_heads.center_head import CenterHead
-import argparse
-import random
-import tqdm
-from time import sleep, time
-from tensorboardX import SummaryWriter
-from tools.metrics import *
-from tools.utils import *
+from models.centerpoint.det3d.models.bbox_heads.center_head import CenterHead
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from models.model import CVTModel
-
-
+from models.cvt.model import CVTModel
 
 
 # creates CVT head of the model

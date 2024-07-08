@@ -1,0 +1,5 @@
+# ninja log v5
+1	2526	1718639726464975611	/home/vrb230004/CenterPoint/det3d/ops/iou3d_nms/build/temp.linux-x86_64-cpython-311/src/iou3d_nms_kernel.o	19af82208e9930cc
+1	18037	1718639741958420488	/home/vrb230004/CenterPoint/det3d/ops/iou3d_nms/build/temp.linux-x86_64-cpython-311/src/iou3d_nms.o	a80b0d3667059dc0
+1	18253	1718639742178422069	/home/vrb230004/CenterPoint/det3d/ops/iou3d_nms/build/temp.linux-x86_64-cpython-311/src/iou3d_cpu.o	309a79ff8e096e46
+1	18464	1718639742388423583	/home/vrb230004/CenterPoint/det3d/ops/iou3d_nms/build/temp.linux-x86_64-cpython-311/src/iou3d_nms_api.o	b102b6b73b2c9a6c
