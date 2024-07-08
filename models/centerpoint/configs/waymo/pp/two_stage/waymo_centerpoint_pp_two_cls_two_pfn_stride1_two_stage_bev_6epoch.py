@@ -1,7 +1,7 @@
 import itertools
 import logging
 
-from det3d.utils.config_tool import get_downsample_factor
+from models.centerpoint.det3d.utils.config_tool import get_downsample_factor
 
 tasks = [
     dict(num_class=2, class_names=['VEHICLE', 'PEDESTRIAN']),
@@ -46,7 +46,8 @@ model = dict(
             dataset='waymo',
             weight=2,
             code_weights=[1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
-            common_heads={'reg': (2, 2), 'height': (1, 2), 'dim':(3, 2), 'rot':(2, 2)}, # (output_channel, num_conv)
+            common_heads={'reg': (2, 2), 'height': (1, 2), 'dim': (
+                3, 2), 'rot': (2, 2)},  # (output_channel, num_conv)
         ),
     ),
     second_stage_modules=[
@@ -82,9 +83,9 @@ model = dict(
                 CLS_LOSS='BinaryCrossEntropy',
                 REG_LOSS='L1',
                 LOSS_WEIGHTS={
-                'rcnn_cls_weight': 1.0,
-                'rcnn_reg_weight': 1.0,
-                'code_weights': [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+                    'rcnn_cls_weight': 1.0,
+                    'rcnn_reg_weight': 1.0,
+                    'code_weights': [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
                 }
             )
         ),
@@ -148,7 +149,8 @@ voxel_generator = dict(
     range=[-74.88, -74.88, -2, 74.88, 74.88, 4.0],
     voxel_size=[0.32, 0.32, 6.0],
     max_points_in_voxel=20,
-    max_voxel_num=[32000, 60000], # we only use non-empty voxels. this will be much smaller than max_voxel_num
+    # we only use non-empty voxels. this will be much smaller than max_voxel_num
+    max_voxel_num=[32000, 60000],
 )
 
 train_pipeline = [
@@ -206,7 +208,6 @@ data = dict(
 )
 
 
-
 optimizer_config = dict(grad_clip=dict(max_norm=35, norm_type=2))
 
 # optimizer
@@ -233,6 +234,6 @@ device_ids = range(8)
 dist_params = dict(backend="nccl", init_method="env://")
 log_level = "INFO"
 work_dir = './work_dirs/{}/'.format(__file__[__file__.rfind('/') + 1:-3])
-load_from = None 
-resume_from = None  
+load_from = None
+resume_from = None
 workflow = [('train', 1)]

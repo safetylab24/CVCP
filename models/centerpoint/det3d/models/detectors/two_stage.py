@@ -1,4 +1,4 @@
-from det3d.core.bbox import box_torch_ops
+from models.centerpoint.det3d.core.bbox import box_torch_ops
 from ..registry import DETECTORS
 from .base import BaseDetector
 from .. import builder

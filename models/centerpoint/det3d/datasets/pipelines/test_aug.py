@@ -1,4 +1,4 @@
-from det3d import torchie
+from models.centerpoint.det3d import torchie
 
 from ..registry import PIPELINES
 from .compose import Compose
@@ -27,9 +27,6 @@ class DoubleFlip(object):
         points[:, 0] = -points[:, 0]
         points[:, 1] = -points[:, 1]
 
-        res["lidar"]["double_flip_points"] = points  
+        res["lidar"]["double_flip_points"] = points
 
-        return res, info 
-
-
-
+        return res, info

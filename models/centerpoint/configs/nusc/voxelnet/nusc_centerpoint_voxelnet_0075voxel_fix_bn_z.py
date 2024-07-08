@@ -1,7 +1,7 @@
 import itertools
 import logging
 
-from det3d.utils.config_tool import get_downsample_factor
+from models.centerpoint.det3d.utils.config_tool import get_downsample_factor
 
 tasks = [
     dict(num_class=1, class_names=["car"]),
@@ -48,7 +48,8 @@ model = dict(
         dataset='nuscenes',
         weight=0.25,
         code_weights=[1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.2, 0.2, 1.0, 1.0],
-        common_heads={'reg': (2, 2), 'height': (1, 2), 'dim':(3, 2), 'rot':(2, 2), 'vel': (2, 2)},
+        common_heads={'reg': (2, 2), 'height': (1, 2), 'dim': (
+            3, 2), 'rot': (2, 2), 'vel': (2, 2)},
         share_conv_channel=64,
         dcn_head=False
     ),
@@ -193,14 +194,13 @@ data = dict(
         type=dataset_type,
         root_path=data_root,
         info_path=test_anno,
-        ann_file=test_anno, 
+        ann_file=test_anno,
         test_mode=True,
         nsweeps=nsweeps,
         class_names=class_names,
         pipeline=test_pipeline,
     ),
 )
-
 
 
 optimizer_config = dict(grad_clip=dict(max_norm=35, norm_type=2))
@@ -229,5 +229,5 @@ dist_params = dict(backend="nccl", init_method="env://")
 log_level = "INFO"
 work_dir = './work_dirs/{}/'.format(__file__[__file__.rfind('/') + 1:-3])
 load_from = None
-resume_from = None 
+resume_from = None
 workflow = [('train', 1)]

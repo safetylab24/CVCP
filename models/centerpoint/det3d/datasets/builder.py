@@ -1,6 +1,6 @@
 import copy
 
-from det3d.utils import build_from_cfg
+from models.centerpoint.det3d.utils import build_from_cfg
 
 from .dataset_wrappers import ConcatDataset, RepeatDataset
 from .registry import DATASETS

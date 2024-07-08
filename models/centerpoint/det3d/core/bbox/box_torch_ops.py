@@ -5,9 +5,10 @@ import numpy as np
 import torch
 from torch import stack as tstack
 try:
-    from det3d.ops.iou3d_nms import iou3d_nms_cuda, iou3d_nms_utils
+    from models.centerpoint.det3d.ops.iou3d_nms import iou3d_nms_cuda, iou3d_nms_utils
 except:
     print("iou3d cuda not built. You don't need this if you use circle_nms. Otherwise, refer to the advanced installation part to build this cuda extension")
+
 
 def torch_to_np_dtype(ttype):
     type_map = {
@@ -121,6 +122,7 @@ def rotation_3d_in_axis(points, angles, axis=0):
     # print(points.shape, rot_mat_T.shape)
     return torch.einsum("aij,jka->aik", points, rot_mat_T)
 
+
 def rotate_points_along_z(points, angle):
     """
     Args:
@@ -154,7 +156,8 @@ def rotation_2d(points, angles):
     """
     rot_sin = torch.sin(angles)
     rot_cos = torch.cos(angles)
-    rot_mat_T = torch.stack([tstack([rot_cos, -rot_sin]), tstack([rot_sin, rot_cos])])
+    rot_mat_T = torch.stack(
+        [tstack([rot_cos, -rot_sin]), tstack([rot_sin, rot_cos])])
     return torch.einsum("aij,jka->aik", (points, rot_mat_T))
 
 
@@ -217,14 +220,16 @@ def project_to_image(points_3d, proj_mat):
 
 def camera_to_lidar(points, r_rect, velo2cam):
     num_points = points.shape[0]
-    points = torch.cat([points, torch.ones(num_points, 1).type_as(points)], dim=-1)
+    points = torch.cat(
+        [points, torch.ones(num_points, 1).type_as(points)], dim=-1)
     lidar_points = points @ torch.inverse((r_rect @ velo2cam).t())
     return lidar_points[..., :3]
 
 
 def lidar_to_camera(points, r_rect, velo2cam):
     num_points = points.shape[0]
-    points = torch.cat([points, torch.ones(num_points, 1).type_as(points)], dim=-1)
+    points = torch.cat(
+        [points, torch.ones(num_points, 1).type_as(points)], dim=-1)
     camera_points = points @ (r_rect @ velo2cam).t()
     return camera_points[..., :3]
 
@@ -254,7 +259,7 @@ def rotate_nms_pcdet(boxes, scores, thresh, pre_maxsize=None, post_max_size=None
     """
     # transform back to pcdet's coordinate
     boxes = boxes[:, [0, 1, 2, 4, 3, 5, -1]]
-    boxes[:, -1] = -boxes[:, -1] - np.pi /2
+    boxes[:, -1] = -boxes[:, -1] - np.pi / 2
 
     order = scores.sort(0, descending=True)[1]
     if pre_maxsize is not None:
@@ -265,7 +270,7 @@ def rotate_nms_pcdet(boxes, scores, thresh, pre_maxsize=None, post_max_size=None
     keep = torch.LongTensor(boxes.size(0))
 
     if len(boxes) == 0:
-        num_out =0
+        num_out = 0
     else:
         num_out = iou3d_nms_cuda.nms_gpu(boxes, keep, thresh)
 
@@ -274,4 +279,4 @@ def rotate_nms_pcdet(boxes, scores, thresh, pre_maxsize=None, post_max_size=None
     if post_max_size is not None:
         selected = selected[:post_max_size]
 
-    return selected 
+    return selected

@@ -1,6 +1,6 @@
 import collections
 
-from det3d.utils import build_from_cfg
+from models.centerpoint.det3d.utils import build_from_cfg
 from ..registry import PIPELINES
 
 
@@ -12,7 +12,7 @@ class Compose(object):
         for transform in transforms:
             if isinstance(transform, dict):
                 if transform['type'] == 'Empty':
-                    continue 
+                    continue
                 transform = build_from_cfg(transform, PIPELINES)
                 self.transforms.append(transform)
             elif callable(transform):
@@ -34,4 +34,3 @@ class Compose(object):
             format_string += "    {0}".format(t)
         format_string += "\n)"
         return format_string
-

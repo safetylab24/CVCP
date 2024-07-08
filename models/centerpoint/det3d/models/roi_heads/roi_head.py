@@ -6,19 +6,20 @@
 
 from torch import batch_norm
 import torch.nn as nn
-import torch 
+import torch
 from .roi_head_template import RoIHeadTemplate
 
-from det3d.core import box_torch_ops
+from models.centerpoint.det3d.core import box_torch_ops
 
 from ..registry import ROI_HEAD
+
 
 @ROI_HEAD.register_module
 class RoIHead(RoIHeadTemplate):
     def __init__(self, input_channels, model_cfg, num_class=1, code_size=7, add_box_param=False, test_cfg=None):
         super().__init__(num_class=num_class, model_cfg=model_cfg)
         self.model_cfg = model_cfg
-        self.test_cfg = test_cfg 
+        self.test_cfg = test_cfg
         self.code_size = code_size
         self.add_box_param = add_box_param
 
@@ -27,7 +28,8 @@ class RoIHead(RoIHeadTemplate):
         shared_fc_list = []
         for k in range(0, self.model_cfg.SHARED_FC.__len__()):
             shared_fc_list.extend([
-                nn.Conv1d(pre_channel, self.model_cfg.SHARED_FC[k], kernel_size=1, bias=False),
+                nn.Conv1d(
+                    pre_channel, self.model_cfg.SHARED_FC[k], kernel_size=1, bias=False),
                 nn.BatchNorm1d(self.model_cfg.SHARED_FC[k]),
                 nn.ReLU()
             ])
@@ -83,17 +85,22 @@ class RoIHead(RoIHeadTemplate):
 
         # RoI aware pooling
         if self.add_box_param:
-            batch_dict['roi_features'] = torch.cat([batch_dict['roi_features'], batch_dict['rois'], batch_dict['roi_scores'].unsqueeze(-1)], dim=-1)
+            batch_dict['roi_features'] = torch.cat(
+                [batch_dict['roi_features'], batch_dict['rois'], batch_dict['roi_scores'].unsqueeze(-1)], dim=-1)
 
         pooled_features = batch_dict['roi_features'].reshape(-1, 1,
-            batch_dict['roi_features'].shape[-1]).contiguous()  # (BxN, 1, C)
+                                                             batch_dict['roi_features'].shape[-1]).contiguous()  # (BxN, 1, C)
 
         batch_size_rcnn = pooled_features.shape[0]
-        pooled_features = pooled_features.permute(0, 2, 1).contiguous() # (BxN, C, 1)
+        pooled_features = pooled_features.permute(
+            0, 2, 1).contiguous()  # (BxN, C, 1)
 
-        shared_features = self.shared_fc_layer(pooled_features.view(batch_size_rcnn, -1, 1))
-        rcnn_cls = self.cls_layers(shared_features).transpose(1, 2).contiguous().squeeze(dim=1)  # (B, 1 or 2)
-        rcnn_reg = self.reg_layers(shared_features).transpose(1, 2).contiguous().squeeze(dim=1)  # (B, C)
+        shared_features = self.shared_fc_layer(
+            pooled_features.view(batch_size_rcnn, -1, 1))
+        rcnn_cls = self.cls_layers(shared_features).transpose(
+            1, 2).contiguous().squeeze(dim=1)  # (B, 1 or 2)
+        rcnn_reg = self.reg_layers(shared_features).transpose(
+            1, 2).contiguous().squeeze(dim=1)  # (B, C)
 
         if not training:
             batch_cls_preds, batch_box_preds = self.generate_predicted_boxes(
@@ -107,5 +114,5 @@ class RoIHead(RoIHeadTemplate):
             targets_dict['rcnn_reg'] = rcnn_reg
 
             self.forward_ret_dict = targets_dict
-        
-        return batch_dict        
+
+        return batch_dict

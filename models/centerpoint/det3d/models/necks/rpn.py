@@ -9,10 +9,10 @@ from torch.nn import functional as F
 from torchvision.models import resnet
 from torch.nn.modules.batchnorm import _BatchNorm
 
-from det3d.torchie.cnn import constant_init, kaiming_init, xavier_init
-from det3d.torchie.trainer import load_checkpoint
-from det3d.models.utils import Empty, GroupNorm, Sequential
-from det3d.models.utils import change_default_args
+from models.centerpoint.det3d.torchie.cnn import constant_init, kaiming_init, xavier_init
+from models.centerpoint.det3d.torchie.trainer import load_checkpoint
+from models.centerpoint.det3d.models.utils import Empty, GroupNorm, Sequential
+from models.centerpoint.det3d.models.utils import change_default_args
 
 from .. import builder
 from ..registry import NECKS
@@ -50,7 +50,8 @@ class RPN(nn.Module):
         assert len(self._num_filters) == len(self._layer_nums)
         assert len(self._num_upsample_filters) == len(self._upsample_strides)
 
-        self._upsample_start_idx = len(self._layer_nums) - len(self._upsample_strides)
+        self._upsample_start_idx = len(
+            self._layer_nums) - len(self._upsample_strides)
 
         must_equal_list = []
         for i in range(len(self._upsample_strides)):
@@ -81,14 +82,16 @@ class RPN(nn.Module):
                     deblock = Sequential(
                         nn.ConvTranspose2d(
                             num_out_filters,
-                            self._num_upsample_filters[i - self._upsample_start_idx],
+                            self._num_upsample_filters[i -
+                                                       self._upsample_start_idx],
                             stride,
                             stride=stride,
                             bias=False,
                         ),
                         build_norm_layer(
                             self._norm_cfg,
-                            self._num_upsample_filters[i - self._upsample_start_idx],
+                            self._num_upsample_filters[i -
+                                                       self._upsample_start_idx],
                         )[1],
                         nn.ReLU(),
                     )
@@ -97,14 +100,16 @@ class RPN(nn.Module):
                     deblock = Sequential(
                         nn.Conv2d(
                             num_out_filters,
-                            self._num_upsample_filters[i - self._upsample_start_idx],
+                            self._num_upsample_filters[i -
+                                                       self._upsample_start_idx],
                             stride,
                             stride=stride,
                             bias=False,
                         ),
                         build_norm_layer(
                             self._norm_cfg,
-                            self._num_upsample_filters[i - self._upsample_start_idx],
+                            self._num_upsample_filters[i -
+                                                       self._upsample_start_idx],
                         )[1],
                         nn.ReLU(),
                     )
@@ -157,4 +162,3 @@ class RPN(nn.Module):
             x = torch.cat(ups, dim=1)
 
         return x
-

@@ -3,8 +3,8 @@ import subprocess
 import tempfile
 from pathlib import Path
 
-from det3d.utils.find import find_cuda_device_arch
-from det3d.utils.loader import import_file
+from models.centerpoint.det3d.utils.find import find_cuda_device_arch
+from models.centerpoint.det3d.utils.loader import import_file
 
 from .command import CUDALink, Gpp, Nvcc, compile_libraries, out
 
@@ -25,7 +25,8 @@ class Pybind11Link(Gpp):
         build_directory: str = None,
     ):
         pb11_includes = (
-            subprocess.check_output("python3 -m pybind11 --includes", shell=True)
+            subprocess.check_output(
+                "python3 -m pybind11 --includes", shell=True)
             .decode("utf8")
             .strip("\n")
         )
@@ -63,7 +64,8 @@ class Pybind11CUDALink(CUDALink):
         build_directory: str = None,
     ):
         pb11_includes = (
-            subprocess.check_output("python3 -m pybind11 --includes", shell=True)
+            subprocess.check_output(
+                "python3 -m pybind11 --includes", shell=True)
             .decode("utf8")
             .strip("\n")
         )
@@ -112,7 +114,8 @@ def load_pb11(
             main_sources.append(s)
 
     if cuda is True and arch is None:
-        raise ValueError("you must specify arch if sources contains" " cuda files")
+        raise ValueError(
+            "you must specify arch if sources contains" " cuda files")
     cmd_groups.append(cmds)
     if cuda:
         cmd_groups.append(
@@ -123,6 +126,7 @@ def load_pb11(
             [Pybind11Link(outs + main_sources, target, includes=includes)]
         )
     for cmds in cmd_groups:
-        compile_libraries(cmds, cwd, num_workers=num_workers, compiler=compiler)
+        compile_libraries(cmds, cwd, num_workers=num_workers,
+                          compiler=compiler)
 
     return import_file(target, add_to_sys=False, disable_warning=True)

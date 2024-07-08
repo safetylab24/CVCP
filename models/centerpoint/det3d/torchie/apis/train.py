@@ -11,14 +11,14 @@ except:
 
 import numpy as np
 import torch
-from det3d.builder import _create_learning_rate_scheduler
+from models.centerpoint.det3d.builder import _create_learning_rate_scheduler
 
-# from det3d.datasets.kitti.eval_hooks import KittiDistEvalmAPHook, KittiEvalmAPHookV2
-from det3d.core import DistOptimizerHook
-from det3d.datasets import DATASETS, build_dataloader
-from det3d.solver.fastai_optim import OptimWrapper
-from det3d.torchie.trainer import DistSamplerSeedHook, Trainer, obj_from_dict
-from det3d.utils.print_utils import metric_to_str
+# from models.centerpoint.det3d.datasets.kitti.eval_hooks import KittiDistEvalmAPHook, KittiEvalmAPHookV2
+from models.centerpoint.det3d.core import DistOptimizerHook
+from models.centerpoint.det3d.datasets import DATASETS, build_dataloader
+from models.centerpoint.det3d.solver.fastai_optim import OptimWrapper
+from models.centerpoint.det3d.torchie.trainer import DistSamplerSeedHook, Trainer, obj_from_dict
+from models.centerpoint.det3d.utils.print_utils import metric_to_str
 from torch import nn
 from torch.nn.parallel import DistributedDataParallel
 
@@ -32,7 +32,8 @@ def example_to_device(example, device=None, non_blocking=False) -> dict:
     float_names = ["voxels", "bev_map"]
     for k, v in example.items():
         if k in ["anchors", "anchors_mask", "reg_targets", "reg_weights", "labels", 'points']:
-            example_torch[k] = [res.to(device, non_blocking=non_blocking) for res in v]
+            example_torch[k] = [
+                res.to(device, non_blocking=non_blocking) for res in v]
         elif k in [
             "voxels",
             "bev_map",
@@ -49,7 +50,8 @@ def example_to_device(example, device=None, non_blocking=False) -> dict:
             calib = {}
             for k1, v1 in v.items():
                 # calib[k1] = torch.tensor(v1, dtype=dtype, device=device)
-                calib[k1] = torch.tensor(v1).to(device, non_blocking=non_blocking)
+                calib[k1] = torch.tensor(v1).to(
+                    device, non_blocking=non_blocking)
             example_torch[k] = calib
         else:
             example_torch[k] = v
@@ -65,7 +67,8 @@ def parse_losses(losses):
         elif isinstance(loss_value, list):
             log_vars[loss_name] = sum(_loss.mean() for _loss in loss_value)
         else:
-            raise TypeError("{} is not a tensor or list of tensors".format(loss_name))
+            raise TypeError(
+                "{} is not a tensor or list of tensors".format(loss_name))
 
     loss = sum(_value for _key, _value in log_vars.items() if "loss" in _key)
 
@@ -106,11 +109,13 @@ def batch_processor(model, data, train_mode, **kwargs):
         loss, log_vars = parse_second_losses(losses)
 
         outputs = dict(
-            loss=loss, log_vars=log_vars, num_samples=len(example["anchors"][0])
+            loss=loss, log_vars=log_vars, num_samples=len(
+                example["anchors"][0])
         )
         return outputs
     else:
         return model(example, return_loss=False)
+
 
 def batch_processor_ensemble(model1, model2, data, train_mode, **kwargs):
     assert 0, 'deprecated'
@@ -119,14 +124,14 @@ def batch_processor_ensemble(model1, model2, data, train_mode, **kwargs):
     else:
         device = None
 
-    assert train_mode is False 
+    assert train_mode is False
 
     example = example_to_device(data, device, non_blocking=False)
     del data
 
     preds_dicts1 = model1.pred_hm(example)
     preds_dicts2 = model2.pred_hm(example)
-    
+
     num_task = len(preds_dicts1)
 
     merge_list = []
@@ -141,7 +146,7 @@ def batch_processor_ensemble(model1, model2, data, train_mode, **kwargs):
 
         merge_list.append(preds_dict1)
 
-    # now get the final prediciton 
+    # now get the final prediciton
     return model1.pred_result(example, merge_list)
 
 
@@ -159,7 +164,8 @@ def build_one_cycle_optimizer(model, optimizer_config):
             torch.optim.Adam, betas=(0.9, 0.99), amsgrad=optimizer_config.amsgrad
         )
     else:
-        optimizer_func = partial(torch.optim.Adam, amsgrad=optimizer_cfg.amsgrad)
+        optimizer_func = partial(
+            torch.optim.Adam, amsgrad=optimizer_cfg.amsgrad)
 
     optimizer = OptimWrapper.create(
         optimizer_func,
@@ -275,9 +281,10 @@ def train_detector(model, dataset, cfg, distributed=False, validate=False, logge
         cfg.lr_config = None
     else:
         optimizer = build_optimizer(model, cfg.optimizer)
-        lr_scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, milestones=cfg.drop_step, gamma=.1)
+        lr_scheduler = torch.optim.lr_scheduler.MultiStepLR(
+            optimizer, milestones=cfg.drop_step, gamma=.1)
         # lr_scheduler = None
-        cfg.lr_config = None 
+        cfg.lr_config = None
 
     # put model on gpus
     if distributed:
@@ -323,4 +330,5 @@ def train_detector(model, dataset, cfg, distributed=False, validate=False, logge
     elif cfg.load_from:
         trainer.load_checkpoint(cfg.load_from)
 
-    trainer.run(data_loaders, cfg.workflow, cfg.total_epochs, local_rank=cfg.local_rank)
+    trainer.run(data_loaders, cfg.workflow,
+                cfg.total_epochs, local_rank=cfg.local_rank)

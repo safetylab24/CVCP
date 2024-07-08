@@ -11,11 +11,11 @@ except:
 import numpy as np
 import torch
 import yaml
-from det3d import torchie
-from det3d.datasets import build_dataloader, build_dataset
-from det3d.models import build_detector
-from det3d.torchie import Config
-from det3d.torchie.apis import (
+from models.centerpoint.det3d import torchie
+from models.centerpoint.det3d.datasets import build_dataloader, build_dataset
+from models.centerpoint.det3d.models import build_detector
+from models.centerpoint.det3d.torchie import Config
+from models.centerpoint.det3d.torchie.apis import (
     batch_processor,
     build_optimizer,
     get_root_logger,
@@ -23,11 +23,12 @@ from det3d.torchie.apis import (
     set_random_seed,
     train_detector,
 )
-from det3d.torchie.trainer import get_dist_info, load_checkpoint
-from det3d.torchie.trainer.utils import all_gather, synchronize
+from models.centerpoint.det3d.torchie.trainer import get_dist_info, load_checkpoint
+from models.centerpoint.det3d.torchie.trainer.utils import all_gather, synchronize
 from torch.nn.parallel import DistributedDataParallel
-import pickle 
-import time 
+import pickle
+import time
+
 
 def save_pred(pred, root):
     with open(os.path.join(root, "prediction.pkl"), "wb") as f:
@@ -37,7 +38,8 @@ def save_pred(pred, root):
 def parse_args():
     parser = argparse.ArgumentParser(description="Train a detector")
     parser.add_argument("config", help="train config file path")
-    parser.add_argument("--work_dir", required=True, help="the dir to save logs and models")
+    parser.add_argument("--work_dir", required=True,
+                        help="the dir to save logs and models")
     parser.add_argument(
         "--checkpoint", help="the dir to checkpoint which the model read from"
     )
@@ -92,7 +94,8 @@ def main():
 
     if distributed:
         torch.cuda.set_device(args.local_rank)
-        torch.distributed.init_process_group(backend="nccl", init_method="env://")
+        torch.distributed.init_process_group(
+            backend="nccl", init_method="env://")
 
         cfg.gpus = torch.distributed.get_world_size()
     else:
@@ -101,7 +104,8 @@ def main():
     # init logger before other steps
     logger = get_root_logger(cfg.log_level)
     logger.info("Distributed testing: {}".format(distributed))
-    logger.info(f"torch.backends.cudnn.benchmark: {torch.backends.cudnn.benchmark}")
+    logger.info(
+        f"torch.backends.cudnn.benchmark: {torch.backends.cudnn.benchmark}")
 
     model = build_detector(cfg.model, train_cfg=None, test_cfg=cfg.test_cfg)
 
@@ -149,10 +153,10 @@ def main():
     start = time.time()
 
     start = int(len(dataset) / 3)
-    end = int(len(dataset) * 2 /3)
+    end = int(len(dataset) * 2 / 3)
 
-    time_start = 0 
-    time_end = 0 
+    time_start = 0
+    time_end = 0
 
     for i, data_batch in enumerate(data_loader):
         if i == start:
@@ -175,7 +179,7 @@ def main():
                 ]:
                     output[k] = v.to(cpu_device)
             detections.update(
-                {token: output,}
+                {token: output, }
             )
             if args.local_rank == 0:
                 prog_bar.update()
@@ -184,7 +188,7 @@ def main():
 
     all_predictions = all_gather(detections)
 
-    print("\n Total time per frame: ", (time_end -  time_start) / (end - start))
+    print("\n Total time per frame: ", (time_end - time_start) / (end - start))
 
     if args.local_rank != 0:
         return
@@ -198,7 +202,8 @@ def main():
 
     save_pred(predictions, args.work_dir)
 
-    result_dict, _ = dataset.evaluation(copy.deepcopy(predictions), output_dir=args.work_dir, testset=args.testset)
+    result_dict, _ = dataset.evaluation(copy.deepcopy(
+        predictions), output_dir=args.work_dir, testset=args.testset)
 
     if result_dict is not None:
         for k, v in result_dict["results"].items():
@@ -206,6 +211,7 @@ def main():
 
     if args.txt_result:
         assert False, "No longer support kitti"
+
 
 if __name__ == "__main__":
     main()

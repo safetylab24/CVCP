@@ -1,8 +1,8 @@
 import platform
 from functools import partial
 
-from det3d.torchie.parallel import collate, collate_kitti
-from det3d.torchie.trainer import get_dist_info
+from models.centerpoint.det3d.torchie.parallel import collate, collate_kitti
+from models.centerpoint.det3d.torchie.trainer import get_dist_info
 from torch.utils.data import DataLoader
 
 from .sampler import (
@@ -31,9 +31,11 @@ def build_dataloader(
         #                      rank=rank,
         #                      shuffle=shuffle)
         if shuffle:
-            sampler = DistributedGroupSampler(dataset, batch_size, world_size, rank)
+            sampler = DistributedGroupSampler(
+                dataset, batch_size, world_size, rank)
         else:
-            sampler = DistributedSampler(dataset, world_size, rank, shuffle=False)
+            sampler = DistributedSampler(
+                dataset, world_size, rank, shuffle=False)
         batch_size = batch_size
         num_workers = workers_per_gpu
     else:

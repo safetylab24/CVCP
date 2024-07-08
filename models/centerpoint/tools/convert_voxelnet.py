@@ -14,11 +14,11 @@ except:
 import numpy as np
 import torch
 import yaml
-from det3d import __version__, torchie
-from det3d.datasets import build_dataloader, build_dataset
-from det3d.models import build_detector
-from det3d.torchie import Config
-from det3d.torchie.apis import (
+from models.centerpoint.det3d import __version__, torchie
+from models.centerpoint.det3d.datasets import build_dataloader, build_dataset
+from models.centerpoint.det3d.models import build_detector
+from models.centerpoint.det3d.torchie import Config
+from models.centerpoint.det3d.torchie.apis import (
     batch_processor,
     build_optimizer,
     get_root_logger,
@@ -26,11 +26,12 @@ from det3d.torchie.apis import (
     set_random_seed,
     train_detector,
 )
-from det3d.torchie.trainer import get_dist_info, load_checkpoint
-from det3d.torchie.trainer.utils import all_gather, synchronize
+from models.centerpoint.det3d.torchie.trainer import get_dist_info, load_checkpoint
+from models.centerpoint.det3d.torchie.trainer.utils import all_gather, synchronize
 from torch.nn.parallel import DistributedDataParallel
-import pickle 
-import time 
+import pickle
+import time
+
 
 def convert_state_dict(module, state_dict, strict=False, logger=None):
     """Load state_dict into a module
@@ -40,33 +41,40 @@ def convert_state_dict(module, state_dict, strict=False, logger=None):
 
     own_state = module.state_dict()
     for name, param in state_dict.items():
-        # a hacky fixed to load a new voxelnet 
+        # a hacky fixed to load a new voxelnet
         if name not in own_state:
             if name[:20] == 'backbone.middle_conv':
                 index = int(name[20:].split('.')[1])
 
                 if index in [0, 1, 2]:
-                    new_name = 'backbone.conv_input.{}.{}'.format(str(index), name[23:])
+                    new_name = 'backbone.conv_input.{}.{}'.format(
+                        str(index), name[23:])
                 elif index in [3, 4]:
-                    new_name = 'backbone.conv1.{}.{}'.format(str(index-3), name[23:]) 
+                    new_name = 'backbone.conv1.{}.{}'.format(
+                        str(index-3), name[23:])
                 elif index in [5, 6, 7, 8, 9]:
-                    new_name = 'backbone.conv2.{}.{}'.format(str(index-5), name[23:]) 
+                    new_name = 'backbone.conv2.{}.{}'.format(
+                        str(index-5), name[23:])
                 elif index in [10, 11, 12, 13, 14]:
-                    new_name = 'backbone.conv3.{}.{}'.format(str(index-10), name[24:])
+                    new_name = 'backbone.conv3.{}.{}'.format(
+                        str(index-10), name[24:])
                 elif index in [15, 16, 17, 18, 19]:
-                    new_name = 'backbone.conv4.{}.{}'.format(str(index-15), name[24:])
+                    new_name = 'backbone.conv4.{}.{}'.format(
+                        str(index-15), name[24:])
                 elif index in [20, 21, 22]:
-                    new_name = 'backbone.extra_conv.{}.{}'.format(str(index-20), name[24:])
+                    new_name = 'backbone.extra_conv.{}.{}'.format(
+                        str(index-20), name[24:])
                 else:
                     raise NotImplementedError(index)
 
                 if param.size() != own_state[new_name].size():
-                    shape_mismatch_pairs.append([name, own_state[name].size(), param.size()])
+                    shape_mismatch_pairs.append(
+                        [name, own_state[name].size(), param.size()])
                     continue
 
                 own_state[new_name].copy_(param)
                 print("load {}'s param from {}".format(new_name, name))
-                continue 
+                continue
 
             unexpected_keys.append(name)
             continue
@@ -74,13 +82,15 @@ def convert_state_dict(module, state_dict, strict=False, logger=None):
             # backwards compatibility for serialized parameters
             param = param.data
         if param.size() != own_state[name].size():
-            shape_mismatch_pairs.append([name, own_state[name].size(), param.size()])
+            shape_mismatch_pairs.append(
+                [name, own_state[name].size(), param.size()])
             continue
         own_state[name].copy_(param)
 
     all_missing_keys = set(own_state.keys()) - set(state_dict.keys())
     # ignore "num_batches_tracked" of BN layers
-    missing_keys = [key for key in all_missing_keys if "num_batches_tracked" not in key]
+    missing_keys = [
+        key for key in all_missing_keys if "num_batches_tracked" not in key]
 
     err_msg = []
     if unexpected_keys:
@@ -91,7 +101,8 @@ def convert_state_dict(module, state_dict, strict=False, logger=None):
         )
     if missing_keys:
         err_msg.append(
-            "missing keys in source state_dict: {}\n".format(", ".join(missing_keys))
+            "missing keys in source state_dict: {}\n".format(
+                ", ".join(missing_keys))
         )
     if shape_mismatch_pairs:
         mismatch_info = "these keys have mismatched shape:\n"
@@ -102,7 +113,8 @@ def convert_state_dict(module, state_dict, strict=False, logger=None):
 
     rank, _ = get_dist_info()
     if len(err_msg) > 0 and rank == 0:
-        err_msg.insert(0, "The model and loaded state dict do not match exactly\n")
+        err_msg.insert(
+            0, "The model and loaded state dict do not match exactly\n")
         err_msg = "\n".join(err_msg)
         if strict:
             raise RuntimeError(err_msg)
@@ -110,6 +122,7 @@ def convert_state_dict(module, state_dict, strict=False, logger=None):
             logger.warning(err_msg)
         else:
             print(err_msg)
+
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Train a detector")
@@ -121,6 +134,7 @@ def parse_args():
     args = parser.parse_args()
 
     return args
+
 
 def weights_to_cpu(state_dict):
     """Copy a model state_dict to cpu.
@@ -152,13 +166,15 @@ def save_checkpoint(model, filename, meta=None):
     if meta is None:
         meta = {}
     elif not isinstance(meta, dict):
-        raise TypeError("meta must be a dict or None, but got {}".format(type(meta)))
+        raise TypeError(
+            "meta must be a dict or None, but got {}".format(type(meta)))
 
     torchie.mkdir_or_exist(osp.dirname(filename))
     if hasattr(model, "module"):
         model = model.module
 
-    checkpoint = {"meta": meta, "state_dict": weights_to_cpu(model.state_dict())}
+    checkpoint = {"meta": meta,
+                  "state_dict": weights_to_cpu(model.state_dict())}
 
     torch.save(checkpoint, filename)
 
@@ -182,5 +198,6 @@ def main():
     convert_state_dict(model, state_dict)
 
     save_checkpoint(model, osp.join(args.work_dir, 'voxelnet_converted.pth'))
+
 
 main()

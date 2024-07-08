@@ -5,13 +5,13 @@ from functools import partial
 import det3d.core.sampler.preprocess as prep
 import numpy as np
 import torch
-from det3d.core.input.voxel_generator import VoxelGenerator
-from det3d.core.sampler.preprocess import DataBasePreprocessor
-from det3d.core.sampler.sample_ops import DataBaseSamplerV2
-from det3d.solver import learning_schedules
-from det3d.solver import learning_schedules_fastai as lsf
-from det3d.solver import optim
-from det3d.solver.fastai_optim import FastAIMixedOptim, OptimWrapper
+from models.centerpoint.det3d.core.input.voxel_generator import VoxelGenerator
+from models.centerpoint.det3d.core.sampler.preprocess import DataBasePreprocessor
+from models.centerpoint.det3d.core.sampler.sample_ops import DataBaseSamplerV2
+from models.centerpoint.det3d.solver import learning_schedules
+from models.centerpoint.det3d.solver import learning_schedules_fastai as lsf
+from models.centerpoint.det3d.solver import optim
+from models.centerpoint.det3d.solver.fastai_optim import FastAIMixedOptim, OptimWrapper
 from torch import nn
 
 
@@ -25,6 +25,7 @@ def build_voxel_generator(voxel_config):
     )
 
     return voxel_generator
+
 
 def build_db_preprocess(db_prep_config, logger=None):
     logger = logging.getLogger("build_db_preprocess")
@@ -171,8 +172,10 @@ def _create_learning_rate_scheduler(optimizer, learning_rate_config, total_step)
         mom_phases = []
         for phase_cfg in config.phases:
             lr_phases.append((phase_cfg.start, phase_cfg.lambda_func))
-            mom_phases.append((phase_cfg.start, phase_cfg.momentum_lambda_func))
-        lr_scheduler = lsf.LRSchedulerStep(optimizer, total_step, lr_phases, mom_phases)
+            mom_phases.append(
+                (phase_cfg.start, phase_cfg.momentum_lambda_func))
+        lr_scheduler = lsf.LRSchedulerStep(
+            optimizer, total_step, lr_phases, mom_phases)
     elif learning_rate_type == "one_cycle":
         lr_scheduler = lsf.OneCycle(
             optimizer,
@@ -196,14 +199,16 @@ def _create_learning_rate_scheduler(optimizer, learning_rate_config, total_step)
             optimizer, total_step, config.boundaries, config.rates
         )
     elif lr_scheduler is None:
-        raise ValueError("Learning_rate %s not supported." % learning_rate_type)
+        raise ValueError("Learning_rate %s not supported." %
+                         learning_rate_type)
 
     return lr_scheduler
 
 
 def build_dbsampler(cfg, logger=None):
     logger = logging.getLogger("build_dbsampler")
-    prepors = [build_db_preprocess(c, logger=logger) for c in cfg.db_prep_steps]
+    prepors = [build_db_preprocess(c, logger=logger)
+               for c in cfg.db_prep_steps]
     db_prepor = DataBasePreprocessor(prepors)
     rate = cfg.rate
     grot_range = cfg.global_random_rotation_range_per_object

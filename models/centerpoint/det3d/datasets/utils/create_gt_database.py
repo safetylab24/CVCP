@@ -1,10 +1,10 @@
 import pickle
 from pathlib import Path
-import os 
+import os
 import numpy as np
 
-from det3d.core import box_np_ops
-from det3d.datasets.dataset_factory import get_dataset
+from models.centerpoint.det3d.core import box_np_ops
+from models.centerpoint.det3d.datasets.dataset_factory import get_dataset
 from tqdm import tqdm
 
 dataset_name_map = {
@@ -54,14 +54,17 @@ def create_groundtruth_database(
         print('teststtttststsststststststst')
         if db_path is None:
             if virtual:
-                db_path = root_path / f"gt_database_{nsweeps}sweeps_withvelo_virtual"
+                db_path = root_path / \
+                    f"gt_database_{nsweeps}sweeps_withvelo_virtual"
             else:
                 db_path = root_path / f"gt_database_{nsweeps}sweeps_withvelo"
         if dbinfo_path is None:
             if virtual:
-                dbinfo_path = root_path / f"dbinfos_train_{nsweeps}sweeps_withvelo_virtual.pkl"
+                dbinfo_path = root_path / \
+                    f"dbinfos_train_{nsweeps}sweeps_withvelo_virtual.pkl"
             else:
-                dbinfo_path = root_path / f"dbinfos_train_{nsweeps}sweeps_withvelo.pkl"
+                dbinfo_path = root_path / \
+                    f"dbinfos_train_{nsweeps}sweeps_withvelo.pkl"
     else:
         raise NotImplementedError()
 
@@ -77,11 +80,11 @@ def create_groundtruth_database(
         if "image_idx" in sensor_data["metadata"]:
             image_idx = sensor_data["metadata"]["image_idx"]
 
-        if nsweeps > 1: 
+        if nsweeps > 1:
             points = sensor_data["lidar"]["combined"]
         else:
             points = sensor_data["lidar"]["points"]
-            
+
         annos = sensor_data["lidar"]["annotations"]
         gt_boxes = annos["boxes"]
         names = annos["names"]
@@ -90,9 +93,9 @@ def create_groundtruth_database(
             # waymo dataset contains millions of objects and it is not possible to store
             # all of them into a single folder
             # we randomly sample a few objects for gt augmentation
-            # We keep all cyclist as they are rare 
+            # We keep all cyclist as they are rare
             if index % 4 != 0:
-                mask = (names == 'VEHICLE') 
+                mask = (names == 'VEHICLE')
                 mask = np.logical_not(mask)
                 names = names[mask]
                 gt_boxes = gt_boxes[mask]
@@ -115,7 +118,7 @@ def create_groundtruth_database(
 
         num_obj = gt_boxes.shape[0]
         if num_obj == 0:
-            continue 
+            continue
         point_indices = box_np_ops.points_in_rbbox(points, gt_boxes)
         for i in range(num_obj):
             if (used_classes is None) or names[i] in used_classes:
@@ -135,7 +138,8 @@ def create_groundtruth_database(
 
             if (used_classes is None) or names[i] in used_classes:
                 if relative_path:
-                    db_dump_path = os.path.join(db_path.stem, names[i], filename)
+                    db_dump_path = os.path.join(
+                        db_path.stem, names[i], filename)
                 else:
                     db_dump_path = str(filepath)
 

@@ -1,8 +1,8 @@
 import itertools
 import logging
 
-from det3d.utils.config_tool import get_downsample_factor
-DOUBLE_FLIP = True 
+from models.centerpoint.det3d.utils.config_tool import get_downsample_factor
+DOUBLE_FLIP = True
 
 tasks = [
     dict(num_class=1, class_names=["car"]),
@@ -49,7 +49,8 @@ model = dict(
         dataset='nuscenes',
         weight=0.25,
         code_weights=[1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.2, 0.2, 1.0, 1.0],
-        common_heads={'reg': (2, 2), 'height': (1, 2), 'dim':(3, 2), 'rot':(2, 2), 'vel': (2, 2)},
+        common_heads={'reg': (2, 2), 'height': (1, 2), 'dim': (
+            3, 2), 'rot': (2, 2), 'vel': (2, 2)},
         share_conv_channel=64,
         dcn_head=False
     ),
@@ -161,7 +162,7 @@ test_pipeline = [
     dict(type="LoadPointCloudFromFile", dataset=dataset_type),
     dict(type="LoadPointCloudAnnotations", with_bbox=True),
     dict(type="Preprocess", cfg=val_preprocessor),
-    dict(type="DoubleFlip") if DOUBLE_FLIP else dict(type="Empty"), 
+    dict(type="DoubleFlip") if DOUBLE_FLIP else dict(type="Empty"),
     dict(type="Voxelization", cfg=voxel_generator),
     dict(type="AssignLabel", cfg=train_cfg["assigner"]),
     dict(type="Reformat", double_flip=DOUBLE_FLIP),
@@ -207,7 +208,6 @@ data = dict(
 )
 
 
-
 optimizer_config = dict(grad_clip=dict(max_norm=35, norm_type=2))
 # optimizer
 optimizer = dict(
@@ -234,5 +234,5 @@ dist_params = dict(backend="nccl", init_method="env://")
 log_level = "INFO"
 work_dir = './work_dirs/{}/'.format(__file__[__file__.rfind('/') + 1:-3])
 load_from = None
-resume_from = None 
+resume_from = None
 workflow = [('train', 1)]

@@ -8,7 +8,7 @@ from functools import partial
 from pathlib import Path
 
 import fire
-from det3d.utils.find import find_cuda, find_cuda_device_arch
+from models.centerpoint.det3d.utils.find import find_cuda, find_cuda_device_arch
 
 
 class Gpp:
@@ -274,11 +274,13 @@ def compile_libraries(cmds, code_folder=None, compiler: str = None, num_workers=
     #     print(cmd.shell())
     if num_workers == 0:
         rets = map(
-            partial(compile_func, code_folder=code_folder, compiler=compiler), cmds
+            partial(compile_func, code_folder=code_folder,
+                    compiler=compiler), cmds
         )
     else:
         with ProcessPoolExecutor(num_workers) as pool:
-            func = partial(compile_func, code_folder=code_folder, compiler=compiler)
+            func = partial(compile_func, code_folder=code_folder,
+                           compiler=compiler)
             rets = pool.map(func, cmds)
 
     if any([r.returncode != 0 for r in rets]):

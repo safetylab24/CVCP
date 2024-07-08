@@ -1,4 +1,4 @@
-from det3d.models.bbox_heads.center_head import CenterHead
+from models.centerpoint.det3d.models.bbox_heads.center_head import CenterHead
 import logging
 import torch
 
@@ -24,7 +24,8 @@ bbox_head_config = dict(
     dataset='nuscenes',
     weight=0.25,
     code_weights=[1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.2, 0.2, 1.0, 1.0],
-    common_heads={'reg': (2, 2), 'height': (1, 2), 'dim': (3, 2), 'rot': (2, 2), 'vel': (2, 2)},
+    common_heads={'reg': (2, 2), 'height': (1, 2), 'dim': (
+        3, 2), 'rot': (2, 2), 'vel': (2, 2)},
     share_conv_channel=64,
     dcn_head=False
 )

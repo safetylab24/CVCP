@@ -5,7 +5,7 @@ Licensed under MIT License [see LICENSE].
 """
 
 import torch
-from det3d.models.utils import get_paddings_indicator
+from models.centerpoint.det3d.models.utils import get_paddings_indicator
 from torch import nn
 from torch.nn import functional as F
 from ..registry import BACKBONES, READERS
@@ -41,7 +41,8 @@ class PFNLayer(nn.Module):
 
         x = self.linear(inputs)
         torch.backends.cudnn.enabled = False
-        x = self.norm(x.permute(0, 2, 1).contiguous()).permute(0, 2, 1).contiguous()
+        x = self.norm(x.permute(0, 2, 1).contiguous()
+                      ).permute(0, 2, 1).contiguous()
         torch.backends.cudnn.enabled = True
         x = F.relu(x)
 
@@ -105,7 +106,7 @@ class PillarFeatureNet(nn.Module):
             )
         self.pfn_layers = nn.ModuleList(pfn_layers)
 
-        self.virtual = virtual 
+        self.virtual = virtual
 
         # Need pillar (voxel) size and x/y offset in order to calculate pillar offset
         self.vx = voxel_size[0]
@@ -120,7 +121,7 @@ class PillarFeatureNet(nn.Module):
             virtual_point_mask = features[..., -2] == -1
             virtual_points = features[virtual_point_mask]
             virtual_points[..., -2] = 1
-            features[..., -2] = 0 
+            features[..., -2] = 0
             features[virtual_point_mask] = virtual_points
 
         dtype = features.dtype
@@ -214,5 +215,6 @@ class PointPillarsScatter(nn.Module):
         batch_canvas = torch.stack(batch_canvas, 0)
 
         # Undo the column stacking to final 4-dim tensor
-        batch_canvas = batch_canvas.view(batch_size, self.nchannels, self.ny, self.nx)
+        batch_canvas = batch_canvas.view(
+            batch_size, self.nchannels, self.ny, self.nx)
         return batch_canvas

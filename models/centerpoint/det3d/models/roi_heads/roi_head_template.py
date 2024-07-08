@@ -8,8 +8,9 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from det3d.core.bbox import box_torch_ops
+from models.centerpoint.det3d.core.bbox import box_torch_ops
 from .target_assigner.proposal_target_layer import ProposalTargetLayer
+
 
 def limit_period(val, offset=0.5, period=np.pi):
     return val - torch.floor(val / period + offset) * period
@@ -20,7 +21,8 @@ class RoIHeadTemplate(nn.Module):
         super().__init__()
         self.model_cfg = model_cfg
         self.num_class = num_class
-        self.proposal_target_layer = ProposalTargetLayer(roi_sampler_cfg=self.model_cfg.TARGET_CONFIG)
+        self.proposal_target_layer = ProposalTargetLayer(
+            roi_sampler_cfg=self.model_cfg.TARGET_CONFIG)
 
         self.forward_ret_dict = None
 
@@ -36,7 +38,8 @@ class RoIHeadTemplate(nn.Module):
             pre_channel = fc_list[k]
             if self.model_cfg.DP_RATIO >= 0 and k == 0:
                 fc_layers.append(nn.Dropout(self.model_cfg.DP_RATIO))
-        fc_layers.append(nn.Conv1d(pre_channel, output_channels, kernel_size=1, bias=True))
+        fc_layers.append(
+            nn.Conv1d(pre_channel, output_channels, kernel_size=1, bias=True))
         fc_layers = nn.Sequential(*fc_layers)
         return fc_layers
 
@@ -60,7 +63,7 @@ class RoIHeadTemplate(nn.Module):
 
         if rois.shape[-1] == 9:
             # rotate velocity
-            gt_of_rois[:, :, 7:-1] = gt_of_rois[:, :, 7:-1] - rois[:, :, 7:]    
+            gt_of_rois[:, :, 7:-1] = gt_of_rois[:, :, 7:-1] - rois[:, :, 7:]
 
             """
             roi_vel = gt_of_rois[:, :, 7:-1]
@@ -73,14 +76,16 @@ class RoIHeadTemplate(nn.Module):
 
         # flip orientation if rois have opposite orientation
         heading_label = gt_of_rois[:, :, 6] % (2 * np.pi)  # 0 ~ 2pi
-        opposite_flag = (heading_label > np.pi * 0.5) & (heading_label < np.pi * 1.5)
-        heading_label[opposite_flag] = (heading_label[opposite_flag] + np.pi) % (2 * np.pi)  # (0 ~ pi/2, 3pi/2 ~ 2pi)
+        opposite_flag = (heading_label > np.pi *
+                         0.5) & (heading_label < np.pi * 1.5)
+        heading_label[opposite_flag] = (
+            heading_label[opposite_flag] + np.pi) % (2 * np.pi)  # (0 ~ pi/2, 3pi/2 ~ 2pi)
         flag = heading_label > np.pi
         heading_label[flag] = heading_label[flag] - np.pi * 2  # (-pi/2, pi/2)
-        heading_label = torch.clamp(heading_label, min=-np.pi / 2, max=np.pi / 2)
+        heading_label = torch.clamp(
+            heading_label, min=-np.pi / 2, max=np.pi / 2)
 
         gt_of_rois[:, :, 6] = heading_label
-
 
         targets_dict['gt_of_rois'] = gt_of_rois
         return targets_dict
@@ -106,11 +111,13 @@ class RoIHeadTemplate(nn.Module):
                 reduction='none'
             )  # [B, M, 7]
 
-            rcnn_loss_reg = rcnn_loss_reg * rcnn_loss_reg.new_tensor(\
+            rcnn_loss_reg = rcnn_loss_reg * rcnn_loss_reg.new_tensor(
                 loss_cfgs.LOSS_WEIGHTS['code_weights'])
 
-            rcnn_loss_reg = (rcnn_loss_reg.view(rcnn_batch_size, -1) * fg_mask.unsqueeze(dim=-1).float()).sum() / max(fg_sum, 1)
-            rcnn_loss_reg = rcnn_loss_reg * loss_cfgs.LOSS_WEIGHTS['rcnn_reg_weight']
+            rcnn_loss_reg = (rcnn_loss_reg.view(
+                rcnn_batch_size, -1) * fg_mask.unsqueeze(dim=-1).float()).sum() / max(fg_sum, 1)
+            rcnn_loss_reg = rcnn_loss_reg * \
+                loss_cfgs.LOSS_WEIGHTS['rcnn_reg_weight']
             tb_dict['rcnn_loss_reg'] = rcnn_loss_reg.detach()
         else:
             raise NotImplementedError
@@ -123,28 +130,35 @@ class RoIHeadTemplate(nn.Module):
         rcnn_cls_labels = forward_ret_dict['rcnn_cls_labels'].view(-1)
         if loss_cfgs.CLS_LOSS == 'BinaryCrossEntropy':
             rcnn_cls_flat = rcnn_cls.view(-1)
-            batch_loss_cls = F.binary_cross_entropy(torch.sigmoid(rcnn_cls_flat), rcnn_cls_labels.float(), reduction='none')
+            batch_loss_cls = F.binary_cross_entropy(torch.sigmoid(
+                rcnn_cls_flat), rcnn_cls_labels.float(), reduction='none')
             cls_valid_mask = (rcnn_cls_labels >= 0).float()
-            rcnn_loss_cls = (batch_loss_cls * cls_valid_mask).sum() / torch.clamp(cls_valid_mask.sum(), min=1.0)
+            rcnn_loss_cls = (batch_loss_cls * cls_valid_mask).sum() / \
+                torch.clamp(cls_valid_mask.sum(), min=1.0)
         elif loss_cfgs.CLS_LOSS == 'CrossEntropy':
-            batch_loss_cls = F.cross_entropy(rcnn_cls, rcnn_cls_labels, reduction='none', ignore_index=-1)
+            batch_loss_cls = F.cross_entropy(
+                rcnn_cls, rcnn_cls_labels, reduction='none', ignore_index=-1)
             cls_valid_mask = (rcnn_cls_labels >= 0).float()
-            rcnn_loss_cls = (batch_loss_cls * cls_valid_mask).sum() / torch.clamp(cls_valid_mask.sum(), min=1.0)
+            rcnn_loss_cls = (batch_loss_cls * cls_valid_mask).sum() / \
+                torch.clamp(cls_valid_mask.sum(), min=1.0)
         else:
             raise NotImplementedError
 
-        rcnn_loss_cls = rcnn_loss_cls * loss_cfgs.LOSS_WEIGHTS['rcnn_cls_weight']
+        rcnn_loss_cls = rcnn_loss_cls * \
+            loss_cfgs.LOSS_WEIGHTS['rcnn_cls_weight']
         tb_dict = {'rcnn_loss_cls': rcnn_loss_cls.detach()}
         return rcnn_loss_cls, tb_dict
 
     def get_loss(self, tb_dict=None):
         tb_dict = {} if tb_dict is None else tb_dict
         rcnn_loss = 0
-        rcnn_loss_cls, cls_tb_dict = self.get_box_cls_layer_loss(self.forward_ret_dict)
+        rcnn_loss_cls, cls_tb_dict = self.get_box_cls_layer_loss(
+            self.forward_ret_dict)
         rcnn_loss += rcnn_loss_cls
         tb_dict.update(cls_tb_dict)
 
-        rcnn_loss_reg, reg_tb_dict = self.get_box_reg_layer_loss(self.forward_ret_dict)
+        rcnn_loss_reg, reg_tb_dict = self.get_box_reg_layer_loss(
+            self.forward_ret_dict)
         rcnn_loss += rcnn_loss_reg
         tb_dict.update(reg_tb_dict)
         tb_dict['rcnn_loss'] = rcnn_loss.item()
@@ -179,5 +193,5 @@ class RoIHeadTemplate(nn.Module):
 
         batch_box_preds[:, 0:3] += roi_xyz
         batch_box_preds = batch_box_preds.view(batch_size, -1, code_size)
-        
+
         return batch_cls_preds, batch_box_preds
