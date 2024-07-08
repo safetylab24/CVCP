@@ -201,9 +201,7 @@ class CenterHead(nn.Module):
             logger = logging.getLogger("CenterHead")
         self.logger = logger
 
-        logger.info(
-            f"num_classes: {num_classes}"
-        )
+        logger.info(f"num_classes: {num_classes}")
 
         # a shared convolution 
         self.shared_conv = nn.Sequential(

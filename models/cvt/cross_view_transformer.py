@@ -33,4 +33,4 @@ class CrossViewTransformer(nn.Module):
     def forward(self, images, intrinsics, extrinsics):
         x, atts = self.encoder(images, intrinsics, extrinsics)
 
-        return x # (4, 128, 25, 25)
+        return x
