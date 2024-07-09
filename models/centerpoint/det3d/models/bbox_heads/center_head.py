@@ -5,22 +5,23 @@
 # Licensed under the MIT License
 # ------------------------------------------------------------------------------
 
-import logging
+from CVCP.models.centerpoint.det3d.core import box_torch_ops
 from collections import defaultdict
-from models.centerpoint.det3d.core import box_torch_ops
-import torch
-from models.centerpoint.det3d.torchie.cnn import kaiming_init
-from torch import double, nn
-from models.centerpoint.det3d.models.losses.centernet_loss import FastFocalLoss, RegLoss
-from models.centerpoint.det3d.models.utils import Sequential
+import logging
+from CVCP.models.centerpoint.det3d.core.utils.circle_nms_jit import circle_nms
+import copy
 from ..registry import HEADS
-import copy 
+from CVCP.models.centerpoint.det3d.models.utils import Sequential
+from CVCP.models.centerpoint.det3d.models.losses.centernet_loss import FastFocalLoss, RegLoss
+from torch import double, nn
+from CVCP.models.centerpoint.det3d.torchie.cnn import kaiming_init
+import torch
+import numpy as np
 try:
-    from models.centerpoint.det3d.ops.dcn import DeformConv
+    from CVCP.models.centerpoint.det3d.ops.dcn import DeformConv
 except:
-    print("Deformable Convolution not built!")
+    "tion not built!"
 
-from models.centerpoint.det3d.core.utils.circle_nms_jit import circle_nms
 
 class FeatureAdaption(nn.Module):
     """Feature Adaption Module.
@@ -39,8 +40,8 @@ class FeatureAdaption(nn.Module):
     def __init__(self,
                  in_channels,
                  out_channels,
-                 kernel_size=3,
-                 deformable_groups=4):
+                 kernel_size = 3,
+                 deformable_groups = 4):
         super(FeatureAdaption, self).__init__()
         offset_channels = kernel_size * kernel_size * 2
         self.conv_offset = nn.Conv2d(
@@ -62,6 +63,7 @@ class FeatureAdaption(nn.Module):
         x = self.relu(self.conv_adaption(x, offset))
         return x
 
+
 class SepHead(nn.Module):
     def __init__(
         self,
@@ -75,22 +77,22 @@ class SepHead(nn.Module):
     ):
         super(SepHead, self).__init__(**kwargs)
 
-        self.heads = heads 
+        self.heads = heads
         for head in self.heads:
             classes, num_conv = self.heads[head]
 
             fc = Sequential()
             for i in range(num_conv-1):
                 fc.add(nn.Conv2d(in_channels, head_conv,
-                    kernel_size=final_kernel, stride=1, 
-                    padding=final_kernel // 2, bias=True))
+                                 kernel_size=final_kernel, stride=1,
+                                 padding=final_kernel // 2, bias=True))
                 if bn:
                     fc.add(nn.BatchNorm2d(head_conv))
                 fc.add(nn.ReLU())
 
             fc.add(nn.Conv2d(head_conv, classes,
-                    kernel_size=final_kernel, stride=1, 
-                    padding=final_kernel // 2, bias=True))    
+                             kernel_size=final_kernel, stride=1,
+                             padding=final_kernel // 2, bias=True))
 
             if 'hm' in head:
                 fc[-1].bias.data.fill_(init_bias)
@@ -100,14 +102,14 @@ class SepHead(nn.Module):
                         kaiming_init(m)
 
             self.__setattr__(head, fc)
-        
 
     def forward(self, x):
-        ret_dict = dict()        
+        ret_dict = dict()
         for head in self.heads:
             ret_dict[head] = self.__getattr__(head)(x)
 
         return ret_dict
+
 
 class DCNSepHead(nn.Module):
     def __init__(
@@ -129,31 +131,31 @@ class DCNSepHead(nn.Module):
             in_channels,
             in_channels,
             kernel_size=3,
-            deformable_groups=4) 
-        
+            deformable_groups=4)
+
         self.feature_adapt_reg = FeatureAdaption(
             in_channels,
             in_channels,
             kernel_size=3,
-            deformable_groups=4)  
+            deformable_groups=4)
 
-        # heatmap prediction head 
+        # heatmap prediction head
         self.cls_head = Sequential(
             nn.Conv2d(in_channels, head_conv,
-            kernel_size=3, padding=1, bias=True),
+                      kernel_size=3, padding=1, bias=True),
             nn.BatchNorm2d(64),
             nn.ReLU(inplace=True),
             nn.Conv2d(head_conv, num_cls,
-                kernel_size=3, stride=1, 
-                padding=1, bias=True)
+                      kernel_size=3, stride=1,
+                      padding=1, bias=True)
         )
         self.cls_head[-1].bias.data.fill_(init_bias)
 
-        # other regression target 
-        self.task_head = SepHead(in_channels, heads, head_conv=head_conv, bn=bn, final_kernel=final_kernel)
+        # other regression target
+        self.task_head = SepHead(
+            in_channels, heads, head_conv=head_conv, bn=bn, final_kernel=final_kernel)
 
-
-    def forward(self, x):    
+    def forward(self, x):
         center_feat = self.feature_adapt_cls(x)
         reg_feat = self.feature_adapt_reg(x)
 
@@ -184,7 +186,7 @@ class CenterHead(nn.Module):
 
         num_classes = [len(t["class_names"]) for t in tasks]
         self.class_names = [t["class_names"] for t in tasks]
-        self.code_weights = code_weights 
+        self.code_weights = code_weights
         self.weight = weight  # weight between hm loss and loc loss
         self.dataset = dataset
 
@@ -194,8 +196,8 @@ class CenterHead(nn.Module):
         self.crit = FastFocalLoss()
         self.crit_reg = RegLoss()
 
-        self.box_n_dim = 9 if 'vel' in common_heads else 7  
-        self.use_direction_classifier = False 
+        self.box_n_dim = 9 if 'vel' in common_heads else 7
+        self.use_direction_classifier = False
 
         if not logger:
             logger = logging.getLogger("CenterHead")
@@ -203,10 +205,10 @@ class CenterHead(nn.Module):
 
         logger.info(f"num_classes: {num_classes}")
 
-        # a shared convolution 
+        # a shared convolution
         self.shared_conv = nn.Sequential(
             nn.Conv2d(in_channels, share_conv_channel,
-            kernel_size=3, padding=1, bias=True),
+                      kernel_size=3, padding=1, bias=True),
             nn.BatchNorm2d(share_conv_channel),
             nn.ReLU(inplace=True)
         ).to('cuda')
@@ -222,11 +224,13 @@ class CenterHead(nn.Module):
             if not dcn_head:
                 heads.update(dict(hm=(num_cls, num_hm_conv)))
                 self.tasks.append(
-                    SepHead(share_conv_channel, heads, bn=True, init_bias=init_bias, final_kernel=3).to('cuda')
+                    SepHead(share_conv_channel, heads, bn=True,
+                            init_bias=init_bias, final_kernel=3).to('cuda')
                 )
             else:
                 self.tasks.append(
-                    DCNSepHead(share_conv_channel, num_cls, heads, bn=True, init_bias=init_bias, final_kernel=3).to('cuda')
+                    DCNSepHead(share_conv_channel, num_cls, heads, bn=True,
+                               init_bias=init_bias, final_kernel=3).to('cuda')
                 )
 
         logger.info("Finish CenterHead Initialization")
@@ -251,34 +255,38 @@ class CenterHead(nn.Module):
             # heatmap focal loss
             preds_dict['hm'] = self._sigmoid(preds_dict['hm'])
 
-            hm_loss = self.crit(preds_dict['hm'], example['hm'][task_id], example['ind'][task_id], example['mask'][task_id], example['cat'][task_id])
+            hm_loss = self.crit(preds_dict['hm'], example['hm'][task_id], example['ind']
+                                [task_id], example['mask'][task_id], example['cat'][task_id])
 
             target_box = example['anno_box'][task_id]
             # reconstruct the anno_box from multiple reg heads
             if self.dataset in ['waymo', 'nuscenes']:
                 if 'vel' in preds_dict:
                     preds_dict['anno_box'] = torch.cat((preds_dict['reg'], preds_dict['height'], preds_dict['dim'],
-                                                        preds_dict['vel'], preds_dict['rot']), dim=1)  
+                                                        preds_dict['vel'], preds_dict['rot']), dim=1)
                 else:
                     preds_dict['anno_box'] = torch.cat((preds_dict['reg'], preds_dict['height'], preds_dict['dim'],
-                                                        preds_dict['rot']), dim=1)   
-                    target_box = target_box[..., [0, 1, 2, 3, 4, 5, -2, -1]] # remove vel target                       
+                                                        preds_dict['rot']), dim=1)
+                    # remove vel target
+                    target_box = target_box[..., [0, 1, 2, 3, 4, 5, -2, -1]]
             else:
                 raise NotImplementedError()
 
             ret = {}
- 
-            # Regression loss for dimension, offset, height, rotation            
-            box_loss = self.crit_reg(preds_dict['anno_box'], example['mask'][task_id], example['ind'][task_id], target_box)
+
+            # Regression loss for dimension, offset, height, rotation
+            box_loss = self.crit_reg(
+                preds_dict['anno_box'], example['mask'][task_id], example['ind'][task_id], target_box)
 
             loc_loss = (box_loss*box_loss.new_tensor(self.code_weights)).sum()
 
             loss = hm_loss + self.weight*loc_loss
 
-            ret.update({'loss': loss, 'hm_loss': hm_loss.detach().cpu(), 'loc_loss':loc_loss, 'loc_loss_elem': box_loss.detach().cpu(), 'num_positive': example['mask'][task_id].float().sum()})
+            ret.update({'loss': loss, 'hm_loss': hm_loss.detach().cpu(), 'loc_loss': loc_loss,
+                       'loc_loss_elem': box_loss.detach().cpu(), 'num_positive': example['mask'][task_id].float().sum()})
 
             rets.append(ret)
-        
+
         """convert batch-key to key-batch
         """
         rets_merged = defaultdict(list)
@@ -307,7 +315,7 @@ class CenterHead(nn.Module):
             )
 
         for task_id, preds_dict in enumerate(preds_dicts):
-            # convert N C H W to N H W C 
+            # convert N C H W to N H W C
             for key, val in preds_dict.items():
                 preds_dict[key] = val.permute(0, 2, 3, 1).contiguous()
 
@@ -319,16 +327,20 @@ class CenterHead(nn.Module):
                 for k in preds_dict.keys():
                     # transform the prediction map back to their original coordinate befor flipping
                     # the flipped predictions are ordered in a group of 4. The first one is the original pointcloud
-                    # the second one is X flip pointcloud(y=-y), the third one is Y flip pointcloud(x=-x), and the last one is 
+                    # the second one is X flip pointcloud(y=-y), the third one is Y flip pointcloud(x=-x), and the last one is
                     # X and Y flip pointcloud(x=-x, y=-y).
                     # Also please note that pytorch's flip function is defined on higher dimensional space, so dims=[2] means that
                     # it is flipping along the axis with H length(which is normaly the Y axis), however in our traditional word, it is flipping along
                     # the X axis. The below flip follows pytorch's definition yflip(y=-y) xflip(x=-x)
                     _, H, W, C = preds_dict[k].shape
-                    preds_dict[k] = preds_dict[k].reshape(int(batch_size), 4, H, W, C)
-                    preds_dict[k][:, 1] = torch.flip(preds_dict[k][:, 1], dims=[1]) 
-                    preds_dict[k][:, 2] = torch.flip(preds_dict[k][:, 2], dims=[2])
-                    preds_dict[k][:, 3] = torch.flip(preds_dict[k][:, 3], dims=[1, 2])
+                    preds_dict[k] = preds_dict[k].reshape(
+                        int(batch_size), 4, H, W, C)
+                    preds_dict[k][:, 1] = torch.flip(
+                        preds_dict[k][:, 1], dims=[1])
+                    preds_dict[k][:, 2] = torch.flip(
+                        preds_dict[k][:, 2], dims=[2])
+                    preds_dict[k][:, 3] = torch.flip(
+                        preds_dict[k][:, 3], dims=[1, 2])
 
             if "metadata" not in example or len(example["metadata"]) == 0:
                 meta_list = [None] * batch_size
@@ -359,7 +371,7 @@ class CenterHead(nn.Module):
                 batch_reg[:, 3, ..., 1] = 1 - batch_reg[:, 3, ..., 1]
                 batch_reg = batch_reg.mean(dim=1)
 
-                # first yflip 
+                # first yflip
                 # y = -y theta = pi -theta
                 # sin(pi-theta) = sin(theta) cos(pi-theta) = -cos(theta)
                 # batch_rots[:, 1] the same
@@ -370,7 +382,7 @@ class CenterHead(nn.Module):
                 # batch_rots[:, 2] the same
                 batch_rots[:, 2] *= -1
 
-                # double flip 
+                # double flip
                 batch_rots[:, 3] *= -1
                 batch_rotc[:, 3] *= -1
 
@@ -395,8 +407,10 @@ class CenterHead(nn.Module):
             xs = xs.view(batch, -1, 1) + batch_reg[:, :, 0:1]
             ys = ys.view(batch, -1, 1) + batch_reg[:, :, 1:2]
 
-            xs = xs * test_cfg.out_size_factor * test_cfg.voxel_size[0] + test_cfg.pc_range[0]
-            ys = ys * test_cfg.out_size_factor * test_cfg.voxel_size[1] + test_cfg.pc_range[1]
+            xs = xs * test_cfg.out_size_factor * \
+                test_cfg.voxel_size[0] + test_cfg.pc_range[0]
+            ys = ys * test_cfg.out_size_factor * \
+                test_cfg.voxel_size[1] + test_cfg.pc_range[1]
 
             if 'vel' in preds_dict:
                 batch_vel = preds_dict['vel']
@@ -408,20 +422,23 @@ class CenterHead(nn.Module):
                     batch_vel[:, 2, ..., 0] *= -1
 
                     batch_vel[:, 3] *= -1
-                    
+
                     batch_vel = batch_vel.mean(dim=1)
 
                 batch_vel = batch_vel.reshape(batch, H*W, 2)
-                batch_box_preds = torch.cat([xs, ys, batch_hei, batch_dim, batch_vel, batch_rot], dim=2)
-            else: 
-                batch_box_preds = torch.cat([xs, ys, batch_hei, batch_dim, batch_rot], dim=2)
+                batch_box_preds = torch.cat(
+                    [xs, ys, batch_hei, batch_dim, batch_vel, batch_rot], dim=2)
+            else:
+                batch_box_preds = torch.cat(
+                    [xs, ys, batch_hei, batch_dim, batch_rot], dim=2)
 
             metas.append(meta_list)
 
             if test_cfg.get('per_class_nms', False):
-                pass 
+                pass
             else:
-                rets.append(self.post_processing(batch_box_preds, batch_hm, test_cfg, post_center_range, task_id)) 
+                rets.append(self.post_processing(batch_box_preds,
+                            batch_hm, test_cfg, post_center_range, task_id))
 
         # Merge branches results
         ret_list = []
@@ -443,7 +460,7 @@ class CenterHead(nn.Module):
             ret['metadata'] = metas[0][i]
             ret_list.append(ret)
 
-        return ret_list 
+        return ret_list
 
     @torch.no_grad()
     def post_processing(self, batch_box_preds, batch_hm, test_cfg, post_center_range, task_id):
@@ -460,7 +477,7 @@ class CenterHead(nn.Module):
             distance_mask = (box_preds[..., :3] >= post_center_range[:3]).all(1) \
                 & (box_preds[..., :3] <= post_center_range[3:]).all(1)
 
-            mask = distance_mask & score_mask 
+            mask = distance_mask & score_mask
 
             box_preds = box_preds[mask]
             scores = scores[mask]
@@ -469,14 +486,15 @@ class CenterHead(nn.Module):
             boxes_for_nms = box_preds[:, [0, 1, 2, 3, 4, 5, -1]]
 
             if test_cfg.get('circular_nms', False):
-                centers = boxes_for_nms[:, [0, 1]] 
+                centers = boxes_for_nms[:, [0, 1]]
                 boxes = torch.cat([centers, scores.view(-1, 1)], dim=1)
-                selected = _circle_nms(boxes, min_radius=test_cfg.min_radius[task_id], post_max_size=test_cfg.nms.nms_post_max_size)  
+                selected = _circle_nms(
+                    boxes, min_radius=test_cfg.min_radius[task_id], post_max_size=test_cfg.nms.nms_post_max_size)
             else:
-                selected = box_torch_ops.rotate_nms_pcdet(boxes_for_nms.float(), scores.float(), 
-                                    thresh=test_cfg.nms.nms_iou_threshold,
-                                    pre_maxsize=test_cfg.nms.nms_pre_max_size,
-                                    post_max_size=test_cfg.nms.nms_post_max_size)
+                selected = box_torch_ops.rotate_nms_pcdet(boxes_for_nms.float(), scores.float(),
+                                                          thresh=test_cfg.nms.nms_iou_threshold,
+                                                          pre_maxsize=test_cfg.nms.nms_pre_max_size,
+                                                          post_max_size=test_cfg.nms.nms_post_max_size)
 
             selected_boxes = box_preds[selected]
             selected_scores = scores[selected]
@@ -490,14 +508,15 @@ class CenterHead(nn.Module):
 
             prediction_dicts.append(prediction_dict)
 
-        return prediction_dicts 
+        return prediction_dicts
 
-import numpy as np 
+
 def _circle_nms(boxes, min_radius, post_max_size=83):
     """
     NMS according to center distance
     """
-    keep = np.array(circle_nms(boxes.cpu().numpy(), thresh=min_radius))[:post_max_size]
+    keep = np.array(circle_nms(boxes.cpu().numpy(), thresh=min_radius))[
+        :post_max_size]
 
     keep = torch.from_numpy(keep).long().to(boxes.device)
 

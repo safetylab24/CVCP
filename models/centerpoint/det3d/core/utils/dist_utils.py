@@ -1,7 +1,7 @@
 from collections import OrderedDict
 
 import torch.distributed as dist
-from models.centerpoint.det3d.torchie.trainer import OptimizerHook
+from CVCP.models.centerpoint.det3d.torchie.trainer import OptimizerHook
 from torch._utils import _flatten_dense_tensors, _take_tensors, _unflatten_dense_tensors
 
 
@@ -51,7 +51,8 @@ class DistOptimizerHook(OptimizerHook):
     def after_train_iter(self, runner):
         runner.optimizer.zero_grad()
         runner.outputs["loss"].backward()
-        allreduce_grads(runner.model.parameters(), self.coalesce, self.bucket_size_mb)
+        allreduce_grads(runner.model.parameters(),
+                        self.coalesce, self.bucket_size_mb)
         if self.grad_clip is not None:
             self.clip_grads(runner.model.parameters())
         runner.optimizer.step()

@@ -7,7 +7,7 @@ import math
 import torch.distributed as dist
 from torch.utils.data.sampler import Sampler
 
-from models.centerpoint.det3d.torchie.trainer import get_dist_info
+from CVCP.models.centerpoint.det3d.torchie.trainer import get_dist_info
 from torch.utils.data import DistributedSampler as _DistributedSampler
 
 # from torch.utils.data import Sampler
@@ -31,17 +31,20 @@ class DistributedSamplerV2(Sampler):
     def __init__(self, dataset, num_replicas=None, rank=None, shuffle=True):
         if num_replicas is None:
             if not dist.is_available():
-                raise RuntimeError("Requires distributed package to be available")
+                raise RuntimeError(
+                    "Requires distributed package to be available")
             num_replicas = dist.get_world_size()
         if rank is None:
             if not dist.is_available():
-                raise RuntimeError("Requires distributed package to be available")
+                raise RuntimeError(
+                    "Requires distributed package to be available")
             rank = dist.get_rank()
         self.dataset = dataset
         self.num_replicas = num_replicas
         self.rank = rank
         self.epoch = 0
-        self.num_samples = int(math.ceil(len(self.dataset) * 1.0 / self.num_replicas))
+        self.num_samples = int(
+            math.ceil(len(self.dataset) * 1.0 / self.num_replicas))
         self.total_size = self.num_samples * self.num_replicas
         self.shuffle = shuffle
 
@@ -59,7 +62,7 @@ class DistributedSamplerV2(Sampler):
         assert len(indices) == self.total_size
 
         # subsample
-        indices = indices[self.rank : self.total_size : self.num_replicas]
+        indices = indices[self.rank: self.total_size: self.num_replicas]
         assert len(indices) == self.num_samples
 
         return iter(indices)
@@ -90,7 +93,7 @@ class DistributedSampler(_DistributedSampler):
         assert len(indices) == self.total_size
 
         # subsample
-        indices = indices[self.rank : self.total_size : self.num_replicas]
+        indices = indices[self.rank: self.total_size: self.num_replicas]
         assert len(indices) == self.num_samples
 
         return iter(indices)
@@ -124,7 +127,7 @@ class GroupSampler(Sampler):
             indices.append(indice)
         indices = np.concatenate(indices)
         indices = [
-            indices[i * self.samples_per_gpu : (i + 1) * self.samples_per_gpu]
+            indices[i * self.samples_per_gpu: (i + 1) * self.samples_per_gpu]
             for i in np.random.permutation(range(len(indices) // self.samples_per_gpu))
         ]
         indices = np.concatenate(indices)
@@ -192,9 +195,11 @@ class DistributedGroupSampler(Sampler):
             if size > 0:
                 indice = np.where(self.flag == i)[0]
                 assert len(indice) == size
-                indice = indice[list(torch.randperm(int(size), generator=g))].tolist()
+                indice = indice[list(torch.randperm(
+                    int(size), generator=g))].tolist()
                 extra = int(
-                    math.ceil(size * 1.0 / self.samples_per_gpu / self.num_replicas)
+                    math.ceil(size * 1.0 / self.samples_per_gpu /
+                              self.num_replicas)
                 ) * self.samples_per_gpu * self.num_replicas - len(indice)
                 indice += indice[:extra]
                 indices += indice
@@ -204,14 +209,15 @@ class DistributedGroupSampler(Sampler):
         indices = [
             indices[j]
             for i in list(
-                torch.randperm(len(indices) // self.samples_per_gpu, generator=g)
+                torch.randperm(
+                    len(indices) // self.samples_per_gpu, generator=g)
             )
             for j in range(i * self.samples_per_gpu, (i + 1) * self.samples_per_gpu)
         ]
 
         # subsample
         offset = self.num_samples * self.rank
-        indices = indices[offset : offset + self.num_samples]
+        indices = indices[offset: offset + self.num_samples]
         assert len(indices) == self.num_samples
 
         return iter(indices)

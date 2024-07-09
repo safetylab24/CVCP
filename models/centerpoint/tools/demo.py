@@ -11,11 +11,11 @@ except:
 import numpy as np
 import torch
 import yaml
-from models.centerpoint.det3d import torchie
-from models.centerpoint.det3d.datasets import build_dataloader, build_dataset
-from models.centerpoint.det3d.models import build_detector
-from models.centerpoint.det3d.torchie import Config
-from models.centerpoint.det3d.torchie.apis import (
+from CVCP.models.centerpoint.det3d import torchie
+from CVCP.models.centerpoint.det3d.datasets import build_dataloader, build_dataset
+from CVCP.models.centerpoint.det3d.models import build_detector
+from CVCP.models.centerpoint.det3d.torchie import Config
+from CVCP.models.centerpoint.det3d.torchie.apis import (
     batch_processor,
     build_optimizer,
     get_root_logger,
@@ -23,11 +23,11 @@ from models.centerpoint.det3d.torchie.apis import (
     set_random_seed,
     train_detector,
 )
-from models.centerpoint.det3d.torchie.trainer import load_checkpoint
+from CVCP.models.centerpoint.det3d.torchie.trainer import load_checkpoint
 import pickle
 import time
 from matplotlib import pyplot as plt
-from models.centerpoint.det3d.torchie.parallel import collate, collate_kitti
+from CVCP.models.centerpoint.det3d.torchie.parallel import collate, collate_kitti
 from torch.utils.data import DataLoader
 import matplotlib.cm as cm
 import subprocess

@@ -5,8 +5,8 @@ import pickle
 import fire
 import os
 
-from models.centerpoint.det3ds.centerpoint.det3d.datasets.nuscenes import nusc_common as nu_ds
-from models.centerpoint.det3d.datasets.utils.create_gt_database import create_groundtruth_database
+from CVCP.models.centerpoint.det3d.datasets.nuscenes import nusc_common as nu_ds
+from CVCP.models.centerpoint.det3d.datasets.utils.create_gt_database import create_groundtruth_database
 
 
 def nuscenes_data_prep(root_path, version, nsweeps=10, filter_zero=True, virtual=False):

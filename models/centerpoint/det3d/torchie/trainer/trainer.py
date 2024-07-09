@@ -5,7 +5,7 @@ import threading
 from collections import OrderedDict
 
 import torch
-from models.centerpoint.det3d import torchie
+from CVCP.models.centerpoint.det3d import torchie
 
 from . import hooks
 from .checkpoint import load_checkpoint, save_checkpoint
@@ -34,8 +34,9 @@ def example_to_device(example, device, non_blocking=False) -> dict:
     float_names = ["voxels", "bev_map"]
     for k, v in example.items():
         if k in ["anchors", "anchors_mask", "reg_targets", "reg_weights", "labels", "hm",
-                "anno_box", "ind", "mask", 'cat', 'points']:
-            example_torch[k] = [res.to(device, non_blocking=non_blocking) for res in v]
+                 "anno_box", "ind", "mask", 'cat', 'points']:
+            example_torch[k] = [
+                res.to(device, non_blocking=non_blocking) for res in v]
         elif k in [
             "voxels",
             "bev_map",
@@ -286,7 +287,8 @@ class Trainer(object):
 
     def current_lr(self):
         if self.optimizer is None:
-            raise RuntimeError("lr is not applicable because optimizer does not exist.")
+            raise RuntimeError(
+                "lr is not applicable because optimizer does not exist.")
         return [group["lr"] for group in self.optimizer.param_groups]
 
     def register_hook(self, hook, priority="NORMAL"):
@@ -392,7 +394,7 @@ class Trainer(object):
         for i, data_batch in enumerate(data_loader):
             global_step = base_step + i
             if self.lr_scheduler is not None:
-                #print(global_step)
+                # print(global_step)
                 self.lr_scheduler.step(global_step)
 
             self._inner_iter = i
@@ -410,7 +412,8 @@ class Trainer(object):
             if not isinstance(outputs, dict):
                 raise TypeError("batch_processor() must return a dict")
             if "log_vars" in outputs:
-                self.log_buffer.update(outputs["log_vars"], outputs["num_samples"])
+                self.log_buffer.update(
+                    outputs["log_vars"], outputs["num_samples"])
             self.outputs = outputs
             self.call_hook("after_train_iter")
             self._iter += 1
@@ -447,7 +450,7 @@ class Trainer(object):
                     ]:
                         output[k] = v.to(cpu_device)
                 detections.update(
-                    {token: output,}
+                    {token: output, }
                 )
                 if self.rank == 0:
                     for _ in range(self.world_size):
@@ -479,10 +482,12 @@ class Trainer(object):
     def resume(self, checkpoint, resume_optimizer=True, map_location="default"):
         if map_location == "default":
             checkpoint = self.load_checkpoint(
-                checkpoint , map_location='cuda:{}'.format(torch.cuda.current_device()) # TODO: FIX THIS!!
+                checkpoint, map_location='cuda:{}'.format(
+                    torch.cuda.current_device())  # TODO: FIX THIS!!
             )
         else:
-            checkpoint = self.load_checkpoint(checkpoint, map_location=map_location)
+            checkpoint = self.load_checkpoint(
+                checkpoint, map_location=map_location)
 
         self._epoch = checkpoint["meta"]["epoch"]
         self._iter = checkpoint["meta"]["iter"]

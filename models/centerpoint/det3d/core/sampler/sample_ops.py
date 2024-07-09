@@ -5,9 +5,9 @@ import time
 from functools import partial, reduce
 
 import numpy as np
-from models.centerpoint.det3d.core.bbox import box_np_ops
-from models.centerpoint.det3d.core.sampler import preprocess as prep
-from models.centerpoint.det3d.utils.check import shape_mergeable
+from CVCP.models.centerpoint.det3d.core.bbox import box_np_ops
+from CVCP.models.centerpoint.det3d.core.sampler import preprocess as prep
+from CVCP.models.centerpoint.det3d.utils.check import shape_mergeable
 
 
 class DataBaseSamplerV2:
@@ -198,12 +198,14 @@ class DataBaseSamplerV2:
                 rect = calib["rect"]
                 Trv2c = calib["Trv2c"]
                 P2 = calib["P2"]
-                gt_bboxes = box_np_ops.box3d_to_bbox(sampled_gt_boxes, rect, Trv2c, P2)
-                crop_frustums = prep.random_crop_frustum(gt_bboxes, rect, Trv2c, P2)
+                gt_bboxes = box_np_ops.box3d_to_bbox(
+                    sampled_gt_boxes, rect, Trv2c, P2)
+                crop_frustums = prep.random_crop_frustum(
+                    gt_bboxes, rect, Trv2c, P2)
                 for i in range(crop_frustums.shape[0]):
                     s_points = s_points_list[i]
                     mask = prep.mask_points_in_corners(
-                        s_points, crop_frustums[i : i + 1]
+                        s_points, crop_frustums[i: i + 1]
                     ).reshape(-1)
                     num_remove = np.sum(mask)
                     if num_remove > 0 and (s_points.shape[0] - num_remove) > 15:
@@ -269,7 +271,7 @@ class DataBaseSamplerV2:
                 boxes, None, valid_mask, 0, 0, self._global_rot_range, num_try=100
             )
 
-        sp_boxes_new = boxes[gt_boxes.shape[0] :]
+        sp_boxes_new = boxes[gt_boxes.shape[0]:]
         sp_boxes_bv = box_np_ops.center_to_corner_box2d(
             sp_boxes_new[:, 0:2], sp_boxes_new[:, 3:5], sp_boxes_new[:, -1]
         )
@@ -336,7 +338,7 @@ class DataBaseSamplerV2:
                 group_ids=group_ids,
                 num_try=100,
             )
-        sp_boxes_new = boxes[gt_boxes.shape[0] :]
+        sp_boxes_new = boxes[gt_boxes.shape[0]:]
         sp_boxes_bv = box_np_ops.center_to_corner_box2d(
             sp_boxes_new[:, 0:2], sp_boxes_new[:, 3:5], sp_boxes_new[:, -1]
         )
@@ -348,9 +350,9 @@ class DataBaseSamplerV2:
         valid_samples = []
         idx = num_gt
         for num in group_num:
-            if coll_mat[idx : idx + num].any():
-                coll_mat[idx : idx + num] = False
-                coll_mat[:, idx : idx + num] = False
+            if coll_mat[idx: idx + num].any():
+                coll_mat[idx: idx + num] = False
+                coll_mat[:, idx: idx + num] = False
             else:
                 for i in range(num):
                     if self._enable_global_rot:

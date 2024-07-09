@@ -5,7 +5,7 @@ Licensed under MIT License [see LICENSE].
 """
 
 import torch
-from models.centerpoint.det3d.models.utils import get_paddings_indicator
+from CVCP.models.centerpoint.det3d.models.utils import get_paddings_indicator
 from torch import nn
 from torch.nn import functional as F
 from ..registry import BACKBONES, READERS

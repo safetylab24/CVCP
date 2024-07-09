@@ -3,8 +3,8 @@ from pathlib import Path
 import os
 import numpy as np
 
-from models.centerpoint.det3d.core import box_np_ops
-from models.centerpoint.det3d.datasets.dataset_factory import get_dataset
+from CVCP.models.centerpoint.det3d.core import box_np_ops
+from CVCP.models.centerpoint.det3d.datasets.dataset_factory import get_dataset
 from tqdm import tqdm
 
 dataset_name_map = {

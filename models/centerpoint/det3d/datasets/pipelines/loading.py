@@ -7,8 +7,8 @@ import pycocotools.mask as maskUtils
 
 from pathlib import Path
 from copy import deepcopy
-from models.centerpoint.det3d import torchie
-from models.centerpoint.det3d.core import box_np_ops
+from CVCP.models.centerpoint.det3d import torchie
+from CVCP.models.centerpoint.det3d.core import box_np_ops
 import pickle
 import os
 from ..registry import PIPELINES

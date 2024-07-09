@@ -9,7 +9,7 @@ import torch.nn as nn
 import torch
 from .roi_head_template import RoIHeadTemplate
 
-from models.centerpoint.det3d.core import box_torch_ops
+from CVCP.models.centerpoint.det3d.core import box_torch_ops
 
 from ..registry import ROI_HEAD
 

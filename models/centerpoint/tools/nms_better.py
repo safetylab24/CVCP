@@ -14,7 +14,7 @@ from nuscenes.utils.geometry_utils import BoxVisibility, transform_matrix
 from nuscenes.utils.geometry_utils import points_in_box
 from functools import reduce
 from tqdm import tqdm
-from models.centerpoint.det3d.core import box_torch_ops
+from CVCP.models.centerpoint.det3d.core import box_torch_ops
 from collections import defaultdict
 import torch
 import glob

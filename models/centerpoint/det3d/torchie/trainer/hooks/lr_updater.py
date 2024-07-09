@@ -2,7 +2,7 @@ from __future__ import division
 
 from math import cos, pi
 
-from models.centerpoint.det3d.solver import learning_schedules_fastai as lsf
+from CVCP.models.centerpoint.det3d.solver import learning_schedules_fastai as lsf
 
 from .hook import Hook
 
@@ -55,7 +55,8 @@ class LrUpdaterHook(Hook):
     def before_run(self, trainer):
         for group in trainer.optimizer.param_groups:
             group.setdefault("initial_lr", group["lr"])
-        self.base_lr = [group["initial_lr"] for group in trainer.optimizer.param_groups]
+        self.base_lr = [group["initial_lr"]
+                        for group in trainer.optimizer.param_groups]
 
     def before_train_epoch(self, trainer):
         if not self.by_epoch:

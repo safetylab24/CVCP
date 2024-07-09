@@ -3,8 +3,8 @@ import subprocess
 import tempfile
 from pathlib import Path
 
-from models.centerpoint.det3d.utils.find import find_cuda_device_arch
-from models.centerpoint.det3d.utils.loader import import_file
+from CVCP.models.centerpoint.det3d.utils.find import find_cuda_device_arch
+from CVCP.models.centerpoint.det3d.utils.loader import import_file
 
 from .command import CUDALink, Gpp, Nvcc, compile_libraries, out
 

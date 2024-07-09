@@ -1,4 +1,4 @@
-from models.centerpoint.det3d.utils import Registry
+from CVCP.models.centerpoint.det3d.utils import Registry
 
 READERS = Registry("reader")
 BACKBONES = Registry("backbone")

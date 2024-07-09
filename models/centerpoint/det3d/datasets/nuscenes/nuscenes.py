@@ -15,15 +15,15 @@ try:
 except:
     print("nuScenes devkit not found!")
 
-from models.centerpoint.det3d.datasets.custom import PointCloudDataset
-from models.centerpoint.det3d.datasets.nuscenes.nusc_common import (
+from CVCP.models.centerpoint.det3d.datasets.custom import PointCloudDataset
+from CVCP.models.centerpoint.det3d.datasets.nuscenes.nusc_common import (
     general_to_detection,
     cls_attr_dist,
     _second_det_to_nusc_box,
     _lidar_nusc_box_to_global,
     eval_main
 )
-from models.centerpoint.det3d.datasets.registry import DATASETS
+from CVCP.models.centerpoint.det3d.datasets.registry import DATASETS
 
 
 @DATASETS.register_module
@@ -39,7 +39,7 @@ class NuScenesDataset(PointCloudDataset):
         pipeline=None,
         class_names=None,
         test_mode=False,
-        version="v1.0-trainval",
+        version="v1.0-mini",
         load_interval=1,
         **kwargs,
     ):
@@ -52,7 +52,7 @@ class NuScenesDataset(PointCloudDataset):
         assert self.nsweeps > 0, "At least input one sweep please!"
         print(self.nsweeps)
 
-        self._info_path = info_path
+        self._info_path = '/home/vrb230004/media/datasets/nuscenes/dbinfos_train_2sweeps_withvelo.pkl'
         self._class_names = class_names
 
         if not hasattr(self, "_nusc_infos"):
@@ -221,8 +221,7 @@ class NuScenesDataset(PointCloudDataset):
             "meta": None,
         }
 
-        nusc = NuScenes(version=version, dataroot=str(
-            self._root_path), verbose=True)
+        nusc = NuScenes(version=version, dataroot=str(self._root_path), verbose=True)
 
         mapped_class_names = []
         for n in self._class_names:

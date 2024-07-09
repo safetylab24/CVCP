@@ -1,7 +1,7 @@
 import multiprocessing
 
 import torch
-from models.centerpoint.det3d import torchie
+from CVCP.models.centerpoint.det3d import torchie
 
 from .checkpoint import load_checkpoint
 

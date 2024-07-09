@@ -1,7 +1,7 @@
 from functools import partial
 
 import numpy as np
-from models.centerpoint.det3d import torchie
+from CVCP.models.centerpoint.det3d import torchie
 from six.moves import map, zip
 
 
@@ -12,7 +12,8 @@ def tensor2imgs(tensor, mean=(0, 0, 0), std=(1, 1, 1), to_rgb=True):
     imgs = []
     for img_id in range(num_imgs):
         img = tensor[img_id, ...].cpu().numpy().transpose(1, 2, 0)
-        img = torchie.imdenormalize(img, mean, std, to_bgr=to_rgb).astype(np.uint8)
+        img = torchie.imdenormalize(
+            img, mean, std, to_bgr=to_rgb).astype(np.uint8)
         imgs.append(np.ascontiguousarray(img))
     return imgs
 

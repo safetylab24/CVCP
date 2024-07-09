@@ -1,8 +1,8 @@
 import platform
 from functools import partial
 
-from models.centerpoint.det3d.torchie.parallel import collate, collate_kitti
-from models.centerpoint.det3d.torchie.trainer import get_dist_info
+from CVCP.models.centerpoint.det3d.torchie.parallel import collate, collate_kitti
+from CVCP.models.centerpoint.det3d.torchie.trainer import get_dist_info
 from torch.utils.data import DataLoader
 
 from .sampler import (

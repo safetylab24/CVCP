@@ -8,7 +8,7 @@ from functools import partial
 from pathlib import Path
 
 import fire
-from models.centerpoint.det3d.utils.find import find_cuda, find_cuda_device_arch
+from CVCP.models.centerpoint.det3d.utils.find import find_cuda, find_cuda_device_arch
 
 
 class Gpp:

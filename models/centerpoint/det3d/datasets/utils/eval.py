@@ -1,9 +1,9 @@
 import numpy as np
 import numba
 
-from models.centerpoint.det3d.ops.nms.nms_gpu import rotate_iou_gpu_eval
-from models.centerpoint.det3d.ops.nms.nms_gpu import inter
-from models.centerpoint.det3d.core import box_np_ops
+from CVCP.models.centerpoint.det3d.ops.nms.nms_gpu import rotate_iou_gpu_eval
+from CVCP.models.centerpoint.det3d.ops.nms.nms_gpu import inter
+from CVCP.models.centerpoint.det3d.core import box_np_ops
 
 
 def get_split_parts(num, num_part):

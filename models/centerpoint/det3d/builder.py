@@ -2,16 +2,16 @@ import logging
 import pickle
 from functools import partial
 
-import det3d.core.sampler.preprocess as prep
+import CVCP.models.centerpoint.det3d.core.sampler.preprocess as prep
 import numpy as np
 import torch
-from models.centerpoint.det3d.core.input.voxel_generator import VoxelGenerator
-from models.centerpoint.det3d.core.sampler.preprocess import DataBasePreprocessor
-from models.centerpoint.det3d.core.sampler.sample_ops import DataBaseSamplerV2
-from models.centerpoint.det3d.solver import learning_schedules
-from models.centerpoint.det3d.solver import learning_schedules_fastai as lsf
-from models.centerpoint.det3d.solver import optim
-from models.centerpoint.det3d.solver.fastai_optim import FastAIMixedOptim, OptimWrapper
+from CVCP.models.centerpoint.det3d.core.input.voxel_generator import VoxelGenerator
+from CVCP.models.centerpoint.det3d.core.sampler.preprocess import DataBasePreprocessor
+from CVCP.models.centerpoint.det3d.core.sampler.sample_ops import DataBaseSamplerV2
+from CVCP.models.centerpoint.det3d.solver import learning_schedules
+from CVCP.models.centerpoint.det3d.solver import learning_schedules_fastai as lsf
+from CVCP.models.centerpoint.det3d.solver import optim
+from CVCP.models.centerpoint.det3d.solver.fastai_optim import FastAIMixedOptim, OptimWrapper
 from torch import nn
 
 

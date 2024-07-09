@@ -1,4 +1,4 @@
-from models.centerpoint.det3d.core.utils.scatter import scatter_mean
+from CVCP.models.centerpoint.det3d.core.utils.scatter import scatter_mean
 from torch.nn import functional as F
 from ..registry import READERS
 from torch import nn

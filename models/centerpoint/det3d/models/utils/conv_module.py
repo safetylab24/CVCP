@@ -1,7 +1,7 @@
 import warnings
 
 import torch.nn as nn
-from models.centerpoint.det3d.torchie.cnn import constant_init, kaiming_init
+from CVCP.models.centerpoint.det3d.torchie.cnn import constant_init, kaiming_init
 
 from .conv_ws import ConvWS2d
 from .norm import build_norm_layer

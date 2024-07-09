@@ -1,4 +1,4 @@
-from models.centerpoint.det3d.models.bbox_heads.center_head import CenterHead
+from CVCP.models.centerpoint.det3d.models.bbox_heads.center_head import CenterHead
 import logging
 import torch
 

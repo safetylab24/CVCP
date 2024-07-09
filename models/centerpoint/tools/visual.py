@@ -1,4 +1,4 @@
-from models.centerpoint.det3ds.centerpoint.det3ds.centerpoint.det3ds.centerpoint.det3d.core.bbox.box_np_ops import center_to_corner_box3d
+from CVCP.models.centerpoint.det3ds.centerpoint.det3ds.centerpoint.det3ds.centerpoint.det3d.core.bbox.box_np_ops import center_to_corner_box3d
 import open3d as o3d
 import argparse
 import pickle

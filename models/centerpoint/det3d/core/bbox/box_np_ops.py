@@ -2,7 +2,7 @@ from pathlib import Path
 
 import numba
 import numpy as np
-from models.centerpoint.det3d.core.bbox.geometry import (
+from CVCP.models.centerpoint.det3d.core.bbox.geometry import (
     points_count_convex_polygon_3d_jit,
     points_in_convex_polygon_3d_jit,
 )
@@ -81,7 +81,8 @@ def corners_nd(dims, origin=0.5):
     elif ndim == 3:
         corners_norm = corners_norm[[0, 1, 3, 2, 4, 5, 7, 6]]
     corners_norm = corners_norm - np.array(origin, dtype=dims.dtype)
-    corners = dims.reshape([-1, 1, ndim]) * corners_norm.reshape([1, 2 ** ndim, ndim])
+    corners = dims.reshape([-1, 1, ndim]) * \
+        corners_norm.reshape([1, 2 ** ndim, ndim])
     return corners
 
 
@@ -90,7 +91,8 @@ def corners_2d_jit(dims, origin=0.5):
     ndim = 2
     corners_norm = np.array([[0, 0], [0, 1], [1, 1], [1, 0]], dtype=dims.dtype)
     corners_norm = corners_norm - np.array(origin, dtype=dims.dtype)
-    corners = dims.reshape((-1, 1, ndim)) * corners_norm.reshape((1, 2 ** ndim, ndim))
+    corners = dims.reshape((-1, 1, ndim)) * \
+        corners_norm.reshape((1, 2 ** ndim, ndim))
     return corners
 
 
@@ -103,7 +105,8 @@ def corners_3d_jit(dims, origin=0.5):
     ).reshape((8, 3))
     corners_norm = corners_norm[[0, 1, 3, 2, 4, 5, 7, 6]]
     corners_norm = corners_norm - np.array(origin, dtype=dims.dtype)
-    corners = dims.reshape((-1, 1, ndim)) * corners_norm.reshape((1, 2 ** ndim, ndim))
+    corners = dims.reshape((-1, 1, ndim)) * \
+        corners_norm.reshape((1, 2 ** ndim, ndim))
     return corners
 
 
@@ -293,7 +296,8 @@ def box2d_to_corner_jit(boxes):
     corners_norm[2] = 1.0
     corners_norm[3, 0] = 1.0
     corners_norm -= np.array([0.5, 0.5], dtype=boxes.dtype)
-    corners = boxes.reshape(num_box, 1, 5)[:, :, 2:4] * corners_norm.reshape(1, 4, 2)
+    corners = boxes.reshape(num_box, 1, 5)[
+        :, :, 2:4] * corners_norm.reshape(1, 4, 2)
     rot_mat_T = np.zeros((2, 2), dtype=boxes.dtype)
     box_corners = np.zeros((num_box, 4, 2), dtype=boxes.dtype)
     for i in range(num_box):
@@ -379,7 +383,8 @@ def get_frustum(bbox_image, C, near_clip=0.001, far_clip=100):
     fku = C[0, 0]
     fkv = -C[1, 1]
     u0v0 = C[0:2, 2]
-    z_points = np.array([near_clip] * 4 + [far_clip] * 4, dtype=C.dtype)[:, np.newaxis]
+    z_points = np.array([near_clip] * 4 + [far_clip] *
+                        4, dtype=C.dtype)[:, np.newaxis]
     b = bbox_image
     box_corners = np.array(
         [[b[0], b[1]], [b[0], b[3]], [b[2], b[3]], [b[2], b[1]]], dtype=C.dtype
@@ -390,7 +395,8 @@ def get_frustum(bbox_image, C, near_clip=0.001, far_clip=100):
     far_box_corners = (box_corners - u0v0) / np.array(
         [fku / far_clip, -fkv / far_clip], dtype=C.dtype
     )
-    ret_xy = np.concatenate([near_box_corners, far_box_corners], axis=0)  # [8, 2]
+    ret_xy = np.concatenate(
+        [near_box_corners, far_box_corners], axis=0)  # [8, 2]
     ret_xyz = np.concatenate([ret_xy, z_points], axis=1)
     return ret_xyz
 
@@ -411,7 +417,8 @@ def get_frustum_v2(bboxes, C, near_clip=0.001, far_clip=100):
     far_box_corners = (box_corners - u0v0) / np.array(
         [fku / far_clip, -fkv / far_clip], dtype=C.dtype
     )
-    ret_xy = np.concatenate([near_box_corners, far_box_corners], axis=1)  # [8, 2]
+    ret_xy = np.concatenate(
+        [near_box_corners, far_box_corners], axis=1)  # [8, 2]
     ret_xyz = np.concatenate([ret_xy, z_points], axis=-1)
     return ret_xyz
 
@@ -773,8 +780,10 @@ def get_minimum_bounding_box_bv(points, voxel_size, bound, downsample=8, margin=
     max_y = points[:, 1].max()
     min_x = points[:, 0].min()
     min_y = points[:, 1].min()
-    max_x = np.floor(max_x / (x_vsize * downsample) + 1) * (x_vsize * downsample)
-    max_y = np.floor(max_y / (y_vsize * downsample) + 1) * (y_vsize * downsample)
+    max_x = np.floor(max_x / (x_vsize * downsample) + 1) * \
+        (x_vsize * downsample)
+    max_y = np.floor(max_y / (y_vsize * downsample) + 1) * \
+        (y_vsize * downsample)
     min_x = np.floor(min_x / (x_vsize * downsample)) * (x_vsize * downsample)
     min_y = np.floor(min_y / (y_vsize * downsample)) * (y_vsize * downsample)
     max_x = np.minimum(max_x + margin, bound[2])
@@ -782,7 +791,7 @@ def get_minimum_bounding_box_bv(points, voxel_size, bound, downsample=8, margin=
     min_x = np.maximum(min_x - margin, bound[0])
     min_y = np.maximum(min_y - margin, bound[1])
     return np.array([min_x, min_y, max_x, max_y])
-    
+
 
 def box3d_to_bbox(box3d, rect, Trv2c, P2):
     box3d_to_cam = box_lidar_to_camera(box3d, rect, Trv2c)

@@ -1,6 +1,6 @@
 import collections
 
-from models.centerpoint.det3d.utils import build_from_cfg
+from CVCP.models.centerpoint.det3d.utils import build_from_cfg
 from ..registry import PIPELINES
 
 

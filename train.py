@@ -29,7 +29,6 @@ def main():
         n_classes=cvt_config.get('n_classes'), 
         loss_type=cvt_config.get('loss_type'))
     
-    #TODO: load configs for creating the model segments
     head_seg = head(
         in_channels=centerpoint_config.get('in_channels'),
         tasks=centerpoint_config.get('tasks'),

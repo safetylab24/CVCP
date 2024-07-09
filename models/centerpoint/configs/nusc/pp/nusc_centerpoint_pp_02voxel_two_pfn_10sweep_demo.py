@@ -1,7 +1,7 @@
 import itertools
 import logging
 
-from models.centerpoint.det3d.utils.config_tool import get_downsample_factor
+from CVCP.models.centerpoint.det3d.utils.config_tool import get_downsample_factor
 
 tasks = [
     dict(num_class=1, class_names=["car"]),

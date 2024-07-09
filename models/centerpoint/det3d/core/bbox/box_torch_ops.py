@@ -5,7 +5,7 @@ import numpy as np
 import torch
 from torch import stack as tstack
 try:
-    from models.centerpoint.det3d.ops.iou3d_nms import iou3d_nms_cuda, iou3d_nms_utils
+    from CVCP.models.centerpoint.det3d.ops.iou3d_nms import iou3d_nms_cuda, iou3d_nms_utils
 except:
     print("iou3d cuda not built. You don't need this if you use circle_nms. Otherwise, refer to the advanced installation part to build this cuda extension")
 

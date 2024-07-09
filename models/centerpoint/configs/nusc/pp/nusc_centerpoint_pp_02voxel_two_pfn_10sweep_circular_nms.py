@@ -1,7 +1,7 @@
 import itertools
 import logging
 
-from models.centerpoint.det3d.utils.config_tool import get_downsample_factor
+from CVCP.models.centerpoint.det3d.utils.config_tool import get_downsample_factor
 
 tasks = [
     dict(num_class=1, class_names=["car"]),
@@ -85,13 +85,13 @@ test_cfg = dict(
 
 # dataset settings
 dataset_type = "NuScenesDataset"
-nsweeps = 10
-data_root = "data/nuScenes"
+nsweeps = 2
+data_root = "/home/vrb230004/media/datasets/nuscenes"
 
 db_sampler = dict(
     type="GT-AUG",
     enable=False,
-    db_info_path="data/nuScenes/dbinfos_train_10sweeps_withvelo.pkl",
+    db_info_path="/home/vrb230004/media/datasets/nuscenes/dbinfos_train_2sweeps_withvelo.pkl",
     sample_groups=[
         dict(car=2),
         dict(truck=3),
@@ -162,8 +162,8 @@ test_pipeline = [
     dict(type="Reformat"),
 ]
 
-train_anno = "data/nuScenes/infos_train_10sweeps_withvelo_filter_True.pkl"
-val_anno = "data/nuScenes/infos_val_10sweeps_withvelo_filter_True.pkl"
+train_anno = "/home/vrb230004/media/datasets/nuscenes/infos_train_02sweeps_withvelo_filter_True.pkl"
+val_anno = "/home/vrb230004/media/datasets/nuscenes/infos_val_02sweeps_withvelo_filter_True.pkl"
 test_anno = None
 
 data = dict(

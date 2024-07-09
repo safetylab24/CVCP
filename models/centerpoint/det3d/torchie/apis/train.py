@@ -11,14 +11,14 @@ except:
 
 import numpy as np
 import torch
-from models.centerpoint.det3d.builder import _create_learning_rate_scheduler
+from CVCP.models.centerpoint.det3d.builder import _create_learning_rate_scheduler
 
-# from models.centerpoint.det3d.datasets.kitti.eval_hooks import KittiDistEvalmAPHook, KittiEvalmAPHookV2
-from models.centerpoint.det3d.core import DistOptimizerHook
-from models.centerpoint.det3d.datasets import DATASETS, build_dataloader
-from models.centerpoint.det3d.solver.fastai_optim import OptimWrapper
-from models.centerpoint.det3d.torchie.trainer import DistSamplerSeedHook, Trainer, obj_from_dict
-from models.centerpoint.det3d.utils.print_utils import metric_to_str
+# from CVCP.models.centerpoint.det3d.datasets.kitti.eval_hooks import KittiDistEvalmAPHook, KittiEvalmAPHookV2
+from CVCP.models.centerpoint.det3d.core import DistOptimizerHook
+from CVCP.models.centerpoint.det3d.datasets import DATASETS, build_dataloader
+from CVCP.models.centerpoint.det3d.solver.fastai_optim import OptimWrapper
+from CVCP.models.centerpoint.det3d.torchie.trainer import DistSamplerSeedHook, Trainer, obj_from_dict
+from CVCP.models.centerpoint.det3d.utils.print_utils import metric_to_str
 from torch import nn
 from torch.nn.parallel import DistributedDataParallel
 

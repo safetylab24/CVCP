@@ -1,5 +1,5 @@
 import logging
-from models.centerpoint.det3d.models.bbox_heads.center_head import CenterHead
+from CVCP.models.centerpoint.det3d.models.bbox_heads.center_head import CenterHead
 
 import torch
 import torch.nn as nn
@@ -19,6 +19,8 @@ def cvt(devices=[0], n_classes=2, loss_type='ce'):
     return model
 
 # creates CenterHead part of the model
+
+
 def head(in_channels, tasks, dataset, weight, code_weights, common_heads, share_conv_channel, dcn_head=False):
     # Define tasks
     # tasks = [
@@ -32,7 +34,7 @@ def head(in_channels, tasks, dataset, weight, code_weights, common_heads, share_
 
     # Initialize the logger
     logger = logging.getLogger("CenterHead")
-    logging.basicConfig(level=logging.INFO)    
+    logging.basicConfig(level=logging.INFO)
 
     # Initialize the CenterHead model
     center = CenterHead(
@@ -61,9 +63,8 @@ class CVCPModel(nn.Module):
 
     def forward(self, images, intrinsics, extrinsics):
         # Pass input through the cvt model
-        cvt_out = self.cvt_model(images, intrinsics, extrinsics)
-
-        cvt_out = cvt_out.cuda()
+        # (1, 128, 25, 25), (B, dim, H, W)
+        cvt_out = self.cvt_model(images, intrinsics, extrinsics).cuda()
 
         # Resize the output of cvt_model
         cvt_out_resized = F.interpolate(

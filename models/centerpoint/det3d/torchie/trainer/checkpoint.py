@@ -8,7 +8,7 @@ from importlib import import_module
 
 import torch
 import torchvision
-from models.centerpoint.det3d import torchie
+from CVCP.models.centerpoint.det3d import torchie
 from terminaltables import AsciiTable
 from torch.utils import model_zoo
 
@@ -38,13 +38,14 @@ open_mmlab_model_urls = {
     "kin400/nl3d_r50_f32s2_k400": "https://open-mmlab.s3.ap-northeast-2.amazonaws.com/pretrain/third_party/nl3d_r50_f32s2_k400-fa7e7caa.pth",  # noqa: E501
 }  # yapf: disable
 
-import torch.nn as nn 
+import torch.nn as nn
 from typing import Set
 
 try:
     import spconv.pytorch as spconv
 except:
     import spconv as spconv
+
 
 def find_all_spconv_keys(model: nn.Module, prefix="") -> Set[str]:
     """
@@ -81,17 +82,18 @@ def load_state_dict(module, state_dict, strict=False, logger=None):
             # with different spconv versions, we need to adapt weight shapes for spconv blocks
             # adapt spconv weights from version 1.x to version 2.x if you used weights from spconv 1.x
 
-            param_native = param.transpose(-1, -2)  # (k1, k2, k3, c_in, c_out) to (k1, k2, k3, c_out, c_in)
+            # (k1, k2, k3, c_in, c_out) to (k1, k2, k3, c_out, c_in)
+            param_native = param.transpose(-1, -2)
             if param_native.shape == own_state[name].shape:
                 param = param_native.contiguous()
             else:
                 assert param.shape.__len__() == 5, 'currently only spconv 3D is supported'
-                param_implicit = param.permute(4, 0, 1, 2, 3)  # (k1, k2, k3, c_in, c_out) to (c_out, k1, k2, k3, c_in)
+                # (k1, k2, k3, c_in, c_out) to (c_out, k1, k2, k3, c_in)
+                param_implicit = param.permute(4, 0, 1, 2, 3)
                 if param_implicit.shape == own_state[name].shape:
                     param = param_implicit.contiguous()
 
-
-        # a hacky fixed to load a new voxelnet 
+        # a hacky fixed to load a new voxelnet
         if name not in own_state:
             unexpected_keys.append(name)
             continue
@@ -99,13 +101,15 @@ def load_state_dict(module, state_dict, strict=False, logger=None):
             # backwards compatibility for serialized parameters
             param = param.data
         if param.size() != own_state[name].size():
-            shape_mismatch_pairs.append([name, own_state[name].size(), param.size()])
+            shape_mismatch_pairs.append(
+                [name, own_state[name].size(), param.size()])
             continue
         own_state[name].copy_(param)
 
     all_missing_keys = set(own_state.keys()) - set(state_dict.keys())
     # ignore "num_batches_tracked" of BN layers
-    missing_keys = [key for key in all_missing_keys if "num_batches_tracked" not in key]
+    missing_keys = [
+        key for key in all_missing_keys if "num_batches_tracked" not in key]
 
     err_msg = []
     if unexpected_keys:
@@ -116,7 +120,8 @@ def load_state_dict(module, state_dict, strict=False, logger=None):
         )
     if missing_keys:
         err_msg.append(
-            "missing keys in source state_dict: {}\n".format(", ".join(missing_keys))
+            "missing keys in source state_dict: {}\n".format(
+                ", ".join(missing_keys))
         )
     if shape_mismatch_pairs:
         mismatch_info = "these keys have mismatched shape:\n"
@@ -127,7 +132,8 @@ def load_state_dict(module, state_dict, strict=False, logger=None):
 
     rank, _ = get_dist_info()
     if len(err_msg) > 0 and rank == 0:
-        err_msg.insert(0, "The model and loaded state dict do not match exactly\n")
+        err_msg.insert(
+            0, "The model and loaded state dict do not match exactly\n")
         err_msg = "\n".join(err_msg)
         if strict:
             raise RuntimeError(err_msg)
@@ -205,7 +211,8 @@ def load_checkpoint(model, filename, map_location='cpu', strict=False, logger=No
     elif isinstance(checkpoint, dict) and "state_dict" in checkpoint:
         state_dict = checkpoint["state_dict"]
     else:
-        raise RuntimeError("No state_dict found in checkpoint file {}".format(filename))
+        raise RuntimeError(
+            "No state_dict found in checkpoint file {}".format(filename))
     # strip prefix of state_dict
     if list(state_dict.keys())[0].startswith("module."):
         state_dict = {k[7:]: v for k, v in checkpoint["state_dict"].items()}
@@ -247,13 +254,15 @@ def save_checkpoint(model, filename, optimizer=None, meta=None):
     if meta is None:
         meta = {}
     elif not isinstance(meta, dict):
-        raise TypeError("meta must be a dict or None, but got {}".format(type(meta)))
+        raise TypeError(
+            "meta must be a dict or None, but got {}".format(type(meta)))
 
     torchie.mkdir_or_exist(osp.dirname(filename))
     if hasattr(model, "module"):
         model = model.module
 
-    checkpoint = {"meta": meta, "state_dict": weights_to_cpu(model.state_dict())}
+    checkpoint = {"meta": meta,
+                  "state_dict": weights_to_cpu(model.state_dict())}
     if optimizer is not None:
         checkpoint["optimizer"] = optimizer.state_dict()
 

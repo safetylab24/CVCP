@@ -1,2 +1,0 @@
-2024-06-20 17:46:12,456 - INFO - Start running, host: vrb230004@pdml6, work_dir: /home/vrb230004/CenterPoint/work_dirs/nusc_centerpoint_voxelnet_01voxel
-2024-06-20 17:46:12,456 - INFO - workflow: [('train', 1)], max: 20 epochs

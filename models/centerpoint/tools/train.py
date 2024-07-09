@@ -1,20 +1,19 @@
 import subprocess
 import torch.distributed as dist
-from models.centerpoint.det3d.torchie.apis import (
+from CVCP.models.centerpoint.det3d.torchie.apis import (
     build_optimizer,
     get_root_logger,
     init_dist,
     set_random_seed,
     train_detector,
 )
-from models.centerpoint.det3d.torchie import Config
-from models.centerpoint.det3ds.centerpoint.det3ds.centerpoint.det3ds.centerpoint.det3ds.centerpoint.det3d.models import build_detector
-from models.centerpoint.det3d.datasets import build_dataset
+from CVCP.models.centerpoint.det3d.torchie import Config
+from CVCP.models.centerpoint.det3d.models import build_detector
+from CVCP.models.centerpoint.det3d.datasets import build_dataset
 import yaml
 import torch
-from models.centerpoint.det3dpy as np
-from models.centerpoint.det3dparse
-from models.centerpoint.det3dn
+import numpy as np
+import argparse
 import os
 import sys
 

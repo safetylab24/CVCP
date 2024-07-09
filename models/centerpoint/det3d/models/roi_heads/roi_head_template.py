@@ -8,7 +8,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from models.centerpoint.det3d.core.bbox import box_torch_ops
+from CVCP.models.centerpoint.det3d.core.bbox import box_torch_ops
 from .target_assigner.proposal_target_layer import ProposalTargetLayer
 
 

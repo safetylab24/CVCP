@@ -4,7 +4,7 @@ from .. import builder
 from ..registry import DETECTORS
 from .base import BaseDetector
 from ..utils.finetune_utils import FrozenBatchNorm2d
-from models.centerpoint.det3d.torchie.trainer import load_checkpoint
+from CVCP.models.centerpoint.det3d.torchie.trainer import load_checkpoint
 
 
 @DETECTORS.register_module
@@ -32,13 +32,13 @@ class SingleStageDetector(BaseDetector):
 
     def init_weights(self, pretrained=None):
         if pretrained is None:
-            return 
+            return
         try:
             load_checkpoint(self, pretrained, strict=False)
             print("init weight from {}".format(pretrained))
         except:
             print("no pretrained model at {}".format(pretrained))
-            
+
     def extract_feat(self, data):
         input_features = self.reader(data)
         x = self.backbone(input_features)

@@ -1,11 +1,11 @@
 import numpy as np
 
-from models.centerpoint.det3d.core.bbox import box_np_ops
-from models.centerpoint.det3d.core.sampler import preprocess as prep
-from models.centerpoint.det3d.builder import build_dbsampler
+from CVCP.models.centerpoint.det3d.core.bbox import box_np_ops
+from CVCP.models.centerpoint.det3d.core.sampler import preprocess as prep
+from CVCP.models.centerpoint.det3d.builder import build_dbsampler
 
-from models.centerpoint.det3d.core.input.voxel_generator import VoxelGenerator
-from models.centerpoint.det3d.core.utils.center_utils import (
+from CVCP.models.centerpoint.det3d.core.input.voxel_generator import VoxelGenerator
+from CVCP.models.centerpoint.det3d.core.utils.center_utils import (
     draw_umich_gaussian, gaussian_radius
 )
 from ..registry import PIPELINES

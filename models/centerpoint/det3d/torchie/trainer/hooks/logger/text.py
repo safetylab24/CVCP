@@ -4,7 +4,7 @@ from collections import OrderedDict
 
 import torch
 import torch.distributed as dist
-from models.centerpoint.det3d import torchie
+from CVCP.models.centerpoint.det3d import torchie
 
 from .base import LoggerHook
 
@@ -49,7 +49,8 @@ class TextLoggerHook(LoggerHook):
             )
             if "time" in log_dict.keys():
                 self.time_sec_tot += log_dict["time"] * self.interval
-                time_sec_avg = self.time_sec_tot / (trainer.iter - self.start_iter + 1)
+                time_sec_avg = self.time_sec_tot / \
+                    (trainer.iter - self.start_iter + 1)
                 eta_sec = time_sec_avg * (trainer.max_iters - trainer.iter - 1)
                 eta_str = str(datetime.timedelta(seconds=int(eta_sec)))
                 log_str += "eta: {}, ".format(eta_str)
@@ -98,7 +99,8 @@ class TextLoggerHook(LoggerHook):
 
                 if isinstance(val, list):
                     log_items.append(
-                        "{}: {}".format(name, self._convert_to_precision4(val[idx]))
+                        "{}: {}".format(
+                            name, self._convert_to_precision4(val[idx]))
                     )
                 else:
                     log_items.append("{}: {}".format(name, val))

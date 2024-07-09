@@ -1,7 +1,7 @@
 import torch
 import torch.distributed as dist
 import torch.nn as nn
-from models.centerpoint.det3d.utils.dist import dist_common as comm
+from CVCP.models.centerpoint.det3d.utils.dist import dist_common as comm
 from torch.autograd.function import Function
 from torch.nn import BatchNorm2d
 
@@ -9,7 +9,8 @@ from torch.nn import BatchNorm2d
 class AllReduce(Function):
     @staticmethod
     def forward(ctx, input):
-        input_list = [torch.zeros_like(input) for k in range(dist.get_world_size())]
+        input_list = [torch.zeros_like(input)
+                      for k in range(dist.get_world_size())]
         # Use allgather instead of allreduce since I don't trust in-place operations ..
         dist.all_gather(input_list, input, async_op=False)
         inputs = torch.stack(input_list, dim=0)
@@ -45,7 +46,8 @@ class NaiveSyncBatchNorm(BatchNorm2d):
 
         mean, meansqr = torch.split(vec, C)
         var = meansqr - mean * mean
-        self.running_mean += self.momentum * (mean.detach() - self.running_mean)
+        self.running_mean += self.momentum * \
+            (mean.detach() - self.running_mean)
         self.running_var += self.momentum * (var.detach() - self.running_var)
 
         invstd = torch.rsqrt(var + self.eps)

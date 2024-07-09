@@ -1,4 +1,4 @@
-from models.centerpoint.det3d import torchie
+from CVCP.models.centerpoint.det3d import torchie
 
 from ..registry import PIPELINES
 from .compose import Compose

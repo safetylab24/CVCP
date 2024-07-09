@@ -1,5 +1,5 @@
 import numpy as np
-from models.centerpoint.det3d.ops.point_cloud.point_cloud_ops import points_to_voxel
+from CVCP.models.centerpoint.det3d.ops.point_cloud.point_cloud_ops import points_to_voxel
 
 
 class VoxelGenerator:
@@ -7,7 +7,8 @@ class VoxelGenerator:
         point_cloud_range = np.array(point_cloud_range, dtype=np.float32)
         # [0, -40, -3, 70.4, 40, 1]
         voxel_size = np.array(voxel_size, dtype=np.float32)
-        grid_size = (point_cloud_range[3:] - point_cloud_range[:3]) / voxel_size
+        grid_size = (point_cloud_range[3:] -
+                     point_cloud_range[:3]) / voxel_size
         grid_size = np.round(grid_size).astype(np.int64)
 
         self._voxel_size = voxel_size
@@ -18,7 +19,7 @@ class VoxelGenerator:
 
     def generate(self, points, max_voxels=-1):
         if max_voxels == -1:
-            max_voxels=self._max_voxels
+            max_voxels = self._max_voxels
 
         return points_to_voxel(
             points,
