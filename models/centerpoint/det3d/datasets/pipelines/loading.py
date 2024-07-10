@@ -203,18 +203,23 @@ class LoadPointCloudAnnotations(object):
     def __init__(self, with_bbox=True, **kwargs):
         pass
 
-    def __call__(self, result, info):
+    def __call__(self, res, info):
 
-        if result["type"] in ["NuScenesDataset"] and "gt_boxes" in info:
+        if res["type"] in ["NuScenesDataset"] and "gt_boxes" in info:
             gt_boxes = info["gt_boxes"].astype(np.float32)
             gt_boxes[np.isnan(gt_boxes)] = 0
-            result["lidar"]["annotations"] = {
+            res["lidar"]["annotations"] = {
                 "boxes": gt_boxes,
                 "names": info["gt_names"],
                 "tokens": info["gt_boxes_token"],
                 "velocities": info["gt_boxes_velocity"].astype(np.float32),
             }
+        elif res["type"] == 'WaymoDataset' and "gt_boxes" in info:
+            res["lidar"]["annotations"] = {
+                "boxes": info["gt_boxes"].astype(np.float32),
+                "names": info["gt_names"],
+            }
         else:
             pass
 
-        return result, info
+        return res, info

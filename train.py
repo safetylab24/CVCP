@@ -62,7 +62,8 @@ def main():
         bbox_label_path=config.get('bbox_label_path'),
         num_classes=config.get('n_classes'),
         batch_size=config.get('batch_size'),
-        num_workers=config.get('num_workers'))
+        num_workers=config.get('num_workers'),
+        tasks=centerpoint_config.get('tasks'))
 
     val_loader = get_val_dataloader(
         dataset_dir=config.get('dataset_dir'),
@@ -70,7 +71,8 @@ def main():
         bbox_label_path=config.get('bbox_label_path'),        
         num_classes=config.get('n_classes'),
         batch_size=config.get('batch_size'),
-        num_workers=config.get('num_workers'))
+        num_workers=config.get('num_workers'),
+        tasks=centerpoint_config.get('tasks'))
 
     print("\n=========================")
     print('Data Loaders created. Starting training...')

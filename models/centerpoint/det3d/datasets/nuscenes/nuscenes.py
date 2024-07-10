@@ -39,7 +39,7 @@ class NuScenesDataset(PointCloudDataset):
         pipeline=None,
         class_names=None,
         test_mode=False,
-        version="v1.0-mini",
+        version="v1.0-trainval",
         load_interval=1,
         **kwargs,
     ):
@@ -52,7 +52,7 @@ class NuScenesDataset(PointCloudDataset):
         assert self.nsweeps > 0, "At least input one sweep please!"
         print(self.nsweeps)
 
-        self._info_path = '/home/vrb230004/media/datasets/nuscenes/dbinfos_train_2sweeps_withvelo.pkl'
+        self._info_path = info_path
         self._class_names = class_names
 
         if not hasattr(self, "_nusc_infos"):
@@ -165,7 +165,7 @@ class NuScenesDataset(PointCloudDataset):
 
         info = self._nusc_infos[idx]
 
-        result = {
+        res = {
             "lidar": {
                 "type": "lidar",
                 "points": None,
@@ -184,7 +184,7 @@ class NuScenesDataset(PointCloudDataset):
             "virtual": self.virtual
         }
 
-        data, _ = self.pipeline(result, info) # returns a filled out version of result
+        data, _ = self.pipeline(res, info)
 
         return data
 
@@ -221,7 +221,8 @@ class NuScenesDataset(PointCloudDataset):
             "meta": None,
         }
 
-        nusc = NuScenes(version=version, dataroot=str(self._root_path), verbose=True)
+        nusc = NuScenes(version=version, dataroot=str(
+            self._root_path), verbose=True)
 
         mapped_class_names = []
         for n in self._class_names:

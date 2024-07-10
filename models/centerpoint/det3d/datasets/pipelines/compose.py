@@ -20,13 +20,12 @@ class Compose(object):
             else:
                 raise TypeError("transform must be callable or a dict")
 
-    def __call__(self, result, info):
+    def __call__(self, res, info):
         for t in self.transforms:
-            result, info = t(result, info)
-            # check out res['lidar']['annotations']
-            if result is None:
+            res, info = t(res, info)
+            if res is None:
                 return None
-        return result, info
+        return res, info
 
     def __repr__(self):
         format_string = self.__class__.__name__ + "("

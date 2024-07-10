@@ -101,7 +101,7 @@ class CVCPModel(nn.Module):
 
         return loss.item()
 
-    def val_step(self, data, labels):
+    def val_step(self, data: dict):
         self.eval()
 
-        preds = self.forward(data).detach().cpu()
+        preds = self.forward(data['images'], data['intrinsics'], data['extrinsics']).detach().cpu()

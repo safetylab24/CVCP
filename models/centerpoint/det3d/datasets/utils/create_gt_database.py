@@ -51,7 +51,6 @@ def create_groundtruth_database(
     root_path = Path(data_path)
 
     if dataset_class_name in ["WAYMO", "NUSC"]:
-        print('teststtttststsststststststst')
         if db_path is None:
             if virtual:
                 db_path = root_path / \
