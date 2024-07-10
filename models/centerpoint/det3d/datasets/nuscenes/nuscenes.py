@@ -165,7 +165,7 @@ class NuScenesDataset(PointCloudDataset):
 
         info = self._nusc_infos[idx]
 
-        res = {
+        result = {
             "lidar": {
                 "type": "lidar",
                 "points": None,
@@ -184,7 +184,7 @@ class NuScenesDataset(PointCloudDataset):
             "virtual": self.virtual
         }
 
-        data, _ = self.pipeline(res, info)
+        data, _ = self.pipeline(result, info) # returns a filled out version of result
 
         return data
 

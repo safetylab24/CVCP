@@ -287,13 +287,13 @@ class AssignLabel(object):
         self._min_radius = assigner_cfg.min_radius
         self.cfg = assigner_cfg
 
-    def __call__(self, res, info):
+    def __call__(self, result, info):
         max_objs = self._max_objs
         class_names_by_task = [t.class_names for t in self.tasks]
 
         example = {}
 
-        if res["mode"] == "train":
+        if result["mode"] == "train":
             # Calculate output featuremap size
             # if 'voxels' in res['lidar']:
             #     # Calculate output featuremap size
@@ -309,7 +309,7 @@ class AssignLabel(object):
             grid_size = np.round(grid_size).astype(np.int64)
             feature_map_size = grid_size[:2] // self.out_size_factor
 
-            gt_dict = res["lidar"]["annotations"] # we obtain our bounding boxes here
+            gt_dict = result["lidar"]["annotations"] # we obtain our bounding boxes here
 
             # reorganize the gt_dict by tasks
             task_masks = []
@@ -354,7 +354,7 @@ class AssignLabel(object):
             gt_dict["gt_names"] = task_names
             gt_dict["gt_boxes"] = task_boxes
 
-            res["lidar"]["annotations"] = gt_dict
+            result["lidar"]["annotations"] = gt_dict
 
             draw_gaussian = draw_umich_gaussian
 
@@ -364,7 +364,7 @@ class AssignLabel(object):
                 hm = np.zeros((len(class_names_by_task[idx]), feature_map_size[1], feature_map_size[0]),
                               dtype=np.float32)
 
-                if res['type'] == 'NuScenesDataset':
+                if result['type'] == 'NuScenesDataset':
                     # [reg, hei, dim, vx, vy, rots, rotc]
                     anno_box = np.zeros((max_objs, 10), dtype=np.float32)
                 else:
@@ -412,7 +412,7 @@ class AssignLabel(object):
                         ind[new_idx] = y * feature_map_size[0] + x
                         mask[new_idx] = 1
 
-                        if res['type'] == 'NuScenesDataset':
+                        if result['type'] == 'NuScenesDataset':
                             vx, vy = gt_dict['gt_boxes'][idx][k][6:8]
                             rot = gt_dict['gt_boxes'][idx][k][8]
                             anno_box[new_idx] = np.concatenate(
@@ -455,6 +455,6 @@ class AssignLabel(object):
         else:
             pass
 
-        res["lidar"]["targets"] = example
+        result["lidar"]["targets"] = example
 
-        return res, info
+        return result, info

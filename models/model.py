@@ -53,7 +53,7 @@ def head(in_channels, tasks, dataset, weight, code_weights, common_heads, share_
 
 
 class CVCPModel(nn.Module):
-    def __init__(self, cvt_model, head_model, resize_shape, opt=None, loss=None):
+    def __init__(self, cvt_model, head_model:CenterHead, resize_shape, opt=None, loss=None):
         super(CVCPModel, self).__init__()
         self.cvt_model = cvt_model
         self.head_model = head_model
@@ -87,7 +87,8 @@ class CVCPModel(nn.Module):
             data['images'], data['intrinsics'], data['extrinsics'])
 
         # Compute the loss
-        loss = self.loss(preds, data['labels'])
+        # loss = self.loss(preds, data['labels'])
+        loss = self.head_model.loss(preds, data['labels'])
 
         # Clear gradients
         self.opt.zero_grad()

@@ -4,7 +4,8 @@ batch_size: 1
 resize_shape: [160, 160]
 
 dataset_dir: /home/vrb230004/media/datasets/nuscenes
-labels_dir: /home/vrb230004/media/datasets/cvt_labels_nuscenes
+cvt_metadata_path: /home/vrb230004/media/datasets/cvt_labels_nuscenes
+bbox_label_path: /home/vrb230004/CombinedModels/CenterPoint/data/nuscenes/labels
 
 cvt:
   devices: [0, 1, 2, 3]

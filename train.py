@@ -3,14 +3,16 @@ import torch
 import torch.nn as nn
 import yaml
 
-from CVCP.data import get_train_dataloader, get_val_dataloader
+from CVCP.dataset import get_train_dataloader, get_val_dataloader
 from tqdm import tqdm
 
 import sys
 
+
 def load_config(config_file):
     with open(config_file, 'r') as file:
         return yaml.safe_load(file)
+
 
 def main():
     default_config_path = 'config.yaml'
@@ -18,17 +20,17 @@ def main():
         config = load_config(config_path)
     else:
         config = load_config(default_config_path)
-    
+
     cvt_config = config.get('cvt')
     centerpoint_config = config.get('centerpoint')
     opt_config = config.get('optimizer')
 
     # Instantiate cvt_model and head_model
     cvt_seg = cvt(
-        devices=cvt_config.get('devices'), 
-        n_classes=cvt_config.get('n_classes'), 
+        devices=cvt_config.get('devices'),
+        n_classes=cvt_config.get('n_classes'),
         loss_type=cvt_config.get('loss_type'))
-    
+
     head_seg = head(
         in_channels=centerpoint_config.get('in_channels'),
         tasks=centerpoint_config.get('tasks'),
@@ -49,25 +51,26 @@ def main():
     # Define a loss function and an optimizer
     model.loss = nn.CrossEntropyLoss()
     model.opt = torch.optim.Adam(
-        model.parameters(), 
-        lr=opt_config.get('lr'), 
+        model.parameters(),
+        lr=opt_config.get('lr'),
         weight_decay=opt_config.get('weight_decay'))
 
     # Define dataloaders
     train_loader = get_train_dataloader(
-        dataset_dir=config.get('dataset_dir'), 
-        labels_dir=config.get('labels_dir'),
-        num_classes=config.get('n_classes'),
-        batch_size=config.get('batch_size'),
-        num_workers=config.get('num_workers'))
-    
-    val_loader = get_val_dataloader(
-        dataset_dir=config.get('dataset_dir'), 
-        labels_dir=config.get('labels_dir'),
+        dataset_dir=config.get('dataset_dir'),
+        cvt_metadata_path=config.get('cvt_metadata_path'),
+        bbox_label_path=config.get('bbox_label_path'),
         num_classes=config.get('n_classes'),
         batch_size=config.get('batch_size'),
         num_workers=config.get('num_workers'))
 
+    val_loader = get_val_dataloader(
+        dataset_dir=config.get('dataset_dir'),
+        cvt_metadata_path=config.get('cvt_metadata_path'),
+        bbox_label_path=config.get('bbox_label_path'),        
+        num_classes=config.get('n_classes'),
+        batch_size=config.get('batch_size'),
+        num_workers=config.get('num_workers'))
 
     print("\n=========================")
     print('Data Loaders created. Starting training...')
