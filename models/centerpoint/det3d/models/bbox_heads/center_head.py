@@ -255,10 +255,9 @@ class CenterHead(nn.Module):
             # heatmap focal loss
             preds_dict['hm'] = self._sigmoid(preds_dict['hm'])
 
-            hm_loss = self.crit(preds_dict['hm'], example['hm'][task_id], example['ind']
-                                [task_id], example['mask'][task_id], example['cat'][task_id])
+            hm_loss = self.crit(preds_dict['hm'], example['hm'][task_id], example['ind'][task_id], example['mask'][task_id], example['cat'][task_id])
 
-            target_box = example['anno_box'][task_id]
+            target_box = example['anno_box'][task_id] # (4,500,10)
             # reconstruct the anno_box from multiple reg heads
             if self.dataset in ['waymo', 'nuscenes']:
                 if 'vel' in preds_dict:

@@ -23,6 +23,7 @@ class Compose(object):
     def __call__(self, res, info):
         for t in self.transforms:
             res, info = t(res, info)
+            # check out res['lidar']['annotations']
             if res is None:
                 return None
         return res, info

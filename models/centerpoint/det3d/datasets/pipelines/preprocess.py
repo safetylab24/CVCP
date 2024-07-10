@@ -290,27 +290,26 @@ class AssignLabel(object):
     def __call__(self, res, info):
         max_objs = self._max_objs
         class_names_by_task = [t.class_names for t in self.tasks]
-        num_classes_by_task = [t.num_class for t in self.tasks]
 
         example = {}
 
         if res["mode"] == "train":
             # Calculate output featuremap size
-            if 'voxels' in res['lidar']:
-                # Calculate output featuremap size
-                grid_size = res["lidar"]["voxels"]["shape"]
-                pc_range = res["lidar"]["voxels"]["range"]
-                voxel_size = res["lidar"]["voxels"]["size"]
-                feature_map_size = grid_size[:2] // self.out_size_factor
-            else:
-                pc_range = np.array(self.cfg['pc_range'], dtype=np.float32)
-                voxel_size = np.array(self.cfg['voxel_size'], dtype=np.float32)
-                grid_size = (pc_range[3:] - pc_range[:3]) / voxel_size
-                grid_size = np.round(grid_size).astype(np.int64)
-
+            # if 'voxels' in res['lidar']:
+            #     # Calculate output featuremap size
+            #     grid_size = res["lidar"]["voxels"]["shape"]
+            #     pc_range = res["lidar"]["voxels"]["range"]
+            #     voxel_size = res["lidar"]["voxels"]["size"]
+            #     feature_map_size = grid_size[:2] // self.out_size_factor
+            # else:
+            
+            pc_range = np.array(self.cfg['pc_range'], dtype=np.float32)
+            voxel_size = np.array(self.cfg['voxel_size'], dtype=np.float32)
+            grid_size = (pc_range[3:] - pc_range[:3]) / voxel_size
+            grid_size = np.round(grid_size).astype(np.int64)
             feature_map_size = grid_size[:2] // self.out_size_factor
 
-            gt_dict = res["lidar"]["annotations"]
+            gt_dict = res["lidar"]["annotations"] # we obtain our bounding boxes here
 
             # reorganize the gt_dict by tasks
             task_masks = []
@@ -359,16 +358,14 @@ class AssignLabel(object):
 
             draw_gaussian = draw_umich_gaussian
 
-            hms, anno_boxs, inds, masks, cats = [], [], [], [], []
+            hms, anno_boxes, inds, masks, cats = [], [], [], [], [] # labels
 
-            for idx, task in enumerate(self.tasks):
+            for idx in range(len(self.tasks)):
                 hm = np.zeros((len(class_names_by_task[idx]), feature_map_size[1], feature_map_size[0]),
                               dtype=np.float32)
 
                 if res['type'] == 'NuScenesDataset':
                     # [reg, hei, dim, vx, vy, rots, rotc]
-                    anno_box = np.zeros((max_objs, 10), dtype=np.float32)
-                elif res['type'] == 'WaymoDataset':
                     anno_box = np.zeros((max_objs, 10), dtype=np.float32)
                 else:
                     raise NotImplementedError("Only Support nuScene for Now!")
@@ -382,8 +379,7 @@ class AssignLabel(object):
                 for k in range(num_objs):
                     cls_id = gt_dict['gt_classes'][idx][k] - 1
 
-                    w, l, h = gt_dict['gt_boxes'][idx][k][3], gt_dict['gt_boxes'][idx][k][4], \
-                        gt_dict['gt_boxes'][idx][k][5]
+                    w, l, h = gt_dict['gt_boxes'][idx][k][3], gt_dict['gt_boxes'][idx][k][4], gt_dict['gt_boxes'][idx][k][5]
                     w, l = w / \
                         voxel_size[0] / self.out_size_factor, l / \
                         voxel_size[1] / self.out_size_factor
@@ -393,8 +389,7 @@ class AssignLabel(object):
                         radius = max(self._min_radius, int(radius))
 
                         # be really careful for the coordinate system of your box annotation.
-                        x, y, z = gt_dict['gt_boxes'][idx][k][0], gt_dict['gt_boxes'][idx][k][1], \
-                            gt_dict['gt_boxes'][idx][k][2]
+                        x, y, z = gt_dict['gt_boxes'][idx][k][0], gt_dict['gt_boxes'][idx][k][1], gt_dict['gt_boxes'][idx][k][2]
 
                         coor_x, coor_y = (x - pc_range[0]) / voxel_size[0] / self.out_size_factor, \
                                          (y - pc_range[1]) / \
@@ -423,46 +418,40 @@ class AssignLabel(object):
                             anno_box[new_idx] = np.concatenate(
                                 (ct - (x, y), z, np.log(gt_dict['gt_boxes'][idx][k][3:6]),
                                  np.array(vx), np.array(vy), np.sin(rot), np.cos(rot)), axis=None)
-                        elif res['type'] == 'WaymoDataset':
-                            vx, vy = gt_dict['gt_boxes'][idx][k][6:8]
-                            rot = gt_dict['gt_boxes'][idx][k][-1]
-                            anno_box[new_idx] = np.concatenate(
-                                (ct - (x, y), z, np.log(gt_dict['gt_boxes'][idx][k][3:6]),
-                                 np.array(vx), np.array(vy), np.sin(rot), np.cos(rot)), axis=None)
                         else:
                             raise NotImplementedError(
-                                "Only Support Waymo and nuScene for Now")
+                                "Only Support nuScene for Now")
 
                 hms.append(hm)
-                anno_boxs.append(anno_box)
+                anno_boxes.append(anno_box)
                 masks.append(mask)
                 inds.append(ind)
                 cats.append(cat)
 
             # used for two stage code
-            boxes = flatten(gt_dict['gt_boxes'])
-            classes = merge_multi_group_label(
-                gt_dict['gt_classes'], num_classes_by_task)
+            # boxes = flatten(gt_dict['gt_boxes'])
+            # classes = merge_multi_group_label(
+            #     gt_dict['gt_classes'], num_classes_by_task)
 
-            if res["type"] == "NuScenesDataset":
-                gt_boxes_and_cls = np.zeros((max_objs, 10), dtype=np.float32)
-            elif res['type'] == "WaymoDataset":
-                gt_boxes_and_cls = np.zeros((max_objs, 10), dtype=np.float32)
-            else:
-                raise NotImplementedError()
+            # if res["type"] == "NuScenesDataset":
+            #     gt_boxes_and_cls = np.zeros((max_objs, 10), dtype=np.float32)
+            # elif res['type'] == "WaymoDataset":
+            #     gt_boxes_and_cls = np.zeros((max_objs, 10), dtype=np.float32)
+            # else:
+            #     raise NotImplementedError()
 
-            boxes_and_cls = np.concatenate((boxes,
-                                            classes.reshape(-1, 1).astype(np.float32)), axis=1)
-            num_obj = len(boxes_and_cls)
-            assert num_obj <= max_objs
-            # x, y, z, w, l, h, rotation_y, velocity_x, velocity_y, class_name
-            boxes_and_cls = boxes_and_cls[:, [0, 1, 2, 3, 4, 5, 8, 6, 7, 9]]
-            gt_boxes_and_cls[:num_obj] = boxes_and_cls
+            # boxes_and_cls = np.concatenate((boxes,
+            #                                 classes.reshape(-1, 1).astype(np.float32)), axis=1)
+            # num_obj = len(boxes_and_cls)
+            # assert num_obj <= max_objs
+            # # x, y, z, w, l, h, rotation_y, velocity_x, velocity_y, class_name
+            # boxes_and_cls = boxes_and_cls[:, [0, 1, 2, 3, 4, 5, 8, 6, 7, 9]]
+            # gt_boxes_and_cls[:num_obj] = boxes_and_cls
 
-            example.update({'gt_boxes_and_cls': gt_boxes_and_cls})
+            # example.update({'gt_boxes_and_cls': gt_boxes_and_cls})
 
-            example.update({'hm': hms, 'anno_box': anno_boxs,
-                           'ind': inds, 'mask': masks, 'cat': cats})
+            example= {'hm': hms, 'anno_box': anno_boxes,
+                           'ind': inds, 'mask': masks, 'cat': cats}
         else:
             pass
 
