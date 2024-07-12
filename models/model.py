@@ -53,13 +53,13 @@ def head(in_channels, tasks, dataset, weight, code_weights, common_heads, share_
 
 
 class CVCPModel(nn.Module):
-    def __init__(self, cvt_model, head_model:CenterHead, resize_shape, opt=None, loss=None):
+    def __init__(self, cvt_model, head_model: CenterHead, resize_shape, opt: torch.optim.Optimizer=None):
         super(CVCPModel, self).__init__()
         self.cvt_model = cvt_model
         self.head_model = head_model
         self.resize_shape = resize_shape
         self.opt = opt
-        self.loss = loss
+        # self.loss = loss
 
     def forward(self, images, intrinsics, extrinsics):
         # Pass input through the cvt model
@@ -67,12 +67,11 @@ class CVCPModel(nn.Module):
         cvt_out = self.cvt_model(images, intrinsics, extrinsics).cuda()
 
         # Resize the output of cvt_model
-        cvt_out_resized = F.interpolate(
-            cvt_out, size=self.resize_shape, mode='bilinear', align_corners=False)
+        cvt_out = F.interpolate(cvt_out, size=self.resize_shape, mode='bilinear', align_corners=False)
 
         # Pass the resized output through the head model
         # Returns predictions for each task, and a shared convolution output
-        head_out = self.head_model(cvt_out_resized)
+        head_out = self.head_model(cvt_out)
 
         return head_out
 
@@ -85,10 +84,15 @@ class CVCPModel(nn.Module):
         # Forward pass
         preds = self.forward(
             data['images'], data['intrinsics'], data['extrinsics'])
+        
+        # for key in data['labels'].keys():
+        #     for k in data['labels'][key]:
+        #         k = k.cuda()
 
         # Compute the loss
-        # loss = self.loss(preds, data['labels'])
-        loss = self.head_model.loss(preds, data['labels'])
+        losses = self.head_model.loss(data['labels'], preds)
+        
+        loss, log_vars = parse_second_losses(losses)
 
         # Clear gradients
         self.opt.zero_grad()
@@ -104,4 +108,22 @@ class CVCPModel(nn.Module):
     def val_step(self, data: dict):
         self.eval()
 
-        preds = self.forward(data['images'], data['intrinsics'], data['extrinsics']).detach().cpu()
+        preds = self.forward(
+            data['images'], data['intrinsics'], data['extrinsics']).detach().cpu()
+
+        losses = self.head_model.loss(data['labels'], preds)
+        
+        loss, log_vars = parse_second_losses(losses)
+
+def parse_second_losses(losses):
+    from collections import OrderedDict
+
+    log_vars = OrderedDict()
+    loss = sum(losses["loss"])
+    for loss_name, loss_value in losses.items():
+        if loss_name == "loc_loss_elem":
+            log_vars[loss_name] = [[i.item() for i in j] for j in loss_value]
+        else:
+            log_vars[loss_name] = [i.item() for i in loss_value]
+
+    return loss, log_vars

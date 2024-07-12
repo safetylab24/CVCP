@@ -15,7 +15,7 @@ def load_config(config_file):
 
 
 def main():
-    default_config_path = 'config.yaml'
+    default_config_path = '/home/vrb230004/CombinedModels/CVCP/configs/config.yaml' # changed this cuz i couldnt figure out how to run without CDing into CombinedModels
     if len(sys.argv) > 1 and (config_path := sys.argv[1]):
         config = load_config(config_path)
     else:
@@ -49,7 +49,7 @@ def main():
     model = CVCPModel(cvt_seg, head_seg, resize_shape)
 
     # Define a loss function and an optimizer
-    model.loss = nn.CrossEntropyLoss()
+    # model.loss = nn.CrossEntropyLoss()
     model.opt = torch.optim.Adam(
         model.parameters(),
         lr=opt_config.get('lr'),
@@ -83,7 +83,7 @@ def main():
     print("\n=========================")
 
     step = 0
-
+    best = 1e10
     for epoch in range(config.get('epochs')):
         # training
         for batch in tqdm(train_loader):
@@ -91,7 +91,7 @@ def main():
 
             step += 1
 
-            if step % 10 == 0:
+            if step % 5000 == 0:
                 print(f"Train Loss: {loss}")
 
         # validation
@@ -100,8 +100,18 @@ def main():
 
             step += 1
 
-            if step % 10 == 0:
+            if step % 1000 == 0:
                 print(f"Val Loss: {loss}")
+
+            if loss < best:
+                best = loss
+            
+        ckpt = {
+            'model': model.state_dict(),
+            'opt': model.opt.state_dict(),
+            'epoch': epoch
+        }
+        torch.save(ckpt, f"/home/vrb230004/CombinedModels/CVCP/out_dir/cvcp_ckpt_{epoch}_{best:.4f}.pth")
 
 
 if __name__ == "__main__":

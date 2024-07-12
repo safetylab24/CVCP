@@ -1,7 +1,7 @@
 epochs: 10
 num_workers: 1
 batch_size: 1
-resize_shape: [160, 160]
+resize_shape: [128, 128]
 
 dataset_dir: /home/vrb230004/media/datasets/nuscenes
 cvt_metadata_path: /home/vrb230004/media/datasets/cvt_labels_nuscenes

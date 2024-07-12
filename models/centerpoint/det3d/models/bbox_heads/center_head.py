@@ -243,23 +243,24 @@ class CenterHead(nn.Module):
         for task in self.tasks:
             ret_dicts.append(task(x))
 
-        return ret_dicts, x
+        # return ret_dicts, x
+        return ret_dicts
 
     def _sigmoid(self, x):
         y = torch.clamp(x.sigmoid_(), min=1e-4, max=1-1e-4)
         return y
 
-    def loss(self, example, preds_dicts, test_cfg, **kwargs):
+    def loss(self, label, preds_dicts, test_cfg=None, **kwargs):
         rets = []
         for task_id, preds_dict in enumerate(preds_dicts):
             # heatmap focal loss
             preds_dict['hm'] = self._sigmoid(preds_dict['hm'])
 
-            hm_loss = self.crit(preds_dict['hm'], example['hm'][task_id], example['ind'][task_id], example['mask'][task_id], example['cat'][task_id])
+            hm_loss = self.crit(preds_dict['hm'], label['hm'][task_id], label['ind'][task_id], label['mask'][task_id], label['cat'][task_id])
 
-            target_box = example['anno_box'][task_id] # (4,500,10)
+            target_box = label['anno_box'][task_id] # (4,500,10)
             # reconstruct the anno_box from multiple reg heads
-            if self.dataset in ['waymo', 'nuscenes']:
+            if self.dataset in ['nuscenes']:
                 if 'vel' in preds_dict:
                     preds_dict['anno_box'] = torch.cat((preds_dict['reg'], preds_dict['height'], preds_dict['dim'],
                                                         preds_dict['vel'], preds_dict['rot']), dim=1)
@@ -275,14 +276,14 @@ class CenterHead(nn.Module):
 
             # Regression loss for dimension, offset, height, rotation
             box_loss = self.crit_reg(
-                preds_dict['anno_box'], example['mask'][task_id], example['ind'][task_id], target_box)
+                preds_dict['anno_box'], label['mask'][task_id], label['ind'][task_id], target_box)
 
             loc_loss = (box_loss*box_loss.new_tensor(self.code_weights)).sum()
 
             loss = hm_loss + self.weight*loc_loss
 
             ret.update({'loss': loss, 'hm_loss': hm_loss.detach().cpu(), 'loc_loss': loc_loss,
-                       'loc_loss_elem': box_loss.detach().cpu(), 'num_positive': example['mask'][task_id].float().sum()})
+                       'loc_loss_elem': box_loss.detach().cpu(), 'num_positive': label['mask'][task_id].float().sum()})
 
             rets.append(ret)
 
