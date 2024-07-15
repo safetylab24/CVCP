@@ -9,6 +9,7 @@ from torchvision.models.resnet import Bottleneck
 
 from models.cvt.efficientnet import EfficientNetExtractor
 
+torch.inverse(torch.ones((0, 0), device="cuda:3"))
 
 def ResNetBottleNeck(c):
     return Bottleneck(c, c // 4)
@@ -353,7 +354,8 @@ class Encoder(nn.Module):
         b, n, _, _, _ = images.shape
 
         image = images.flatten(0, 1)  # b n c h w
-        I_inv = torch.inverse(intrinsics)  # b n 3 3
+
+        I_inv = torch.inverse(intrinsics)  # b n 3 3  
         E_inv = torch.inverse(extrinsics)  # b n 4 4
 
         image = self.norm(image)

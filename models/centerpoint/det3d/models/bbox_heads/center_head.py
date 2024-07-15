@@ -296,8 +296,8 @@ class CenterHead(nn.Module):
 
         return rets_merged
 
-    @torch.no_grad()
-    def predict(self, example, preds_dicts, test_cfg, **kwargs):
+    @torch.inference_mode()
+    def predict(self, labels, preds_dicts, test_cfg, **kwargs) -> dict:
         """decode, nms, then return the detection result. Additionaly support double flip testing 
         """
         # get loss info
@@ -306,7 +306,7 @@ class CenterHead(nn.Module):
 
         double_flip = test_cfg.get('double_flip', False)
 
-        post_center_range = test_cfg.post_center_limit_range
+        post_center_range = test_cfg.get('post_center_limit_range')
         if len(post_center_range) > 0:
             post_center_range = torch.tensor(
                 post_center_range,
@@ -342,10 +342,10 @@ class CenterHead(nn.Module):
                     preds_dict[k][:, 3] = torch.flip(
                         preds_dict[k][:, 3], dims=[1, 2])
 
-            if "metadata" not in example or len(example["metadata"]) == 0:
+            if "metadata" not in labels or len(labels["metadata"]) == 0:
                 meta_list = [None] * batch_size
             else:
-                meta_list = example["metadata"]
+                meta_list = labels["metadata"]
                 if double_flip:
                     meta_list = meta_list[:4*int(batch_size):4]
 
@@ -406,11 +406,12 @@ class CenterHead(nn.Module):
 
             xs = xs.view(batch, -1, 1) + batch_reg[:, :, 0:1]
             ys = ys.view(batch, -1, 1) + batch_reg[:, :, 1:2]
-
-            xs = xs * test_cfg.out_size_factor * \
-                test_cfg.voxel_size[0] + test_cfg.pc_range[0]
-            ys = ys * test_cfg.out_size_factor * \
-                test_cfg.voxel_size[1] + test_cfg.pc_range[1]
+            voxel_size = test_cfg.get('voxel_size')
+            pc_range = test_cfg.get('pc_range')
+            xs = xs * test_cfg.get('out_size_factor') * \
+                voxel_size[0] + pc_range[0]
+            ys = ys * test_cfg.get('out_size_factor') * \
+                voxel_size[1] + pc_range[1]
 
             if 'vel' in preds_dict:
                 batch_vel = preds_dict['vel']
@@ -473,7 +474,7 @@ class CenterHead(nn.Module):
 
             scores, labels = torch.max(hm_preds, dim=-1)
 
-            score_mask = scores > test_cfg.score_threshold
+            score_mask = scores > test_cfg.get('score_threshold')
             distance_mask = (box_preds[..., :3] >= post_center_range[:3]).all(1) \
                 & (box_preds[..., :3] <= post_center_range[3:]).all(1)
 
@@ -485,6 +486,8 @@ class CenterHead(nn.Module):
 
             boxes_for_nms = box_preds[:, [0, 1, 2, 3, 4, 5, -1]]
 
+            nms_cfg = test_cfg.get('nms')
+
             if test_cfg.get('circular_nms', False):
                 centers = boxes_for_nms[:, [0, 1]]
                 boxes = torch.cat([centers, scores.view(-1, 1)], dim=1)
@@ -492,9 +495,7 @@ class CenterHead(nn.Module):
                     boxes, min_radius=test_cfg.min_radius[task_id], post_max_size=test_cfg.nms.nms_post_max_size)
             else:
                 selected = box_torch_ops.rotate_nms_pcdet(boxes_for_nms.float(), scores.float(),
-                                                          thresh=test_cfg.nms.nms_iou_threshold,
-                                                          pre_maxsize=test_cfg.nms.nms_pre_max_size,
-                                                          post_max_size=test_cfg.nms.nms_post_max_size)
+                                                          thresh=nms_cfg.get('nms_iou_threshold'),              pre_maxsize=nms_cfg.get('nms_pre_max_size'),post_max_size=nms_cfg.get('nms_post_max_size'))
 
             selected_boxes = box_preds[selected]
             selected_scores = scores[selected]

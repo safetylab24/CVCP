@@ -1,20 +1,19 @@
 epochs: 10
-num_workers: 1
-batch_size: 1
+num_workers: 4
+batch_size: 4
 resize_shape: [128, 128]
 
 dataset_dir: /home/vrb230004/media/datasets/nuscenes
 cvt_metadata_path: /home/vrb230004/media/datasets/cvt_labels_nuscenes
-bbox_label_path: /home/vrb230004/CombinedModels/CenterPoint/data/nuscenes/labels
+bbox_label_path: /home/vrb230004/CombinedModels/labels
 
 cvt:
-  devices: [0, 1, 2, 3]
-  n_classes: 2
-  loss_type: ce # ce or focal
+  devices: [3]
 
 optimizer:
   lr: 0.001
-  weight_decay: 0.0001
+  weight_decay: 0.01
+  momentum: 0.9
 
 centerpoint:
   in_channels: [128, ]
@@ -23,6 +22,22 @@ centerpoint:
   tasks:
     - num_class: 1
       class_names: ["car"]
+    
+    - num_class: 2
+      class_names: ["truck", "construction vehicle"]
+    
+    - num_class: 2
+      class_names: ["bus", "trailer"]
+    
+    - num_class: 1
+      class_names: ["barrier"]
+    
+    - num_class: 2
+      class_names: ["motorcycle", "bicycle"]
+    
+    - num_class: 2
+      class_names: ["pedestrian", "traffic cone"]
+
   code_weights: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.2, 0.2, 1.0, 1.0]
   common_heads: # (output_channel, num_conv)
     'reg': [2, 2]
@@ -32,3 +47,28 @@ centerpoint:
     'vel': [2, 2]
   share_conv_channel: 64
   dcn_head: False
+
+#test_cfg = dict(
+#     post_center_limit_range=[-61.2, -61.2, -10.0, 61.2, 61.2, 10.0],
+#     max_per_img=500,
+#     nms=dict(
+#         nms_pre_max_size=1000,
+#         nms_post_max_size=83,
+#         nms_iou_threshold=0.2,
+#     ),
+#     score_threshold=0.1,
+#     pc_range=[-51.2, -51.2],
+#     out_size_factor=get_downsample_factor(model),
+#     voxel_size=[0.2, 0.2]
+# )
+test:
+  post_center_limit_range: [-61.2, -61.2, -10.0, 61.2, 61.2, 10.0]
+  max_per_img: 500
+  nms:
+    nms_pre_max_size: 1000
+    nms_post_max_size: 83
+    nms_iou_threshold: 0.2
+  score_threshold: 0.1
+  pc_range: [-51.2, -51.2]
+  out_size_factor: 4
+  voxel_size: [0.2, 0.2]

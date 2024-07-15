@@ -121,7 +121,7 @@ def flatten(box):
     return np.concatenate(box, axis=0)
 
 """Return CenterNet training labels like heatmap, height, offset"""
-def assign_label(result, info, tasks, gaussian_overlap=0.1, max_objs=500, min_radius=2, out_size_factor=4, voxel_size=(0.2, 0.2, 8),
+def assign_label(result, tasks, gaussian_overlap=0.1, max_objs=500, min_radius=2, out_size_factor=4, voxel_size=(0.2, 0.2, 8),
         pc_range=(-51.2, -51.2, -5.0, 51.2, 51.2, 3.0)):
     class_names_by_task = [t['class_names'] for t in tasks]
     num_classes_by_task = [t['num_class'] for t in tasks]
@@ -247,7 +247,7 @@ def assign_label(result, info, tasks, gaussian_overlap=0.1, max_objs=500, min_ra
             cats.append(cat)
 
         labels.update({'hm': hms, 'anno_box': anno_boxs,
-                        'ind': inds, 'mask': masks, 'cat': cats})
+                        'ind': inds, 'mask': masks, 'cat': cats, 'num_objs': num_objs})
     else:
         pass
     
