@@ -37,10 +37,12 @@ def head(in_channels, tasks, dataset, weight, code_weights, common_heads, share_
 class CVCPModel(L.LightningModule):
     def __init__(self, cvt_encoder: CVTEncoder, center_head_model: CenterHead, resize_shape, cfg):
         super().__init__()
+        self.save_hyperparameters(ignore=['cvt_encoder', 'head_model'])
         self.cvt_encoder = cvt_encoder
         self.head_model = center_head_model
         self.resize_shape = resize_shape
         self.cfg = cfg
+
 
     # expects data as dict of images, intrinsics, extrinsics, labels
     def training_step(self, batch, batch_idx):
@@ -71,6 +73,7 @@ class CVCPModel(L.LightningModule):
         # Compute the loss
         losses = self.head_model.loss(batch['labels'], preds)
         loss, log_vars = self.parse_second_losses(losses)
+        self.log("val_loss", loss)
         return loss
 
     def configure_optimizers(self):
@@ -81,7 +84,8 @@ class CVCPModel(L.LightningModule):
             'lr_scheduler': {
                 'scheduler': torch.optim.lr_scheduler.OneCycleLR(optimizer, max_lr=self.cfg['lr'], total_steps=self.trainer.estimated_stepping_batches, max_momentum=self.cfg['max_momentum'], base_momentum=self.cfg['base_momentum']),
                 'monitor': 'val_loss',
-                'frequency': 1
+                'frequency': 1,
+                'interval': 'step',
             }
         }
 

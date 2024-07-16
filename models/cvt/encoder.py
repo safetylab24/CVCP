@@ -11,6 +11,7 @@ from models.cvt.efficientnet import EfficientNetExtractor
 
 torch.inverse(torch.ones((0, 0), device="cuda:3"))
 
+
 def ResNetBottleNeck(c):
     return Bottleneck(c, c // 4)
 
@@ -49,8 +50,10 @@ class Normalize(nn.Module):
     def __init__(self, mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]):
         super().__init__()
 
-        self.register_buffer('mean', torch.tensor(mean)[None, :, None, None], persistent=False)
-        self.register_buffer('std', torch.tensor(std)[None, :, None, None], persistent=False)
+        self.register_buffer('mean', torch.tensor(
+            mean)[None, :, None, None], persistent=False)
+        self.register_buffer('std', torch.tensor(
+            std)[None, :, None, None], persistent=False)
 
     def forward(self, x):
         return (x - self.mean) / self.std
@@ -108,14 +111,16 @@ class BEVEmbedding(nn.Module):
         grid[1] = bev_height * grid[1]
 
         # map from bev coordinates to ego frame
-        V = get_view_matrix(bev_height, bev_width, h_meters, w_meters, offset)  # 3 3
+        V = get_view_matrix(bev_height, bev_width,
+                            h_meters, w_meters, offset)  # 3 3
         V_inv = torch.inverse(torch.FloatTensor(V))  # 3 3
         grid = V_inv @ rearrange(grid, 'd h w -> d (h w)')  # 3 (h w)
         grid = rearrange(grid, 'd (h w) -> d h w', h=h, w=w)  # 3 h w
 
         # egocentric frame
         self.register_buffer('grid', grid, persistent=False)  # 3 h w
-        self.learned_features = nn.Parameter(sigma * torch.randn(dim, h, w))  # d h w
+        self.learned_features = nn.Parameter(
+            sigma * torch.randn(dim, h, w))  # d h w
 
     def get_prior(self):
         return self.learned_features
@@ -130,13 +135,17 @@ class CrossAttention(nn.Module):
         self.heads = heads
         self.dim_head = dim_head
 
-        self.to_q = nn.Sequential(norm(dim), nn.Linear(dim, heads * dim_head, bias=qkv_bias))
-        self.to_k = nn.Sequential(norm(dim), nn.Linear(dim, heads * dim_head, bias=qkv_bias))
-        self.to_v = nn.Sequential(norm(dim), nn.Linear(dim, heads * dim_head, bias=qkv_bias))
+        self.to_q = nn.Sequential(norm(dim), nn.Linear(
+            dim, heads * dim_head, bias=qkv_bias))
+        self.to_k = nn.Sequential(norm(dim), nn.Linear(
+            dim, heads * dim_head, bias=qkv_bias))
+        self.to_v = nn.Sequential(norm(dim), nn.Linear(
+            dim, heads * dim_head, bias=qkv_bias))
 
         self.proj = nn.Linear(heads * dim_head, dim)
         self.prenorm = norm(dim)
-        self.mlp = nn.Sequential(nn.Linear(dim, 2 * dim), nn.GELU(), nn.Linear(2 * dim, dim))
+        self.mlp = nn.Sequential(
+            nn.Linear(dim, 2 * dim), nn.GELU(), nn.Linear(2 * dim, dim))
         self.postnorm = norm(dim)
 
     def forward(self, q, k, v, skip=None):
@@ -158,9 +167,12 @@ class CrossAttention(nn.Module):
         v = self.to_v(v)  # b (n h w) (heads dim_head)
 
         # Group the head dim with batch dim
-        q = rearrange(q, 'b ... (m d) -> (b m) ... d', m=self.heads, d=self.dim_head)
-        k = rearrange(k, 'b ... (m d) -> (b m) ... d', m=self.heads, d=self.dim_head)
-        v = rearrange(v, 'b ... (m d) -> (b m) ... d', m=self.heads, d=self.dim_head)
+        q = rearrange(q, 'b ... (m d) -> (b m) ... d',
+                      m=self.heads, d=self.dim_head)
+        k = rearrange(k, 'b ... (m d) -> (b m) ... d',
+                      m=self.heads, d=self.dim_head)
+        v = rearrange(v, 'b ... (m d) -> (b m) ... d',
+                      m=self.heads, d=self.dim_head)
 
         # Dot product attention along cameras
         dot = self.scale * torch.einsum('b n Q d, b n K d -> b n Q K', q, k)
@@ -170,7 +182,8 @@ class CrossAttention(nn.Module):
 
         # Combine values (image level features).
         a = torch.einsum('b Q K, b K d -> b Q d', att, v)
-        a = rearrange(a, '(b m) ... d -> b ... (m d)', m=self.heads, d=self.dim_head)
+        a = rearrange(a, '(b m) ... d -> b ... (m d)',
+                      m=self.heads, d=self.dim_head)
 
         # Combine multiple heads
         z = self.proj(a)
@@ -260,22 +273,28 @@ class CrossViewAttention(nn.Module):
         cam = i_inv @ pixel_flat  # b n 3 (h w)
         cam = F.pad(cam, (0, 0, 0, 1, 0, 0, 0, 0), value=1)  # b n 4 (h w)
         d = e_inv @ cam  # b n 4 (h w)
-        d_flat = rearrange(d, 'b n d (h w) -> (b n) d h w', h=h, w=w)  # (b n) 4 h w
+        d_flat = rearrange(d, 'b n d (h w) -> (b n) d h w',
+                           h=h, w=w)  # (b n) 4 h w
         d_embed = self.img_embed(d_flat)  # (b n) d h w
 
         img_embed = d_embed - c_embed  # (b n) d h w
-        img_embed = img_embed / (img_embed.norm(dim=1, keepdim=True) + 1e-7)  # (b n) d h w
+        img_embed = img_embed / \
+            (img_embed.norm(dim=1, keepdim=True) + 1e-7)  # (b n) d h w
 
         world = bev.grid[:2]  # 2 H W
         w_embed = self.bev_embed(world[None])  # 1 d H W
         bev_embed = w_embed - c_embed  # (b n) d H W
-        bev_embed = bev_embed / (bev_embed.norm(dim=1, keepdim=True) + 1e-7)  # (b n) d H W
-        query_pos = rearrange(bev_embed, '(b n) ... -> b n ...', b=b, n=n)  # b n d H W
+        bev_embed = bev_embed / \
+            (bev_embed.norm(dim=1, keepdim=True) + 1e-7)  # (b n) d H W
+        query_pos = rearrange(
+            bev_embed, '(b n) ... -> b n ...', b=b, n=n)  # b n d H W
 
-        feature_flat = rearrange(feature, 'b n ... -> (b n) ...')  # (b n) d h w
+        feature_flat = rearrange(
+            feature, 'b n ... -> (b n) ...')  # (b n) d h w
 
         if self.feature_proj is not None:
-            key_flat = img_embed + self.feature_proj(feature_flat)  # (b n) d h w
+            key_flat = img_embed + \
+                self.feature_proj(feature_flat)  # (b n) d h w
         else:
             key_flat = img_embed  # (b n) d h w
 
@@ -283,13 +302,15 @@ class CrossViewAttention(nn.Module):
 
         # Expand + refine the BEV embedding
         query = query_pos + x[:, None]  # b n d H W
-        key = rearrange(key_flat, '(b n) ... -> b n ...', b=b, n=n)  # b n d h w
-        val = rearrange(val_flat, '(b n) ... -> b n ...', b=b, n=n)  # b n d h w
+        key = rearrange(key_flat, '(b n) ... -> b n ...',
+                        b=b, n=n)  # b n d h w
+        val = rearrange(val_flat, '(b n) ... -> b n ...',
+                        b=b, n=n)  # b n d h w
 
         return self.cross_attend(query, key, val, skip=x if self.skip else None)
 
 
-class Encoder(nn.Module):
+class CVTEncoder(nn.Module):
     def __init__(
             self,
             # dim: int = 256,
@@ -302,7 +323,8 @@ class Encoder(nn.Module):
         self.norm = Normalize()
 
         self.backbone = EfficientNetExtractor(model_name="efficientnet-b4",
-                                              layer_names=['reduction_2', 'reduction_4'],
+                                              layer_names=[
+                                                  'reduction_2', 'reduction_4'],
                                               image_height=H,
                                               image_width=W, channels=3)
 
@@ -328,7 +350,8 @@ class Encoder(nn.Module):
         }
 
         if scale < 1.0:
-            self.down = lambda x: F.interpolate(x, scale_factor=scale, recompute_scale_factor=False)
+            self.down = lambda x: F.interpolate(
+                x, scale_factor=scale, recompute_scale_factor=False)
         else:
             self.down = lambda x: x
 
@@ -338,12 +361,15 @@ class Encoder(nn.Module):
         layers = list()
 
         for feat_shape, num_layers in zip(self.backbone.output_shapes, middle):
-            _, feat_dim, feat_height, feat_width = self.down(torch.zeros(feat_shape)).shape
+            _, feat_dim, feat_height, feat_width = self.down(
+                torch.zeros(feat_shape)).shape
 
-            cva = CrossViewAttention(feat_height, feat_width, feat_dim, dim, **cross_view)
+            cva = CrossViewAttention(
+                feat_height, feat_width, feat_dim, dim, **cross_view)
             cross_views.append(cva)
 
-            layer = nn.Sequential(*[ResNetBottleNeck(dim) for _ in range(num_layers)])
+            layer = nn.Sequential(*[ResNetBottleNeck(dim)
+                                  for _ in range(num_layers)])
             layers.append(layer)
 
         self.bev_embedding = BEVEmbedding(dim, **bev_embedding)
@@ -355,7 +381,7 @@ class Encoder(nn.Module):
 
         image = images.flatten(0, 1)  # b n c h w
 
-        I_inv = torch.inverse(intrinsics)  # b n 3 3  
+        I_inv = torch.inverse(intrinsics)  # b n 3 3
         E_inv = torch.inverse(extrinsics)  # b n 4 4
 
         image = self.norm(image)
@@ -373,4 +399,4 @@ class Encoder(nn.Module):
             x = layer(x)
             atts.append(att)
 
-        return x, atts
+        return torch.softmax(x, dim=1)

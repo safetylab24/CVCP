@@ -1,7 +1,5 @@
 import json
-from lightning.pytorch.utilities.types import TRAIN_DATALOADERS
 import torch
-import itertools
 from pathlib import Path
 import pickle
 import lightning as L
@@ -16,14 +14,64 @@ from transforms.loading import load_annotations
 from transforms.preprocess import preprocess, assign_label
 
 
+class NuScenesDataModule(L.LightningDataModule):
+    def __init__(self, cvt_metadata_path, bbox_label_path, tasks, config):
+        super().__init__()
+        self.dataset_dir = Path('/home/vrb230004/media/datasets/nuscenes')
+        self.cvt_metadata_path = Path(cvt_metadata_path)
+        self.bbox_label_path = Path(bbox_label_path)
+        self.tasks: dict = tasks
+        self.config = config
+    
+    def setup(self, stage: str) -> None:
+        if stage == 'fit':
+            self.data_train: ConcatDataset = get_dataset(
+                dataset_dir=self.dataset_dir,
+                cvt_metadata_path=self.cvt_metadata_path,
+                bbox_label_path=self.bbox_label_path,
+                split='train',
+                version='v1.0-trainval',
+                tasks=self.tasks
+            )
+            self.data_val : ConcatDataset = get_dataset(
+                dataset_dir=self.dataset_dir,
+                cvt_metadata_path=self.cvt_metadata_path,
+                bbox_label_path=self.bbox_label_path,
+                split='val',
+                version='v1.0-trainval',
+                tasks=self.tasks
+            )
+        
+    def train_dataloader(self):
+        return DataLoader(
+        dataset=self.data_train,
+        batch_size=self.config['batch_size'],
+        num_workers=self.config['num_workers'],
+        # sampler=SequentialSampler(self.data_train),
+        shuffle=True,
+        drop_last=True,
+        pin_memory=True,
+    )
+        
+    def val_dataloader(self):
+        return DataLoader(
+        dataset=self.data_val,
+        batch_size=self.config['batch_size'],
+        num_workers=self.config['num_workers'],
+        sampler=SequentialSampler(self.data_val),
+        shuffle=False,
+        drop_last=True,
+        pin_memory=True,
+    )
+
 def get_dataset(
     dataset_dir,
     cvt_metadata_path,
     bbox_label_path,
     split,
-    version='v1.0-mini',
+    version='v1.0-trainval',
     tasks=None
-):
+) -> ConcatDataset:
     dataset_dir = Path(dataset_dir)
     cvt_metadata_path = Path(cvt_metadata_path)
     bbox_label_path = Path(bbox_label_path)
@@ -32,25 +80,10 @@ def get_dataset(
     split = f'mini_{split}' if version == 'v1.0-mini' else split
 
     # gets a list of scene names from splits/nuscenes/[train/val].txt
-    split_scenes = get_split(split)
-
-    return [NuScenesGeneratedDataset(scene_name, cvt_metadata_path, bbox_label_path, tasks) for scene_name in split_scenes]
-
-def get_split(version):
-    if version == 'train':
-        return (Path(__file__).parents[0] / 'splits/train.txt').read_text().splitlines()
-    elif version == 'val':
-        return (Path(__file__).parents[0] / 'splits/val.txt').read_text().splitlines()
-
+    split_scenes = (Path(__file__).parents[0] / f'splits/{split}.txt').read_text().splitlines()
+    return ConcatDataset([NuScenesGeneratedDataset(scene_name, cvt_metadata_path, bbox_label_path, tasks) for scene_name in split_scenes])
 
 class NuScenesGeneratedDataset(torch.utils.data.Dataset):
-    """
-    Lightweight dataset wrapper around contents of a JSON file
-
-    ------ONE SCENE, MULTIPLE FRAMES-----
-    Contains all camera info, image_paths, label_paths that are to be loaded
-    """
-
     def __init__(self, scene_name, cvt_metadata_path, bbox_label_path, tasks):
         self.scene_name = scene_name
         self.samples = json.loads((Path(cvt_metadata_path) / f'{scene_name}.json').read_text())
@@ -79,145 +112,47 @@ class NuScenesGeneratedDataset(torch.utils.data.Dataset):
     def __getitem__(self, idx):
         inputs = self.samples[idx]
         labels = self.labels[idx]
-        return parse_data(inputs, labels, self.tasks, dataset_dir=Path('/home/vrb230004/media/datasets/nuscenes'))
+        return self.parse_data(inputs, labels, self.tasks, dataset_dir=Path('/home/vrb230004/media/datasets/nuscenes'))
         
-def parse_inputs(inputs: dict, dataset_dir: Path, h=224, w=480, top_crop=24, img_transform=ToTensor()) -> dict:
-    images = list()
-    intrinsics = list()
-    
-    for image_path, I_original in zip(inputs['images'], inputs['intrinsics']):
-        h_resize = h + top_crop
-        w_resize = w
-
-        image = Image.open(dataset_dir / image_path)
-
-        image_new = image.resize((w_resize, h_resize), resample=Image.BILINEAR)
-        image_new = image_new.crop(
-            (0, top_crop, image_new.width, image_new.height))
-
-        I = np.float32(I_original)
-        I[0, 0] *= w_resize / image.width
-        I[0, 2] *= w_resize / image.width
-        I[1, 1] *= h_resize / image.height
-        I[1, 2] *= h_resize / image.height
-        I[1, 2] -= top_crop
-
-        images.append(img_transform(image_new))
-        intrinsics.append(torch.tensor(I))
-    
-    return images, intrinsics
-
-def parse_labels(labels: dict, tasks) -> dict:
-    loaded = load_annotations(labels)
-    preprocessed = preprocess(loaded, 'train', tasks)
-    labels = assign_label(preprocessed, tasks)
-    return labels    
-
-def parse_data(inputs: dict, labels: dict, tasks, dataset_dir: Path, h=224, w=480, top_crop=24, img_transform=ToTensor()) -> dict:
-        images, intrinsics = parse_inputs(inputs, dataset_dir, h, w, top_crop, img_transform)
-        labels = parse_labels(labels, tasks)
-
-        return {
-            'images': torch.stack(images, 0),
-            'intrinsics': torch.stack(intrinsics, 0),
-            'extrinsics': torch.tensor(np.float32(inputs['extrinsics'])),
-            'labels': labels
-        }
-
-
-def get_train_dataloader(dataset_dir=None, cvt_metadata_path=None, bbox_label_path=None, version='v1.0-trainval', batch_size=1, num_workers=1, tasks=None):
-    datasets = get_dataset(
-        dataset_dir=dataset_dir,
-        cvt_metadata_path=cvt_metadata_path,
-        bbox_label_path=bbox_label_path,
-        split='train',
-        version=version,
-        tasks=tasks
-    )
-    data = ConcatDataset(datasets)
-
-    dataloader = DataLoader(
-        dataset=data,
-        batch_size=batch_size,
-        num_workers=num_workers,
-        sampler=SequentialSampler(data),
-        shuffle=False,
-        drop_last=True,
-        pin_memory=True,
-    )
-
-    return dataloader
-
-
-def get_val_dataloader(dataset_dir=None, cvt_metadata_path=None, bbox_label_path=None, version='v1.0-trainval', batch_size=1, num_workers=1, tasks=None):
-    datasets = get_dataset(
-        dataset_dir=dataset_dir,
-        cvt_metadata_path=cvt_metadata_path,
-        bbox_label_path=bbox_label_path,
-        split='val',
-        version=version,
-        tasks=tasks
-    )
-    data = ConcatDataset(datasets)
-
-    dataloader = DataLoader(
-        dataset=data,
-        batch_size=batch_size,
-        num_workers=num_workers,
-        sampler=SequentialSampler(data),
-        shuffle=False,
-        drop_last=True,
-        pin_memory=True
-    )
-
-    return dataloader
-
-
-class NuScenesDataModule(L.LightningDataModule):
-    def __init__(self, cvt_metadata_path, bbox_label_path, tasks):
-        super().__init__()
-        self.dataset_dir = Path('/home/vrb230004/media/datasets/nuscenes')
-        self.cvt_metadata_path = Path(cvt_metadata_path)
-        self.bbox_label_path = Path(bbox_label_path)
-        self.tasks = tasks
-    
-    def setup(self, stage: str) -> None:
-        if stage == 'fit':
-            self.data_train = get_dataset(
-                dataset_dir=self.dataset_dir,
-                cvt_metadata_path=self.cvt_metadata_path,
-                bbox_label_path=self.bbox_label_path,
-                split='train',
-                version='v1.0-trainval',
-                tasks=self.tasks
-                )
-            self.data_val = get_dataset(
-                dataset_dir=self.dataset_dir,
-                cvt_metadata_path=self.cvt_metadata_path,
-                bbox_label_path=self.bbox_label_path,
-                split='val',
-                version='v1.0-trainval',
-                tasks=self.tasks
-                )
+    def parse_inputs(self, inputs: dict, dataset_dir: Path, h=224, w=480, top_crop=24, img_transform=ToTensor()) -> dict:
+        images = list()
+        intrinsics = list()
         
-    def train_dataloader(self):
-        return DataLoader(
-        dataset=self.data_train,
-        batch_size=2,
-        num_workers=2,
-        sampler=SequentialSampler(self.data_train),
-        shuffle=False,
-        drop_last=True,
-        pin_memory=False,
-    )
+        for image_path, I_original in zip(inputs['images'], inputs['intrinsics']):
+            h_resize = h + top_crop
+            w_resize = w
+
+            image = Image.open(dataset_dir / image_path)
+
+            image_new = image.resize((w_resize, h_resize), resample=Image.BILINEAR)
+            image_new = image_new.crop(
+                (0, top_crop, image_new.width, image_new.height))
+
+            I = np.float32(I_original)
+            I[0, 0] *= w_resize / image.width
+            I[0, 2] *= w_resize / image.width
+            I[1, 1] *= h_resize / image.height
+            I[1, 2] *= h_resize / image.height
+            I[1, 2] -= top_crop
+
+            images.append(img_transform(image_new))
+            intrinsics.append(torch.tensor(I))
         
-    def val_dataloader(self):
-        return DataLoader(
-        dataset=self.data_val,
-        batch_size=2,
-        num_workers=2,
-        sampler=SequentialSampler(self.data_val),
-        shuffle=False,
-        drop_last=True,
-        pin_memory=False,
-    )
+        return images, intrinsics
+
+    def parse_labels(self, labels: dict, tasks) -> dict:
+        loaded = load_annotations(labels)
+        preprocessed = preprocess(loaded, 'train', tasks)
+        labels = assign_label(preprocessed, tasks)
+        return labels    
+
+    def parse_data(self, inputs: dict, labels: dict, tasks, dataset_dir: Path, h=224, w=480, top_crop=24, img_transform=ToTensor()) -> dict:
+            images, intrinsics = self.parse_inputs(inputs, dataset_dir, h, w, top_crop, img_transform)
+            labels = self.parse_labels(labels, tasks)
+
+            return {
+                'images': torch.stack(images, 0),
+                'intrinsics': torch.stack(intrinsics, 0),
+                'extrinsics': torch.tensor(np.float32(inputs['extrinsics'])),
+                'labels': labels
+            }
