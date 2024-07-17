@@ -1,11 +1,10 @@
 import numpy as np
 
-from CVCP.models.centerpoint.det3d.core.bbox import box_np_ops
-from CVCP.models.centerpoint.det3d.core.sampler import preprocess as prep
-from CVCP.models.centerpoint.det3d.builder import build_dbsampler
+from models.centerpoint.utils.box_np_ops import limit_period
+import models.centerpoint.utils.preprocess as prep
 import itertools
 
-from CVCP.models.centerpoint.det3d.core.utils.center_utils import (
+from models.centerpoint.utils.center_utils import (
     draw_umich_gaussian, gaussian_radius
 )
 
@@ -22,12 +21,10 @@ def drop_arrays_by_name(gt_names, used_classes):
     inds = np.array(inds, dtype=np.int64)
     return inds
 
-def preprocess(info, mode, tasks, no_augmentation=False, db_sampler=None, 
+def preprocess(info, mode, tasks, no_augmentation=False,
                 global_rotation_noise=[-0.3925, 0.3925], 
                 global_scale_noise=[0.95, 1.05], 
                 global_translate_std=0):
-    if db_sampler is not None:
-        db_sampler = build_dbsampler(db_sampler)
         
     class_names = list(itertools.chain(*[t["class_names"] for t in tasks]))
 
@@ -52,32 +49,6 @@ def preprocess(info, mode, tasks, no_augmentation=False, db_sampler=None,
         gt_boxes_mask = np.array(
             [n in class_names for n in gt_dict["gt_names"]], dtype=np.bool_
         )
-
-        if db_sampler:
-            sampled_dict = db_sampler.sample_all(
-                info["metadata"]["image_prefix"],
-                gt_dict["gt_boxes"],
-                gt_dict["gt_names"],
-                info["metadata"]["num_point_features"],
-                False,
-                gt_group_ids=None,
-                calib=None,
-                road_planes=None
-            )
-
-            if sampled_dict is not None:
-                sampled_gt_names = sampled_dict["gt_names"]
-                sampled_gt_boxes = sampled_dict["gt_boxes"]
-                sampled_gt_masks = sampled_dict["gt_masks"]
-                gt_dict["gt_names"] = np.concatenate(
-                    [gt_dict["gt_names"], sampled_gt_names], axis=0
-                )
-                gt_dict["gt_boxes"] = np.concatenate(
-                    [gt_dict["gt_boxes"], sampled_gt_boxes]
-                )
-                gt_boxes_mask = np.concatenate(
-                    [gt_boxes_mask, sampled_gt_masks], axis=0
-                )
 
         _dict_select(gt_dict, gt_boxes_mask)
 
@@ -173,7 +144,7 @@ def assign_label(result, tasks, gaussian_overlap=0.1, max_objs=500, min_radius=2
 
         for task_box in task_boxes:
             # limit rad to [-pi, pi]
-            task_box[:, -1] = box_np_ops.limit_period(
+            task_box[:, -1] = limit_period(
                 task_box[:, -1], offset=0.5, period=np.pi * 2
             )
 

@@ -1,5 +1,5 @@
 epochs: 15
-num_workers: 1
+num_workers: 7
 batch_size: 4
 resize_shape: [128, 128]
 

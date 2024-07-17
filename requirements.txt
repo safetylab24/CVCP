@@ -1,0 +1,19 @@
+# general dependencies
+torch
+torchvision
+lightning
+tensorboard
+colorama
+
+
+# cvt dependencies
+einops
+efficientnet_pytorch
+
+# centerpoint dependencies
+numba
+git+https://github.com/facebookresearch/pytorch3d.git@stable
+
+
+# label generation dependencies
+nuscenes-devkit

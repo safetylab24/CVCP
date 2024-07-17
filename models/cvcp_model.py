@@ -1,5 +1,5 @@
 import logging
-from models.centerpoint.det3d.models.bbox_heads.center_head import CenterHead
+from models.centerpoint.center_head import CenterHead
 
 import torch
 import torch.nn as nn

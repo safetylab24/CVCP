@@ -10,12 +10,13 @@ from lightning.pytorch.callbacks import ModelCheckpoint, LearningRateMonitor,  M
 from lightning.pytorch.strategies import DDPStrategy
 from lightning.pytorch.loggers import TensorBoardLogger
 import torch
-
+import faulthandler
 def load_config(config_file):
     with open(config_file, 'r') as file:
         return yaml.safe_load(file)
 
 def main():
+    faulthandler.enable()
     torch.cuda.empty_cache()
 
     default_config_path = Path(__file__) / 'configs/config.yaml'
@@ -105,7 +106,8 @@ def main():
     trainer.test(
         datamodule=datamodule,
         model=model,
-        verbose=True
+        verbose=True,
+        ckpt_path=config['ckpt_path']
     )
     
     print("\n=========================")

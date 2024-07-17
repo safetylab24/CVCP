@@ -11,6 +11,8 @@ from lightning.pytorch.strategies import DDPStrategy
 from lightning.pytorch.loggers import TensorBoardLogger
 import torch
 import faulthandler
+from colorama import Fore, Back, Style
+
 def load_config(config_file):
     with open(config_file, 'r') as file:
         return yaml.safe_load(file)
@@ -19,7 +21,7 @@ def main():
     faulthandler.enable()
     torch.cuda.empty_cache()
 
-    default_config_path = Path(__file__) / 'configs/config.yaml'
+    default_config_path = Path(__file__).parents[0] / 'configs/config.yaml'
     if len(sys.argv) > 1 and (config_path := sys.argv[1]):
         config = load_config(config_path)
     else:
@@ -58,7 +60,6 @@ def main():
         name='train'
     )
     
-    logger.log_hyperparams(hyperparameters)
     hyperparameters = {
         'epochs': config['epochs'],
         'batch_size': config['batch_size'],
@@ -68,8 +69,15 @@ def main():
         'weight_decay': config['weight_decay'],
         'num_workers': config['num_workers'],
     }
-    print(hyperparameters, '\n', f'logger: {logger.version},')
-    print(f'log_dir: {logger.log_dir}')
+    
+    logger.log_hyperparams(hyperparameters)
+    
+    print(Fore.GREEN + 'Training started.')
+    print('Hyperparameters:', hyperparameters)
+    print('Logger version:', logger.version)
+    print('Log dir:', logger.log_dir)
+    print(Style.RESET_ALL)
+
     
     lr_monitor = LearningRateMonitor(
         logging_interval='step', 

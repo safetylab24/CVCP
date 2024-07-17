@@ -173,4 +173,5 @@ class NuScenesGeneratedDataset(torch.utils.data.Dataset):
                 'intrinsics': torch.stack(intrinsics, 0),
                 'extrinsics': torch.tensor(np.float32(inputs['extrinsics'])),
                 'labels': labels_out,
+                'labels_original': labels
             }

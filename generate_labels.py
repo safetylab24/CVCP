@@ -229,8 +229,8 @@ def create_nuscenes_infos(root_path, version="v1.0-trainval", filter_zero=True):
 
 if __name__ == "__main__":
     dataroot = '/home/vrb230004/media/datasets/nuscenes_test'
-    version = 'v1.0-test'
-    label_dir = '/home/vrb230004/CombinedModels/test_labels/'
+    version = 'v1.0-mini'
+    label_dir = '/home/vrb230004/CombinedModels/labels/'
     nusc = NuScenes(version=version, dataroot=dataroot, verbose=True)
     create_json = False
     create_pkl = True

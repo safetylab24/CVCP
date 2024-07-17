@@ -1,0 +1,5 @@
+# ninja log v6
+0	2012	1721255109627530271	/home/vrb230004/CombinedModels/testing/CVCP/models/centerpoint/ops/iou3d_nms/build/temp.linux-x86_64-cpython-38/src/iou3d_nms_kernel.o	1818ddc95e0bd494
+0	17803	1721255109627530271	/home/vrb230004/CombinedModels/testing/CVCP/models/centerpoint/ops/iou3d_nms/build/temp.linux-x86_64-cpython-38/src/iou3d_nms.o	bc1bb86e2dc94857
+0	20190	1721255109627530271	/home/vrb230004/CombinedModels/testing/CVCP/models/centerpoint/ops/iou3d_nms/build/temp.linux-x86_64-cpython-38/src/iou3d_cpu.o	bc1bf6c4da4b5e09
+0	20920	1721255109627530271	/home/vrb230004/CombinedModels/testing/CVCP/models/centerpoint/ops/iou3d_nms/build/temp.linux-x86_64-cpython-38/src/iou3d_nms_api.o	f126e5099d5d0587
