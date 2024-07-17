@@ -87,18 +87,18 @@ def preprocess(info, mode, tasks, no_augmentation=False, db_sampler=None,
         )
         gt_dict["gt_classes"] = gt_classes
 
-        # gt_dict["gt_boxes"], points = prep.random_flip_both(
-        #     gt_dict["gt_boxes"], points)
+        gt_dict["gt_boxes"] = prep.random_flip_both(
+            gt_dict["gt_boxes"])
 
-        # gt_dict["gt_boxes"], points = prep.global_rotation(
-        #     gt_dict["gt_boxes"], points, rotation=global_rotation_noise
-        # )
-        # gt_dict["gt_boxes"], points = prep.global_scaling_v2(
-        #     gt_dict["gt_boxes"], points, *global_scale_noise
-        # )
-        # gt_dict["gt_boxes"], points = prep.global_translate_(
-        #     gt_dict["gt_boxes"], points, noise_translate_std=global_translate_std
-        # )
+        gt_dict["gt_boxes"] = prep.global_rotation(
+            gt_dict["gt_boxes"], rotation=global_rotation_noise
+        )
+        gt_dict["gt_boxes"] = prep.global_scaling_v2(
+            gt_dict["gt_boxes"], *global_scale_noise
+        )
+        gt_dict["gt_boxes"] = prep.global_translate_(
+            gt_dict["gt_boxes"], noise_translate_std=global_translate_std
+        )
     elif no_augmentation:
         gt_boxes_mask = np.array(
             [n in class_names for n in gt_dict["gt_names"]], dtype=np.bool_

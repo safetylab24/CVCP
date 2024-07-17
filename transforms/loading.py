@@ -7,8 +7,8 @@ def load_annotations(info: dict):
         gt_boxes[np.isnan(gt_boxes)] = 0
         result["annotations"] = {
             "boxes": gt_boxes,
-            "names": info["gt_names"],
-            "tokens": info["gt_boxes_token"],
+            "names": np.array(info["gt_names"]),
+            "tokens": np.array(info["gt_boxes_token"]),
             "velocities": np.array(info["gt_boxes_velocity"]).astype(np.float32),
         }
     else:

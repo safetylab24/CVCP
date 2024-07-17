@@ -17,10 +17,7 @@ from torch import double, nn
 from CVCP.models.centerpoint.det3d.torchie.cnn import kaiming_init
 import torch
 import numpy as np
-try:
-    from CVCP.models.centerpoint.det3d.ops.dcn import DeformConv
-except:
-    "tion not built!"
+from torchvision.ops.deform_conv import DeformConv2d
 
 
 class FeatureAdaption(nn.Module):
@@ -46,7 +43,7 @@ class FeatureAdaption(nn.Module):
         offset_channels = kernel_size * kernel_size * 2
         self.conv_offset = nn.Conv2d(
             in_channels, deformable_groups * offset_channels, 1, bias=True)
-        self.conv_adaption = DeformConv(
+        self.conv_adaption = DeformConv2d(
             in_channels,
             out_channels,
             kernel_size=kernel_size,
@@ -463,7 +460,7 @@ class CenterHead(nn.Module):
 
         return ret_list
 
-    @torch.no_grad()
+    @torch.inference_mode()
     def post_processing(self, batch_box_preds, batch_hm, test_cfg, post_center_range, task_id):
         batch_size = len(batch_hm)
 

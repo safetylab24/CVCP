@@ -1,5 +1,5 @@
-epochs: 30
-num_workers: 8
+epochs: 15
+num_workers: 1
 batch_size: 4
 resize_shape: [128, 128]
 
@@ -7,10 +7,20 @@ log_dir: /home/vrb230004/CombinedModels/logs
 dataset_dir: /home/vrb230004/media/datasets/nuscenes
 cvt_metadata_path: /home/vrb230004/media/datasets/cvt_labels_nuscenes
 bbox_label_path: /home/vrb230004/CombinedModels/labels
+ckpt_path: /home/vrb230004/CombinedModels/lightning_logs/version_0/checkpoints/epoch=28-step=25462.ckpt
 
 devices: [0,1,2,3]
+version: 'v1.0-trainval'
 
-lr: 0.001
+log_every_n_steps: 25
+limit_train_batches: 1.0
+limit_val_batches: 1.0
+limit_test_batches: 1.0
+check_val_every_n_epoch: 1
+val_check_interval: 1.0
+num_sanity_val_steps: 1
+
+lr: 0.0003
 weight_decay: 0.01
 base_momentum: 0.85
 max_momentum: 0.95
@@ -19,7 +29,7 @@ centerpoint:
   in_channels: [128, ]
   dataset: 'nuscenes'
   weight: 0.25
-  tasks:
+  tasks: # these are the tasks tracked by nuscenes leaderboard
     - num_class: 1
       class_names: ["car"]
     

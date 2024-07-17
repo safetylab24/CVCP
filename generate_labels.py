@@ -130,35 +130,35 @@ def _fill_trainval_infos(nusc, train_scenes, test=False, filter_zero=True):
 
         info = {}
         
-        if not test:
-            annotations = [nusc.get("sample_annotation", token) for token in sample["anns"]]
-            mask = np.array([(anno['num_lidar_pts'] + anno['num_radar_pts']) > 0 for anno in annotations], dtype=bool).reshape(-1)
+        
+        annotations = [nusc.get("sample_annotation", token) for token in sample["anns"]]
+        mask = np.array([(anno['num_lidar_pts'] + anno['num_radar_pts']) > 0 for anno in annotations], dtype=bool).reshape(-1)
 
-            locs = np.array([b.center for b in ref_boxes]).reshape(-1, 3)
-            dims = np.array([b.wlh for b in ref_boxes]).reshape(-1, 3)
-            velocity = np.array([b.velocity for b in ref_boxes]).reshape(-1, 3)
-            rots = np.array([quaternion_yaw(b.orientation) for b in ref_boxes]).reshape(-1, 1)
-            names = np.array([b.name for b in ref_boxes])
-            tokens = np.array([b.token for b in ref_boxes])
-            gt_boxes = np.concatenate(
-                [locs, dims, velocity[:, :2], -rots - np.pi / 2], axis=1
-            )
+        locs = np.array([b.center for b in ref_boxes]).reshape(-1, 3)
+        dims = np.array([b.wlh for b in ref_boxes]).reshape(-1, 3)
+        velocity = np.array([b.velocity for b in ref_boxes]).reshape(-1, 3)
+        rots = np.array([quaternion_yaw(b.orientation) for b in ref_boxes]).reshape(-1, 1)
+        names = np.array([b.name for b in ref_boxes])
+        tokens = np.array([b.token for b in ref_boxes])
+        gt_boxes = np.concatenate(
+            [locs, dims, velocity[:, :2], -rots - np.pi / 2], axis=1
+        )
 
-            assert len(annotations) == len(gt_boxes) == len(velocity) == len(names) == len(tokens)
+        assert len(annotations) == len(gt_boxes) == len(velocity) == len(names) == len(tokens)
 
-            if not filter_zero:
-                info["gt_boxes"] = gt_boxes.tolist()  # Convert to list for JSON serialization
-                info["gt_boxes_velocity"] = velocity.tolist()  # Convert to list for JSON serialization
-                info["gt_names"] = [general_to_detection[name] for name in names]
-                info["gt_boxes_token"] = tokens.tolist()  # Convert to list for JSON serialization
-            else:
-                info["gt_boxes"] = gt_boxes[mask, :].tolist()  # Convert to list for JSON serialization
-                info["gt_boxes_velocity"] = velocity[mask, :].tolist()  # Convert to list for JSON serialization
-                # info["gt_names"] = [general_to_detection[name] for name in names if general_to_detection[name] != "ignore"]
-                info["gt_names"] = names[mask].tolist()
-                for i in range(len(info["gt_names"])):
-                    info["gt_names"][i] = general_to_detection[info["gt_names"][i]]
-                info["gt_boxes_token"] = tokens[mask].tolist()  # Convert to list for JSON serialization
+        if not filter_zero:
+            info["gt_boxes"] = gt_boxes.tolist()  # Convert to list for JSON serialization
+            info["gt_boxes_velocity"] = velocity.tolist()  # Convert to list for JSON serialization
+            info["gt_names"] = [general_to_detection[name] for name in names]
+            info["gt_boxes_token"] = tokens.tolist()  # Convert to list for JSON serialization
+        else:
+            info["gt_boxes"] = gt_boxes[mask, :].tolist()  # Convert to list for JSON serialization
+            info["gt_boxes_velocity"] = velocity[mask, :].tolist()  # Convert to list for JSON serialization
+            # info["gt_names"] = [general_to_detection[name] for name in names if general_to_detection[name] != "ignore"]
+            info["gt_names"] = names[mask].tolist()
+            for i in range(len(info["gt_names"])):
+                info["gt_names"][i] = general_to_detection[info["gt_names"][i]]
+            info["gt_boxes_token"] = tokens[mask].tolist()  # Convert to list for JSON serialization
 
         assert len(info["gt_boxes"]) == len(info["gt_boxes_velocity"]) == len(info["gt_names"]) == len(info["gt_boxes_token"])
         if (len(info["gt_boxes"]) == 0) and filter_zero:
@@ -228,31 +228,39 @@ def create_nuscenes_infos(root_path, version="v1.0-trainval", filter_zero=True):
     return scene_infos
 
 if __name__ == "__main__":
-    nusc = NuScenes(version='v1.0-trainval', dataroot='/home/vrb230004/CombinedModels/CenterPoint/data/nuscenes', verbose=True)
+    dataroot = '/home/vrb230004/media/datasets/nuscenes_test'
+    version = 'v1.0-test'
+    label_dir = '/home/vrb230004/CombinedModels/test_labels/'
+    nusc = NuScenes(version=version, dataroot=dataroot, verbose=True)
+    create_json = False
+    create_pkl = True
 
     scene_infos = create_nuscenes_infos(
-        "/home/vrb230004/CombinedModels/CenterPoint/data/nuscenes", 
-        version="v1.0-trainval", 
+        dataroot, 
+        version=version, 
         filter_zero=True)
     
-    os.makedirs('/home/vrb230004/CombinedModels/labels', exist_ok=True)
+    os.makedirs(label_dir, exist_ok=True)
     for scene_token, infos in tqdm(scene_infos.items()):
         scene_rec = nusc.get('scene', scene_token)
         scene_name = scene_rec['name']
-        scene_path_pkl = '/home/vrb230004/CombinedModels' + f'/labels/{scene_name}.pkl'
-        scene_path_json = '/home/vrb230004/CombinedModels' + f'/labels/{scene_name}.json'
         
-        # reformat infos so that scene_token is part of infos
-        ref_infos = []
-        for i in range(len(infos)):
-            ref_info = infos[i][1]
-            ref_info['token'] = infos[i][0]
-            ref_infos.append(ref_info)
-        
-        if np.array(ref_infos[0]['gt_names']).shape[0] == np.array(ref_infos[0]['gt_boxes']).shape[0] and np.array(ref_infos[0]['gt_boxes']).shape[0] != 0:
-            with open(scene_path_pkl, "wb") as f:
-                pickle.dump(ref_infos, f)
-            with open(scene_path_json, "w") as f:
-                json.dump(ref_infos, f)
+        if create_json or create_pkl:
+            scene_path_json = os.path.join(label_dir, scene_name + '.json')
+            scene_path_pkl = os.path.join(label_dir, scene_name + '.pkl')
+            # reformat infos so that scene_token is part of infos
+            ref_infos = []
+            for i in range(len(infos)):
+                ref_info = infos[i][1]
+                ref_info['token'] = infos[i][0]
+                ref_infos.append(ref_info)
+            
+            if np.array(ref_infos[0]['gt_names']).shape[0] == np.array(ref_infos[0]['gt_boxes']).shape[0] and np.array(ref_infos[0]['gt_boxes']).shape[0] != 0:
+                if create_pkl:
+                    with open(scene_path_pkl, "wb") as f:
+                        pickle.dump(ref_infos, f)
+                if create_json:
+                    with open(scene_path_json, "w") as f:
+                        json.dump(ref_infos, f)
     
     print('Labels generated!')

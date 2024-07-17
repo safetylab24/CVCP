@@ -30,7 +30,7 @@ class NuScenesDataModule(L.LightningDataModule):
                 cvt_metadata_path=self.cvt_metadata_path,
                 bbox_label_path=self.bbox_label_path,
                 split='train',
-                version='v1.0-trainval',
+                version=self.config.get('version', 'v1.0-mini'),
                 tasks=self.tasks
             )
             self.data_val : ConcatDataset = get_dataset(
@@ -38,7 +38,16 @@ class NuScenesDataModule(L.LightningDataModule):
                 cvt_metadata_path=self.cvt_metadata_path,
                 bbox_label_path=self.bbox_label_path,
                 split='val',
-                version='v1.0-trainval',
+                version=self.config.get('version', 'v1.0-mini'),
+                tasks=self.tasks
+            )
+        elif stage == "test" or stage == "predict":
+            self.data_test : ConcatDataset = get_dataset(
+                dataset_dir=self.dataset_dir,
+                cvt_metadata_path=self.cvt_metadata_path,
+                bbox_label_path=self.bbox_label_path,
+                split='val',
+                version=self.config.get('version', 'v1.0-mini'),
                 tasks=self.tasks
             )
         
@@ -63,13 +72,24 @@ class NuScenesDataModule(L.LightningDataModule):
         drop_last=True,
         pin_memory=True,
     )
+        
+    def test_dataloader(self):
+        return DataLoader(
+        dataset=self.data_test,
+        batch_size=1,
+        num_workers=self.config['num_workers'],
+        sampler=SequentialSampler(self.data_test),
+        shuffle=False,
+        drop_last=True,
+        pin_memory=True,
+    )
 
 def get_dataset(
     dataset_dir,
     cvt_metadata_path,
     bbox_label_path,
     split,
-    version='v1.0-trainval',
+    version='v1.0-mini',
     tasks=None
 ) -> ConcatDataset:
     dataset_dir = Path(dataset_dir)
@@ -121,38 +141,36 @@ class NuScenesGeneratedDataset(torch.utils.data.Dataset):
         for image_path, I_original in zip(inputs['images'], inputs['intrinsics']):
             h_resize = h + top_crop
             w_resize = w
+            with Image.open(dataset_dir / image_path) as image:
+                image_new = image.resize((w_resize, h_resize), resample=Image.BILINEAR)
+                image_new = image_new.crop(
+                    (0, top_crop, image_new.width, image_new.height))
 
-            image = Image.open(dataset_dir / image_path)
+                I = np.float32(I_original)
+                I[0, 0] *= w_resize / image.width
+                I[0, 2] *= w_resize / image.width
+                I[1, 1] *= h_resize / image.height
+                I[1, 2] *= h_resize / image.height
+                I[1, 2] -= top_crop
 
-            image_new = image.resize((w_resize, h_resize), resample=Image.BILINEAR)
-            image_new = image_new.crop(
-                (0, top_crop, image_new.width, image_new.height))
-
-            I = np.float32(I_original)
-            I[0, 0] *= w_resize / image.width
-            I[0, 2] *= w_resize / image.width
-            I[1, 1] *= h_resize / image.height
-            I[1, 2] *= h_resize / image.height
-            I[1, 2] -= top_crop
-
-            images.append(img_transform(image_new))
-            intrinsics.append(torch.tensor(I))
+                images.append(img_transform(image_new))
+                intrinsics.append(torch.tensor(I))
         
         return images, intrinsics
 
     def parse_labels(self, labels: dict, tasks) -> dict:
         loaded = load_annotations(labels)
         preprocessed = preprocess(loaded, 'train', tasks)
-        labels = assign_label(preprocessed, tasks)
-        return labels    
+        labels_out = assign_label(preprocessed, tasks)
+        return labels_out 
 
     def parse_data(self, inputs: dict, labels: dict, tasks, dataset_dir: Path, h=224, w=480, top_crop=24, img_transform=ToTensor()) -> dict:
             images, intrinsics = self.parse_inputs(inputs, dataset_dir, h, w, top_crop, img_transform)
-            labels = self.parse_labels(labels, tasks)
+            labels_out = self.parse_labels(labels, tasks)
 
             return {
                 'images': torch.stack(images, 0),
                 'intrinsics': torch.stack(intrinsics, 0),
                 'extrinsics': torch.tensor(np.float32(inputs['extrinsics'])),
-                'labels': labels
+                'labels': labels_out,
             }
