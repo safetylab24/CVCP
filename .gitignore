@@ -1,5 +1,4 @@
 **__pycache__**
-models/centerpoint/work_dirs/train_testing/latest.pth
-models/centerpoint/work_dirs/train_testing/*.log
-models/actually_used_centerhead
-out_dir/
+.vscode
+models/centerpoint/ops/iou3d_nms/build
+models/centerpoint/ops/iou3d_nms/iou3d_nms_cuda.cpython*
