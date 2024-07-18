@@ -5,7 +5,7 @@
 # Licensed under the MIT License
 # ------------------------------------------------------------------------------
 
-from models.centerpoint.utils.box_torch_ops import rotate_nms_pcdet # needs cuda build
+from models.centerpoint.utils.box_torch_ops import rotate_nms_pcdet  # needs cuda build
 from models.centerpoint.utils.weight_init import kaiming_init
 from models.centerpoint.utils.circle_nms_jit import circle_nms
 from models.centerpoint.centernet_loss import FastFocalLoss, RegLoss
@@ -21,24 +21,24 @@ from torchvision.ops.deform_conv import DeformConv2d
 
 
 class FeatureAdaption(nn.Module):
-    """Feature Adaption Module.
+    '''Feature Adaption Module.
 
     Feature Adaption Module is implemented based on DCN v1.
     It uses anchor shape prediction rather than feature map to
     predict offsets of deformable conv layer.
 
     Args:
-        in_channels (int): Number of channels in the input feature map.
-        out_channels (int): Number of channels in the output feature map.
-        kernel_size (int): Deformable conv kernel size.
-        deformable_groups (int): Deformable conv group size.
-    """
+        in_channels(int): Number of channels in the input feature map.
+        out_channels(int): Number of channels in the output feature map.
+        kernel_size(int): Deformable conv kernel size.
+        deformable_groups(int): Deformable conv group size.
+    '''
 
     def __init__(self,
                  in_channels,
                  out_channels,
-                 kernel_size = 3,
-                 deformable_groups = 4):
+                 kernel_size=3,
+                 deformable_groups=4):
         super(FeatureAdaption, self).__init__()
         offset_channels = kernel_size * kernel_size * 2
         self.conv_offset = nn.Conv2d(
@@ -180,8 +180,8 @@ class CenterHead(nn.Module):
     ):
         super(CenterHead, self).__init__()
 
-        num_classes = [len(t["class_names"]) for t in tasks]
-        self.class_names = [t["class_names"] for t in tasks]
+        num_classes = [len(t['class_names']) for t in tasks]
+        self.class_names = [t['class_names'] for t in tasks]
         self.code_weights = code_weights
         self.weight = weight  # weight between hm loss and loc loss
         self.dataset = dataset
@@ -196,10 +196,10 @@ class CenterHead(nn.Module):
         self.use_direction_classifier = False
 
         if not logger:
-            logger = logging.getLogger("CenterHead")
+            logger = logging.getLogger('CenterHead')
         self.logger = logger
 
-        logger.info(f"num_classes: {num_classes}")
+        logger.info(f'num_classes: {num_classes}')
 
         # a shared convolution
         self.shared_conv = nn.Sequential(
@@ -210,10 +210,10 @@ class CenterHead(nn.Module):
         ).to('cuda')
 
         self.tasks = nn.ModuleList()
-        print("Use HM Bias: ", init_bias)
+        print('Use HM Bias: ', init_bias)
 
         if dcn_head:
-            print("Use Deformable Convolution in the CenterHead!")
+            print('Use Deformable Convolution in the CenterHead!')
 
         for num_cls in num_classes:
             heads = copy.deepcopy(common_heads)
@@ -229,7 +229,7 @@ class CenterHead(nn.Module):
                                init_bias=init_bias, final_kernel=3).to('cuda')
                 )
 
-        logger.info("Finish CenterHead Initialization")
+        logger.info('Finish CenterHead Initialization')
 
     def forward(self, x, *kwargs):
         ret_dicts = []
@@ -252,9 +252,10 @@ class CenterHead(nn.Module):
             # heatmap focal loss
             preds_dict['hm'] = self._sigmoid(preds_dict['hm'])
 
-            hm_loss = self.crit(preds_dict['hm'], label['hm'][task_id], label['ind'][task_id], label['mask'][task_id], label['cat'][task_id])
+            hm_loss = self.crit(preds_dict['hm'], label['hm'][task_id], label['ind']
+                                [task_id], label['mask'][task_id], label['cat'][task_id])
 
-            target_box = label['anno_box'][task_id] # (4,500,10)
+            target_box = label['anno_box'][task_id]  # (4,500,10)
             # reconstruct the anno_box from multiple reg heads
             if self.dataset in ['nuscenes']:
                 if 'vel' in preds_dict:
@@ -283,8 +284,8 @@ class CenterHead(nn.Module):
 
             rets.append(ret)
 
-        """convert batch-key to key-batch
-        """
+        '''convert batch-key to key-batch
+        '''
         rets_merged = defaultdict(list)
         for ret in rets:
             for k, v in ret.items():
@@ -293,9 +294,9 @@ class CenterHead(nn.Module):
         return rets_merged
 
     @torch.no_grad()
-    def predict(self, example, preds_dicts, test_cfg, **kwargs):
-        """decode, nms, then return the detection result. Additionaly support double flip testing 
-        """
+    def predict(self, label, preds_dicts, test_cfg, **kwargs):
+        '''decode, nms, then return the detection result. Additionaly support double flip testing
+        '''
         # get loss info
         rets = []
         metas = []
@@ -338,10 +339,10 @@ class CenterHead(nn.Module):
                     preds_dict[k][:, 3] = torch.flip(
                         preds_dict[k][:, 3], dims=[1, 2])
 
-            if "metadata" not in example or len(example["metadata"]) == 0:
+            if 'metadata' not in label or len(label['metadata']) == 0:
                 meta_list = [None] * batch_size
             else:
-                meta_list = example["metadata"]
+                meta_list = label['metadata']
                 if double_flip:
                     meta_list = meta_list[:4*int(batch_size):4]
 
@@ -396,7 +397,8 @@ class CenterHead(nn.Module):
             batch_dim = batch_dim.reshape(batch, H*W, 3)
             batch_hm = batch_hm.reshape(batch, H*W, num_cls)
 
-            ys, xs = torch.meshgrid([torch.arange(0, H), torch.arange(0, W)], indexing='ij')
+            ys, xs = torch.meshgrid(
+                [torch.arange(0, H), torch.arange(0, W)], indexing='ij')
             ys = ys.view(1, H, W).repeat(batch, 1, 1).to(batch_hm)
             xs = xs.view(1, H, W).repeat(batch, 1, 1).to(batch_hm)
 
@@ -406,7 +408,7 @@ class CenterHead(nn.Module):
             voxel_size = test_cfg.get('voxel_size')
             pc_range = test_cfg.get('pc_range')
             xs = xs * test_cfg.get('out_size_factor') * \
-               voxel_size[0] + pc_range[0]
+                voxel_size[0] + pc_range[0]
             ys = ys * test_cfg.get('out_size_factor') * \
                 voxel_size[1] + pc_range[1]
 
@@ -446,9 +448,9 @@ class CenterHead(nn.Module):
         for i in range(num_samples):
             ret = {}
             for k in rets[0][i].keys():
-                if k in ["box3d_lidar", "scores"]:
+                if k in ['box3d_lidar', 'scores']:
                     ret[k] = torch.cat([ret[i][k] for ret in rets])
-                elif k in ["label_preds"]:
+                elif k in ['label_preds']:
                     flag = 0
                     for j, num_class in enumerate(self.num_classes):
                         rets[j][i][k] += flag
@@ -490,9 +492,11 @@ class CenterHead(nn.Module):
                     boxes, min_radius=test_cfg.get('min_radius')[task_id], post_max_size=nms_cfg.get('nms_post_max_size'))
             else:
                 selected = rotate_nms_pcdet(boxes_for_nms.float(), scores.float(),
-                                                          thresh=nms_cfg.get('nms_iou_threshold'),
-                                                          pre_maxsize=nms_cfg.get('nms_pre_max_size'),
-                                                          post_max_size=nms_cfg.get('nms_post_max_size'))
+                                            thresh=nms_cfg.get(
+                                                'nms_iou_threshold'),
+                                            pre_maxsize=nms_cfg.get(
+                                                'nms_pre_max_size'),
+                                            post_max_size=nms_cfg.get('nms_post_max_size'))
 
             selected_boxes = box_preds[selected]
             selected_scores = scores[selected]
@@ -510,9 +514,9 @@ class CenterHead(nn.Module):
 
 
 def _circle_nms(boxes, min_radius, post_max_size=83):
-    """
+    '''
     NMS according to center distance
-    """
+    '''
     keep = np.array(circle_nms(boxes.cpu().numpy(), thresh=min_radius))[
         :post_max_size]
 

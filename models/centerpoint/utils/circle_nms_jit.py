@@ -1,5 +1,6 @@
-import numba 
-import numpy as np 
+import numba
+import numpy as np
+
 
 @numba.jit(nopython=True)
 def circle_nms(dets, thresh):

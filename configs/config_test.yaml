@@ -1,0 +1,72 @@
+epochs: 15
+num_workers: 7
+batch_size: 4
+resize_shape: [128, 128]
+
+log_dir: ./logs
+dataset_dir: ./nuscenes
+nuscenes_metadata_path: ./nuscenes_metadata
+bbox_label_path: ./labels
+ckpt_path: /home/vrb230004/CombinedModels/lightning_logs/version_0/checkpoints/epoch=28-step=25462.ckpt
+
+devices: [0,1,2,3]
+version: 'v1.0-trainval'
+
+log_every_n_steps: 25
+limit_train_batches: 1.0
+limit_val_batches: 1.0
+limit_test_batches: 1.0
+check_val_every_n_epoch: 1
+val_check_interval: 1.0
+num_sanity_val_steps: 1
+
+lr: 0.0003
+weight_decay: 0.01
+base_momentum: 0.85
+max_momentum: 0.95
+
+centerpoint:
+  in_channels: [128, ]
+  dataset: 'nuscenes'
+  weight: 0.25
+  tasks: # these are the tasks tracked by nuscenes leaderboard
+    - num_class: 1
+      class_names: ['car']
+    
+    - num_class: 2
+      class_names: ['truck', 'construction vehicle']
+    
+    - num_class: 2
+      class_names: ['bus', 'trailer']
+    
+    - num_class: 1
+      class_names: ['barrier']
+    
+    - num_class: 2
+      class_names: ['motorcycle', 'bicycle']
+    
+    - num_class: 2
+      class_names: ['pedestrian', 'traffic cone']
+
+  code_weights: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.2, 0.2, 1.0, 1.0]
+  common_heads: # (output_channel, num_conv)
+    'reg': [2, 2]
+    'height': [1, 2]
+    'dim': [3, 2]
+    'rot': [2, 2]
+    'vel': [2, 2]
+  share_conv_channel: 64
+  dcn_head: False
+
+test:
+  ckpt_path: /home/vrb230004/CombinedModels/lightning_logs/version_0/checkpoints/epoch=28-step=25462.ckpt
+  post_center_limit_range: [-61.2, -61.2, -10.0, 61.2, 61.2, 10.0]
+  max_per_img: 500
+  nms:
+    nms_pre_max_size: 1000
+    nms_post_max_size: 83
+    nms_iou_threshold: 0.2
+  score_threshold: 0.1
+  pc_range: [-51.2, -51.2]
+  out_size_factor: 4
+  voxel_size: [0.2, 0.2]

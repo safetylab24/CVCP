@@ -4,6 +4,7 @@ import numpy as np
 import torch
 from torch import stack as tstack
 
+
 def torch_to_np_dtype(ttype):
     type_map = {
         torch.float16: np.dtype(np.float16),
@@ -17,7 +18,7 @@ def torch_to_np_dtype(ttype):
 
 
 def corners_nd(dims, origin=0.5):
-    """generate relative box corners based on length per dim and
+    '''generate relative box corners based on length per dim and
     origin point.
 
     Args:
@@ -30,7 +31,7 @@ def corners_nd(dims, origin=0.5):
         point layout example: (2d) x0y0, x0y1, x1y0, x1y1;
             (3d) x0y0z0, x0y0z1, x0y1z0, x0y1z1, x1y0z0, x1y0z1, x1y1z0, x1y1z1
             where x0 < x1, y0 < y1, z0 < z1
-    """
+    '''
     ndim = int(dims.shape[1])
     dtype = torch_to_np_dtype(dims.dtype)
     if isinstance(origin, float):
@@ -55,7 +56,7 @@ def corners_nd(dims, origin=0.5):
 
 
 def corners_2d(dims, origin=0.5):
-    """generate relative 2d box corners based on length per dim and
+    '''generate relative 2d box corners based on length per dim and
     origin point.
 
     Args:
@@ -66,7 +67,7 @@ def corners_2d(dims, origin=0.5):
     Returns:
         float array, shape=[N, 4, 2]: returned corners.
         point layout: x0y0, x0y1, x1y1, x1y0
-    """
+    '''
     return corners_nd(dims, origin)
 
 
@@ -112,18 +113,18 @@ def rotation_3d_in_axis(points, angles, axis=0):
             ]
         )
     else:
-        raise ValueError("axis should in range")
+        raise ValueError('axis should in range')
     # print(points.shape, rot_mat_T.shape)
-    return torch.einsum("aij,jka->aik", points, rot_mat_T)
+    return torch.einsum('aij,jka->aik', points, rot_mat_T)
 
 
 def rotate_points_along_z(points, angle):
-    """
+    '''
     Args:
         points: (B, N, 3 + C)
         angle: (B), angle along z-axis, angle increases x ==> y
     Returns:
-    """
+    '''
     cosa = torch.cos(angle)
     sina = torch.sin(angle)
     zeros = angle.new_zeros(points.shape[0])
@@ -139,7 +140,7 @@ def rotate_points_along_z(points, angle):
 
 
 def rotation_2d(points, angles):
-    """rotation 2d points based on origin point clockwise when angle positive.
+    '''rotation 2d points based on origin point clockwise when angle positive.
 
     Args:
         points (float array, shape=[N, point_size, 2]): points to be rotated.
@@ -147,16 +148,16 @@ def rotation_2d(points, angles):
 
     Returns:
         float array: same shape as points
-    """
+    '''
     rot_sin = torch.sin(angles)
     rot_cos = torch.cos(angles)
     rot_mat_T = torch.stack(
         [tstack([rot_cos, -rot_sin]), tstack([rot_sin, rot_cos])])
-    return torch.einsum("aij,jka->aik", (points, rot_mat_T))
+    return torch.einsum('aij,jka->aik', (points, rot_mat_T))
 
 
 def center_to_corner_box3d(centers, dims, angles, origin=(0.5, 0.5, 0.5), axis=1):
-    """convert kitti locations, dimensions and angles to corners
+    '''convert kitti locations, dimensions and angles to corners
 
     Args:
         centers (float array, shape=[N, 3]): locations in kitti label file.
@@ -167,7 +168,7 @@ def center_to_corner_box3d(centers, dims, angles, origin=(0.5, 0.5, 0.5), axis=1
         axis (int): rotation axis. 1 for camera and 2 for lidar.
     Returns:
         [type]: [description]
-    """
+    '''
     # 'length' in kitti format is in x axis.
     # yzx(hwl)(kitti label file)<->xyz(lhw)(camera)<->z(-x)(-y)(wlh)(lidar)
     # center in kitti format is [0.5, 1.0, 0.5] in xyz.
@@ -179,7 +180,7 @@ def center_to_corner_box3d(centers, dims, angles, origin=(0.5, 0.5, 0.5), axis=1
 
 
 def center_to_corner_box2d(centers, dims, angles=None, origin=0.5):
-    """convert kitti locations, dimensions and angles to corners
+    '''convert kitti locations, dimensions and angles to corners
 
     Args:
         centers (float array, shape=[N, 2]): locations in kitti label file.
@@ -188,7 +189,7 @@ def center_to_corner_box2d(centers, dims, angles=None, origin=0.5):
 
     Returns:
         [type]: [description]
-    """
+    '''
     # 'length' in kitti format is in x axis.
     # xyz(hwl)(kitti label file)<->xyz(lhw)(camera)<->z(-x)(-y)(wlh)(lidar)
     # center in kitti format is [0.5, 1.0, 0.5] in xyz.
@@ -245,12 +246,12 @@ def box_lidar_to_camera(data, r_rect, velo2cam):
 
 
 def rotate_nms_pcdet(boxes, scores, thresh, pre_maxsize=None, post_max_size=None):
-    """
+    '''
     :param boxes: (N, 5) [x, y, z, l, w, h, theta]
     :param scores: (N)
     :param thresh:
     :return:
-    """
+    '''
     # transform back to pcdet's coordinate
     boxes = boxes[:, [0, 1, 2, 4, 3, 5, -1]]
     boxes[:, -1] = -boxes[:, -1] - np.pi / 2

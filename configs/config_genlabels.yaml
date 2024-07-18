@@ -1,0 +1,4 @@
+dataset_dir: ./nuscenes
+out_dir: ./labels
+version: 'v1.0-trainval'
+create_json: True

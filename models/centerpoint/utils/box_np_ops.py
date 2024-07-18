@@ -7,6 +7,7 @@ from models.centerpoint.utils.geometry import (
     points_in_convex_polygon_3d_jit,
 )
 
+
 def points_count_rbbox(points, rbbox, z_axis=2, origin=(0.5, 0.5, 0.5)):
     rbbox_corners = center_to_corner_box3d(
         rbbox[:, :3], rbbox[:, 3:6], rbbox[:, -1], origin=origin, axis=z_axis
@@ -16,7 +17,7 @@ def points_count_rbbox(points, rbbox, z_axis=2, origin=(0.5, 0.5, 0.5)):
 
 
 def corners_nd(dims, origin=0.5):
-    """generate relative box corners based on length per dim and
+    '''generate relative box corners based on length per dim and
     origin point.
 
     Args:
@@ -28,7 +29,7 @@ def corners_nd(dims, origin=0.5):
         point layout example: (2d) x0y0, x0y1, x1y0, x1y1;
             (3d) x0y0z0, x0y0z1, x0y1z0, x0y1z1, x1y0z0, x1y0z1, x1y1z0, x1y1z1
             where x0 < x1, y0 < y1, z0 < z1
-    """
+    '''
     ndim = int(dims.shape[1])
     corners_norm = np.stack(
         np.unravel_index(np.arange(2 ** ndim), [2] * ndim), axis=1
@@ -95,12 +96,12 @@ def corner_to_standup_nd(boxes_corner):
 
 
 def rbbox2d_to_near_bbox(rbboxes):
-    """convert rotated bbox to nearest 'standing' or 'lying' bbox.
+    '''convert rotated bbox to nearest 'standing' or 'lying' bbox.
     Args:
         rbboxes: [N, 5(x, y, xdim, ydim, rad)] rotated bboxes
     Returns:
         bboxes: [N, 4(xmin, ymin, xmax, ymax)] bboxes
-    """
+    '''
     rots = rbboxes[..., -1]
     rots_0_pi_div_2 = np.abs(limit_period(rots, 0.5, np.pi))
     cond = (rots_0_pi_div_2 > np.pi / 4)[..., np.newaxis]
@@ -140,9 +141,9 @@ def rotation_3d_in_axis(points, angles, axis=0):
             ]
         )
     else:
-        raise ValueError("axis should in range")
+        raise ValueError('axis should in range')
 
-    return np.einsum("aij,jka->aik", points, rot_mat_T)
+    return np.einsum('aij,jka->aik', points, rot_mat_T)
 
 
 def rotation_points_single_angle(points, angle, axis=0):
@@ -165,13 +166,13 @@ def rotation_points_single_angle(points, angle, axis=0):
             dtype=points.dtype,
         )
     else:
-        raise ValueError("axis should in range")
+        raise ValueError('axis should in range')
 
     return points @ rot_mat_T
 
 
 def rotation_2d(points, angles):
-    """rotation 2d points based on origin point clockwise when angle positive.
+    '''rotation 2d points based on origin point clockwise when angle positive.
 
     Args:
         points (float array, shape=[N, point_size, 2]): points to be rotated.
@@ -179,15 +180,15 @@ def rotation_2d(points, angles):
 
     Returns:
         float array: same shape as points
-    """
+    '''
     rot_sin = np.sin(angles)
     rot_cos = np.cos(angles)
     rot_mat_T = np.stack([[rot_cos, -rot_sin], [rot_sin, rot_cos]])
-    return np.einsum("aij,jka->aik", points, rot_mat_T)
+    return np.einsum('aij,jka->aik', points, rot_mat_T)
 
 
 def rotation_box(box_corners, angle):
-    """rotation 2d points based on origin point clockwise when angle positive.
+    '''rotation 2d points based on origin point clockwise when angle positive.
 
     Args:
         points (float array, shape=[N, point_size, 2]): points to be rotated.
@@ -195,7 +196,7 @@ def rotation_box(box_corners, angle):
 
     Returns:
         float array: same shape as points
-    """
+    '''
     rot_sin = np.sin(angle)
     rot_cos = np.cos(angle)
     rot_mat_T = np.array(
@@ -205,7 +206,7 @@ def rotation_box(box_corners, angle):
 
 
 def center_to_corner_box3d(centers, dims, angles=None, origin=(0.5, 0.5, 0.5), axis=2):
-    """convert kitti locations, dimensions and angles to corners
+    '''convert kitti locations, dimensions and angles to corners
 
     Args:
         centers (float array, shape=[N, 3]): locations in kitti label file.
@@ -216,7 +217,7 @@ def center_to_corner_box3d(centers, dims, angles=None, origin=(0.5, 0.5, 0.5), a
         axis (int): rotation axis. 1 for camera and 2 for lidar.
     Returns:
         [type]: [description]
-    """
+    '''
     # 'length' in kitti format is in x axis.
     # yzx(hwl)(kitti label file)<->xyz(lhw)(camera)<->z(-x)(-y)(wlh)(lidar)
     # center in kitti format is [0.5, 1.0, 0.5] in xyz.
@@ -229,7 +230,7 @@ def center_to_corner_box3d(centers, dims, angles=None, origin=(0.5, 0.5, 0.5), a
 
 
 def center_to_corner_box2d(centers, dims, angles=None, origin=0.5):
-    """convert kitti locations, dimensions and angles to corners.
+    '''convert kitti locations, dimensions and angles to corners.
     format: center(xy), dims(xy), angles(clockwise when positive)
 
     Args:
@@ -239,7 +240,7 @@ def center_to_corner_box2d(centers, dims, angles=None, origin=0.5):
 
     Returns:
         [type]: [description]
-    """
+    '''
     # 'length' in kitti format is in x axis.
     # xyz(hwl)(kitti label file)<->xyz(lhw)(camera)<->z(-x)(-y)(wlh)(lidar)
     # center in kitti format is [0.5, 1.0, 0.5] in xyz.
@@ -465,7 +466,7 @@ def remove_outside_points(points, rect, Trv2c, P2, image_shape):
 
 @numba.jit(nopython=True)
 def iou_jit(boxes, query_boxes, eps=1.0):
-    """calculate box iou. note that jit version runs 2x faster than cython in
+    '''calculate box iou. note that jit version runs 2x faster than cython in
     my machine!
     Parameters
     ----------
@@ -474,7 +475,7 @@ def iou_jit(boxes, query_boxes, eps=1.0):
     Returns
     -------
     overlaps: (N, K) ndarray of overlap between boxes and query_boxes
-    """
+    '''
     N = boxes.shape[0]
     K = query_boxes.shape[0]
     overlaps = np.zeros((N, K), dtype=boxes.dtype)
@@ -507,14 +508,14 @@ def iou_jit(boxes, query_boxes, eps=1.0):
 
 @numba.jit(nopython=True)
 def iou_3d_jit(boxes, query_boxes, add1=True):
-    """calculate box iou3d,
+    '''calculate box iou3d,
     ----------
     boxes: (N, 6) ndarray of float
     query_boxes: (K, 6) ndarray of float
     Returns
     -------
     overlaps: (N, K) ndarray of overlap between boxes and query_boxes
-    """
+    '''
     N = boxes.shape[0]
     K = query_boxes.shape[0]
     overlaps = np.zeros((N, K), dtype=boxes.dtype)
@@ -560,14 +561,14 @@ def iou_3d_jit(boxes, query_boxes, add1=True):
 
 @numba.jit(nopython=True)
 def iou_nd_jit(boxes, query_boxes, add1=True):
-    """calculate box iou nd, 2x slower than iou_jit.
+    '''calculate box iou nd, 2x slower than iou_jit.
     ----------
     boxes: (N, ndim * 2) ndarray of float
     query_boxes: (K, ndim * 2) ndarray of float
     Returns
     -------
     overlaps: (N, K) ndarray of overlap between boxes and query_boxes
-    """
+    '''
     N = boxes.shape[0]
     K = query_boxes.shape[0]
     ndim = boxes.shape[1] // 2
@@ -618,14 +619,14 @@ def points_in_rbbox(points, rbbox, z_axis=2, origin=(0.5, 0.5, 0.5)):
 
 
 def corner_to_surfaces_3d(corners):
-    """convert 3d box corners from corner function above
+    '''convert 3d box corners from corner function above
     to surfaces that normal vectors all direct to internal.
 
     Args:
         corners (float array, [N, 8, 3]): 3d box corners.
     Returns:
         surfaces (float array, [N, 6, 4, 3]):
-    """
+    '''
     # box_corners: [N, 8, 3], must from corner functions in this module
     surfaces = np.array(
         [
@@ -642,14 +643,14 @@ def corner_to_surfaces_3d(corners):
 
 @numba.jit(nopython=True)
 def corner_to_surfaces_3d_jit(corners):
-    """convert 3d box corners from corner function above
+    '''convert 3d box corners from corner function above
     to surfaces that normal vectors all direct to internal.
 
     Args:
         corners (float array, [N, 8, 3]): 3d box corners.
     Returns:
         surfaces (float array, [N, 6, 4, 3]):
-    """
+    '''
     # box_corners: [N, 8, 3], must from corner functions in this module
     num_boxes = corners.shape[0]
     surfaces = np.zeros((num_boxes, 6, 4, 3), dtype=corners.dtype)
@@ -664,9 +665,9 @@ def corner_to_surfaces_3d_jit(corners):
 
 
 def assign_label_to_voxel(gt_boxes, coors, voxel_size, coors_range):
-    """assign a 0/1 label to each voxel based on whether
+    '''assign a 0/1 label to each voxel based on whether
     the center of voxel is in gt_box. LIDAR.
-    """
+    '''
     voxel_size = np.array(voxel_size, dtype=gt_boxes.dtype)
     coors_range = np.array(coors_range, dtype=gt_boxes.dtype)
     shift = coors_range[:3]
@@ -685,9 +686,9 @@ def assign_label_to_voxel(gt_boxes, coors, voxel_size, coors_range):
 
 
 def assign_label_to_voxel_v3(gt_boxes, coors, voxel_size, coors_range):
-    """assign a 0/1 label to each voxel based on whether
+    '''assign a 0/1 label to each voxel based on whether
     the center of voxel is in gt_box. LIDAR.
-    """
+    '''
     voxel_size = np.array(voxel_size, dtype=gt_boxes.dtype)
     coors_range = np.array(coors_range, dtype=gt_boxes.dtype)
     shift = coors_range[:3]
@@ -710,7 +711,7 @@ def assign_label_to_voxel_v3(gt_boxes, coors, voxel_size, coors_range):
 
 
 def image_box_region_area(img_cumsum, bbox):
-    """check a 2d voxel is contained by a box. used to filter empty
+    '''check a 2d voxel is contained by a box. used to filter empty
     anchors.
     Summed-area table algorithm:
     ==> W
@@ -724,7 +725,7 @@ def image_box_region_area(img_cumsum, bbox):
     Args:
         img_cumsum: [M, H, W](yx) cumsumed image.
         bbox: [N, 4](xyxy) bounding box,
-    """
+    '''
     N = bbox.shape[0]
     M = img_cumsum.shape[0]
     ret = np.zeros([N, M], dtype=img_cumsum.dtype)

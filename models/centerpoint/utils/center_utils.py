@@ -13,6 +13,7 @@ import numpy as np
 import torch
 from models.centerpoint.utils.circle_nms_jit import circle_nms
 
+
 def gaussian_radius(det_size, min_overlap=0.5):
     height, width = det_size
 

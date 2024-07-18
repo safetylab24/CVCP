@@ -26,7 +26,7 @@ MODELS = {
 
 
 class EfficientNetExtractor(torch.nn.Module):
-    """
+    '''
     Helper wrapper that uses torch.tools.checkpoint.checkpoint to save memory while training.
 
     This runs a fake input with shape (1, 3, input_height, input_width)
@@ -40,12 +40,14 @@ class EfficientNetExtractor(torch.nn.Module):
 
         # [f1, f2], where f1 is 'reduction_1', which is shape [b, d, 128, 128]
         backbone(x)
-    """
+    '''
+
     def __init__(self, layer_names, image_height, image_width, model_name='efficientnet-b4', channels=3):
         super().__init__()
 
         assert model_name in MODELS
-        assert all(k in [k for k, v in MODELS[model_name]] for k in layer_names)
+        assert all(k in [k for k, v in MODELS[model_name]]
+                   for k in layer_names)
 
         idx_max = -1
         layer_to_idx = {}
@@ -67,7 +69,8 @@ class EfficientNetExtractor(torch.nn.Module):
         for idx in range(idx_max):
             l, r = MODELS[model_name][idx][1]
 
-            block = SequentialWithArgs(*[(net._blocks[i], [i * drop]) for i in range(l, r)])
+            block = SequentialWithArgs(
+                *[(net._blocks[i], [i * drop]) for i in range(l, r)])
             blocks.append(block)
 
         self.layers = nn.Sequential(*blocks)
@@ -88,7 +91,8 @@ class EfficientNetExtractor(torch.nn.Module):
 
         for layer in self.layers:
             if self.training:
-                x = torch.utils.checkpoint.checkpoint(layer, x, use_reentrant=False)
+                x = torch.utils.checkpoint.checkpoint(
+                    layer, x, use_reentrant=False)
             else:
                 x = layer(x)
 
@@ -114,9 +118,9 @@ class SequentialWithArgs(nn.Sequential):
 
 
 if __name__ == '__main__':
-    """
+    '''
     Helper to generate aliases for efficientnet backbones
-    """
+    '''
     device = torch.device('cuda')
     dummy = torch.rand(6, 3, 224, 480).to(device)
 

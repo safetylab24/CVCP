@@ -6,7 +6,7 @@ import numpy as np
 def _points_count_convex_polygon_3d_jit(
     points, polygon_surfaces, normal_vec, d, num_surfaces=None
 ):
-    """count points in 3d convex polygons.
+    '''count points in 3d convex polygons.
     Args:
         points: [num_points, 3] array.
         polygon_surfaces: [num_polygon, max_num_surfaces,
@@ -17,7 +17,7 @@ def _points_count_convex_polygon_3d_jit(
             a polygon contain
     Returns:
         [num_polygon] array.
-    """
+    '''
     max_num_surfaces, max_num_points_of_surface = polygon_surfaces.shape[1:3]
     num_points = points.shape[0]
     num_polygons = polygon_surfaces.shape[0]
@@ -41,7 +41,7 @@ def _points_count_convex_polygon_3d_jit(
 
 
 def points_count_convex_polygon_3d_jit(points, polygon_surfaces, num_surfaces=None):
-    """check points is in 3d convex polygons.
+    '''check points is in 3d convex polygons.
     Args:
         points: [num_points, 3] array.
         polygon_surfaces: [num_polygon, max_num_surfaces,
@@ -52,7 +52,7 @@ def points_count_convex_polygon_3d_jit(points, polygon_surfaces, num_surfaces=No
             a polygon contain
     Returns:
         [num_polygon] array.
-    """
+    '''
     max_num_surfaces, max_num_points_of_surface = polygon_surfaces.shape[1:3]
     num_points = points.shape[0]
     num_polygons = polygon_surfaces.shape[0]
@@ -65,8 +65,9 @@ def points_count_convex_polygon_3d_jit(points, polygon_surfaces, num_surfaces=No
         points, polygon_surfaces, normal_vec, d, num_surfaces
     )
 
+
 def points_in_convex_polygon_3d_jit(points, polygon_surfaces, num_surfaces=None):
-    """check points is in 3d convex polygons.
+    '''check points is in 3d convex polygons.
     Args:
         points: [num_points, 3] array.
         polygon_surfaces: [num_polygon, max_num_surfaces,
@@ -77,7 +78,7 @@ def points_in_convex_polygon_3d_jit(points, polygon_surfaces, num_surfaces=None)
             a polygon contain
     Returns:
         [num_points, num_polygon] bool array.
-    """
+    '''
     max_num_surfaces, max_num_points_of_surface = polygon_surfaces.shape[1:3]
     num_points = points.shape[0]
     num_polygons = polygon_surfaces.shape[0]
@@ -95,7 +96,7 @@ def points_in_convex_polygon_3d_jit(points, polygon_surfaces, num_surfaces=None)
 def _points_in_convex_polygon_3d_jit(
     points, polygon_surfaces, normal_vec, d, num_surfaces=None
 ):
-    """check points is in 3d convex polygons.
+    '''check points is in 3d convex polygons.
     Args:
         points: [num_points, 3] array.
         polygon_surfaces: [num_polygon, max_num_surfaces,
@@ -106,7 +107,7 @@ def _points_in_convex_polygon_3d_jit(
             a polygon contain
     Returns:
         [num_points, num_polygon] bool array.
-    """
+    '''
     max_num_surfaces, max_num_points_of_surface = polygon_surfaces.shape[1:3]
     num_points = points.shape[0]
     num_polygons = polygon_surfaces.shape[0]
@@ -131,14 +132,14 @@ def _points_in_convex_polygon_3d_jit(
 
 # @numba.jit
 def points_in_convex_polygon_jit(points, polygon, clockwise=True):
-    """check points is in 2d convex polygons. True when point in polygon
+    '''check points is in 2d convex polygons. True when point in polygon
     Args:
         points: [num_points, 2] array.
         polygon: [num_polygon, num_points_of_polygon, 2] array.
         clockwise: bool. indicate polygon is clockwise.
     Returns:
         [num_points, num_polygon] bool array.
-    """
+    '''
     # first convert polygon to directed lines
     num_points_of_polygon = polygon.shape[1]
     num_points = points.shape[0]
@@ -148,7 +149,8 @@ def points_in_convex_polygon_jit(points, polygon, clockwise=True):
             polygon
             - polygon[
                 :,
-                [num_points_of_polygon - 1] + list(range(num_points_of_polygon - 1)),
+                [num_points_of_polygon - 1] +
+                list(range(num_points_of_polygon - 1)),
                 :,
             ]
         )
@@ -156,7 +158,8 @@ def points_in_convex_polygon_jit(points, polygon, clockwise=True):
         vec1 = (
             polygon[
                 :,
-                [num_points_of_polygon - 1] + list(range(num_points_of_polygon - 1)),
+                [num_points_of_polygon - 1] +
+                list(range(num_points_of_polygon - 1)),
                 :,
             ]
             - polygon
@@ -179,7 +182,7 @@ def points_in_convex_polygon_jit(points, polygon, clockwise=True):
 
 
 def points_in_convex_polygon(points, polygon, clockwise=True):
-    """check points is in convex polygons. may run 2x faster when write in
+    '''check points is in convex polygons. may run 2x faster when write in
     cython(don't need to calculate all cross-product between edge and point)
     Args:
         points: [num_points, 2] array.
@@ -187,7 +190,7 @@ def points_in_convex_polygon(points, polygon, clockwise=True):
         clockwise: bool. indicate polygon is clockwise.
     Returns:
         [num_points, num_polygon] bool array.
-    """
+    '''
     # first convert polygon to directed lines
     num_lines = polygon.shape[1]
     polygon_next = polygon[:, [num_lines - 1] + list(range(num_lines - 1)), :]
@@ -206,7 +209,8 @@ def surface_equ_3d_jitv2(surfaces):
     # polygon_surfaces: [num_polygon, num_surfaces, num_points_of_polygon, 3]
     num_polygon = surfaces.shape[0]
     max_num_surfaces = surfaces.shape[1]
-    normal_vec = np.zeros((num_polygon, max_num_surfaces, 3), dtype=surfaces.dtype)
+    normal_vec = np.zeros(
+        (num_polygon, max_num_surfaces, 3), dtype=surfaces.dtype)
     d = np.zeros((num_polygon, max_num_surfaces), dtype=surfaces.dtype)
     sv0 = surfaces[0, 0, 0] - surfaces[0, 0, 1]
     sv1 = surfaces[0, 0, 0] - surfaces[0, 0, 1]
@@ -229,9 +233,10 @@ def surface_equ_3d_jitv2(surfaces):
             )
     return normal_vec, d
 
+
 @numba.njit
 def points_in_convex_polygon_3d_jit_v2(points, surfaces, num_surfaces=None):
-    """check points is in 3d convex polygons.
+    '''check points is in 3d convex polygons.
     Args:
         points: [num_points, 3] array.
         polygon_surfaces: [num_polygon, max_num_surfaces,
@@ -242,11 +247,12 @@ def points_in_convex_polygon_3d_jit_v2(points, surfaces, num_surfaces=None):
             a polygon contain
     Returns:
         [num_points, num_polygon] bool array.
-    """
+    '''
     num_polygon = surfaces.shape[0]
     max_num_surfaces = surfaces.shape[1]
     num_points = points.shape[0]
-    normal_vec = np.zeros((num_polygon, max_num_surfaces, 3), dtype=surfaces.dtype)
+    normal_vec = np.zeros(
+        (num_polygon, max_num_surfaces, 3), dtype=surfaces.dtype)
     d = np.zeros((num_polygon, max_num_surfaces), dtype=surfaces.dtype)
     sv0 = surfaces[0, 0, 0] - surfaces[0, 0, 1]
     sv1 = surfaces[0, 0, 0] - surfaces[0, 0, 1]

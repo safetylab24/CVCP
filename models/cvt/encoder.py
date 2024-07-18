@@ -9,7 +9,7 @@ from torchvision.models.resnet import Bottleneck
 
 from models.cvt.efficientnet import EfficientNetExtractor
 
-torch.inverse(torch.ones((0, 0), device="cuda:3"))
+torch.inverse(torch.ones((0, 0), device='cuda:3'))
 
 
 def ResNetBottleNeck(c):
@@ -33,9 +33,9 @@ def generate_grid(height: int, width: int):
 
 
 def get_view_matrix(h=200, w=200, h_meters=100.0, w_meters=100.0, offset=0.0):
-    """
+    '''
     copied from ..data.common but want to keep models standalone
-    """
+    '''
     sh = h / h_meters
     sw = w / w_meters
 
@@ -88,7 +88,7 @@ class BEVEmbedding(nn.Module):
             offset: int,
             decoder_blocks: list,
     ):
-        """
+        '''
         Only real arguments are:
 
         dim: embedding size
@@ -98,7 +98,7 @@ class BEVEmbedding(nn.Module):
 
         In hindsight we should have just specified the view matrix in config
         and passed in the view matrix...
-        """
+        '''
         super().__init__()
 
         # each decoder block upsamples the bev embedding by a factor of 2
@@ -149,11 +149,11 @@ class CrossAttention(nn.Module):
         self.postnorm = norm(dim)
 
     def forward(self, q, k, v, skip=None):
-        """
+        '''
                 q: (b n d H W)
                 k: (b n d h w)
                 v: (b n d h w)
-                """
+                '''
         _, _, _, H, W = q.shape
 
         # Move feature dim to last for multi-head proj
@@ -252,14 +252,14 @@ class CrossViewAttention(nn.Module):
             i_inv: torch.FloatTensor,
             e_inv: torch.FloatTensor,
     ):
-        """
+        '''
         x: (b, c, H, W)
         feature: (b, n, dim_in, h, w)
         I_inv: (b, n, 3, 3)
         E_inv: (b, n, 4, 4)
 
         Returns: (b, d, H, W)
-        """
+        '''
         b, n, _, _, _ = feature.shape
 
         pixel = self.image_plane  # b n 3 h w
@@ -322,31 +322,31 @@ class CVTEncoder(nn.Module):
 
         self.norm = Normalize()
 
-        self.backbone = EfficientNetExtractor(model_name="efficientnet-b4",
+        self.backbone = EfficientNetExtractor(model_name='efficientnet-b4',
                                               layer_names=[
                                                   'reduction_2', 'reduction_4'],
                                               image_height=H,
                                               image_width=W, channels=3)
 
         cross_view = {
-            "heads": 4,
-            "dim_head": 32,
-            "qkv_bias": True,
-            "skip": True,
-            "no_image_features": False,
+            'heads': 4,
+            'dim_head': 32,
+            'qkv_bias': True,
+            'skip': True,
+            'no_image_features': False,
 
-            "image_height": H,
-            "image_width": W
+            'image_height': H,
+            'image_width': W
         }
 
         bev_embedding = {
-            "sigma": 1.0,
-            "bev_height": 200,
-            "bev_width": 200,
-            "h_meters": 100,
-            "w_meters": 100,
-            "offset": 0,
-            "decoder_blocks": [128, 128, 64]
+            'sigma': 1.0,
+            'bev_height': 200,
+            'bev_width': 200,
+            'h_meters': 100,
+            'w_meters': 100,
+            'offset': 0,
+            'decoder_blocks': [128, 128, 64]
         }
 
         if scale < 1.0:

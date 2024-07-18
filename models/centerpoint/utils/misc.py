@@ -4,8 +4,9 @@ from collections import OrderedDict
 
 import torch
 
+
 class Sequential(torch.nn.Module):
-    r"""A sequential container.
+    r'''A sequential container.
     Modules will be added to it in the order they are passed in the constructor.
     Alternatively, an ordered dict of modules can also be passed in.
 
@@ -34,7 +35,7 @@ class Sequential(torch.nn.Module):
                   conv2=nn.Conv2d(20,64,5),
                   relu2=nn.ReLU()
                 )
-    """
+    '''
 
     def __init__(self, *args, **kwargs):
         super(Sequential, self).__init__()
@@ -46,14 +47,14 @@ class Sequential(torch.nn.Module):
                 self.add_module(str(idx), module)
         for name, module in kwargs.items():
             if sys.version_info < (3, 6):
-                raise ValueError("kwargs only supported in py36+")
+                raise ValueError('kwargs only supported in py36+')
             if name in self._modules:
-                raise ValueError("name exists.")
+                raise ValueError('name exists.')
             self.add_module(name, module)
 
     def __getitem__(self, idx):
         if not (-len(self) <= idx < len(self)):
-            raise IndexError("index {} is out of range".format(idx))
+            raise IndexError('index {} is out of range'.format(idx))
         if idx < 0:
             idx += len(self)
         it = iter(self._modules.values())
@@ -68,7 +69,7 @@ class Sequential(torch.nn.Module):
         if name is None:
             name = str(len(self._modules))
             if name in self._modules:
-                raise KeyError("name exists")
+                raise KeyError('name exists')
         self.add_module(name, module)
 
     def forward(self, input):
@@ -137,33 +138,33 @@ def change_default_args(**kwargs):
 
 
 def get_printer(msg):
-    """This function returns a printer function, that prints information about a  tensor's
+    '''This function returns a printer function, that prints information about a  tensor's
     gradient. Used by register_hook in the backward pass.
-    """
+    '''
 
     def printer(tensor):
         if tensor.nelement() == 1:
-            print(f"{msg} {tensor}")
+            print(f'{msg} {tensor}')
         else:
             print(
-                f"{msg} shape: {tensor.shape}"
-                f" max: {tensor.max()} min: {tensor.min()}"
-                f" mean: {tensor.mean()}"
+                f'{msg} shape: {tensor.shape}'
+                f' max: {tensor.max()} min: {tensor.min()}'
+                f' mean: {tensor.mean()}'
             )
 
     return printer
 
 
 def register_hook(tensor, msg):
-    """Utility function to call retain_grad and Pytorch's register_hook
+    '''Utility function to call retain_grad and Pytorch's register_hook
     in a single line
-    """
+    '''
     tensor.retain_grad()
     tensor.register_hook(get_printer(msg))
 
 
 def get_paddings_indicator(actual_num, max_num, axis=0):
-    """Create boolean mask by actually number of a padded tensor.
+    '''Create boolean mask by actually number of a padded tensor.
 
     Args:
         actual_num ([type]): [description]
@@ -171,7 +172,7 @@ def get_paddings_indicator(actual_num, max_num, axis=0):
 
     Returns:
         [type]: [description]
-    """
+    '''
 
     actual_num = torch.unsqueeze(actual_num, axis + 1)
     # tiled_actual_num: [N, M, 1]

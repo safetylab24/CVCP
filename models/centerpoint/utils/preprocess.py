@@ -4,7 +4,7 @@ from collections import OrderedDict
 import numba
 import numpy as np
 
-import models.centerpoint.utils.box_np_ops as box_np_ops 
+import models.centerpoint.utils.box_np_ops as box_np_ops
 from models.centerpoint.utils.geometry import (
     points_in_convex_polygon_3d_jit,
     points_in_convex_polygon_jit,
@@ -29,16 +29,16 @@ class BatchSampler:
 
     def _sample(self, num):
         if self._idx + num >= self._example_num:
-            ret = self._indices[self._idx :].copy()
+            ret = self._indices[self._idx:].copy()
             self._reset()
         else:
-            ret = self._indices[self._idx : self._idx + num]
+            ret = self._indices[self._idx: self._idx + num]
             self._idx += num
         return ret
 
     def _reset(self):
         # if self._name is not None:
-        #     print("reset", self._name)
+        #     print('reset', self._name)
         if self._shuffle:
             np.random.shuffle(self._indices)
         self._idx = 0
@@ -61,7 +61,7 @@ class DataBasePreprocessing:
 class DBFilterByDifficulty(DataBasePreprocessing):
     def __init__(self, removed_difficulties, logger=None):
         self._removed_difficulties = removed_difficulties
-        logger.info(f"{removed_difficulties}")
+        logger.info(f'{removed_difficulties}')
 
     def _preprocess(self, db_infos):
         new_db_infos = {}
@@ -69,7 +69,7 @@ class DBFilterByDifficulty(DataBasePreprocessing):
             new_db_infos[key] = [
                 info
                 for info in dinfos
-                if info["difficulty"] not in self._removed_difficulties
+                if info['difficulty'] not in self._removed_difficulties
             ]
         return new_db_infos
 
@@ -77,14 +77,14 @@ class DBFilterByDifficulty(DataBasePreprocessing):
 class DBFilterByMinNumPoint(DataBasePreprocessing):
     def __init__(self, min_gt_point_dict, logger=None):
         self._min_gt_point_dict = min_gt_point_dict
-        logger.info(f"{min_gt_point_dict}")
+        logger.info(f'{min_gt_point_dict}')
 
     def _preprocess(self, db_infos):
         for name, min_num in self._min_gt_point_dict.items():
             if min_num > 0:
                 filtered_infos = []
                 for info in db_infos[name]:
-                    if info["num_points_in_gt"] >= min_num:
+                    if info['num_points_in_gt'] >= min_num:
                         filtered_infos.append(info)
                 db_infos[name] = filtered_infos
         return db_infos
@@ -101,29 +101,30 @@ class DataBasePreprocessor:
 
 
 def filter_gt_box_outside_range(gt_boxes, limit_range):
-    """remove gtbox outside training range.
+    '''remove gtbox outside training range.
     this function should be applied after other prep functions
     Args:
         gt_boxes ([type]): [description]
         limit_range ([type]): [description]
-    """
+    '''
     gt_boxes_bv = box_np_ops.center_to_corner_box2d(
         gt_boxes[:, [0, 1]], gt_boxes[:, [3, 3 + 1]], gt_boxes[:, -1]
     )
     bounding_box = box_np_ops.minmax_to_corner_2d(
         np.asarray(limit_range)[np.newaxis, ...]
     )
-    ret = points_in_convex_polygon_jit(gt_boxes_bv.reshape(-1, 2), bounding_box)
+    ret = points_in_convex_polygon_jit(
+        gt_boxes_bv.reshape(-1, 2), bounding_box)
     return np.any(ret.reshape(-1, 4), axis=1)
 
 
 def filter_gt_box_outside_range_by_center(gt_boxes, limit_range):
-    """remove gtbox outside training range.
+    '''remove gtbox outside training range.
     this function should be applied after other prep functions
     Args:
         gt_boxes ([type]): [description]
         limit_range ([type]): [description]
-    """
+    '''
     gt_box_centers = gt_boxes[:, :2]
     bounding_box = box_np_ops.minmax_to_corner_2d(
         np.asarray(limit_range)[np.newaxis, ...]
@@ -137,11 +138,12 @@ def filter_gt_low_points(gt_boxes, points, num_gt_points, point_num_threshold=2)
     gt_boxes_mask = np.ones([gt_boxes.shape[0]], np.bool)
     for i, num in enumerate(num_gt_points):
         if num <= point_num_threshold:
-            masks = box_np_ops.points_in_rbbox(points, gt_boxes[i : i + 1])
+            masks = box_np_ops.points_in_rbbox(points, gt_boxes[i: i + 1])
             masks = masks.reshape([-1])
             points_mask &= np.logical_not(masks)
             gt_boxes_mask[i] = False
     return gt_boxes[gt_boxes_mask], points[points_mask]
+
 
 @numba.njit
 def _rotation_matrix_3d_(rot_mat_T, angle, axis):
@@ -184,7 +186,8 @@ def _box_single_to_corner_jit(boxes):
     corners_norm[2] = 1.0
     corners_norm[3, 0] = 1.0
     corners_norm -= np.array([0.5, 0.5], dtype=boxes.dtype)
-    corners = boxes.reshape(num_box, 1, 5)[:, :, 2:4] * corners_norm.reshape(1, 4, 2)
+    corners = boxes.reshape(num_box, 1, 5)[
+        :, :, 2:4] * corners_norm.reshape(1, 4, 2)
     rot_mat_T = np.zeros((2, 2), dtype=boxes.dtype)
     box_corners = np.zeros((num_box, 4, 2), dtype=boxes.dtype)
     for i in range(num_box):
@@ -216,7 +219,8 @@ def noise_per_box(boxes, valid_mask, loc_noises, rot_noises):
             for j in range(num_tests):
                 current_corners[:] = box_corners[i]
                 current_corners -= boxes[i, :2]
-                _rotation_box2d_jit_(current_corners, rot_noises[i, j], rot_mat_T)
+                _rotation_box2d_jit_(
+                    current_corners, rot_noises[i, j], rot_mat_T)
                 current_corners += boxes[i, :2] + loc_noises[i, j, :2]
                 coll_mat = box_collision_test(
                     current_corners.reshape(1, 4, 2), box_corners
@@ -263,7 +267,7 @@ def noise_per_box_group(boxes, valid_mask, loc_noises, rot_noises, group_nums):
                     current_corners[:num].reshape(num, 4, 2), box_corners
                 )
                 for i in range(num):  # remove self-coll
-                    coll_mat[i, idx : idx + num] = False
+                    coll_mat[i, idx: idx + num] = False
                 if not coll_mat.any():
                     for i in range(num):
                         success_mask[i + idx] = j
@@ -312,8 +316,10 @@ def noise_per_box_group_v2_(
                     current_radius = np.sqrt(
                         current_box[0, 0] ** 2 + current_box[0, 1] ** 2
                     )
-                    current_grot[i] = np.arctan2(current_box[0, 0], current_box[0, 1])
-                    dst_grot[i] = current_grot[i] + global_rot_noises[idx + i, j]
+                    current_grot[i] = np.arctan2(
+                        current_box[0, 0], current_box[0, 1])
+                    dst_grot[i] = current_grot[i] + \
+                        global_rot_noises[idx + i, j]
                     dst_pos[i, 0] = current_radius * np.sin(dst_grot[i])
                     dst_pos[i, 1] = current_radius * np.cos(dst_grot[i])
                     current_box[0, :2] = dst_pos[i]
@@ -341,12 +347,13 @@ def noise_per_box_group_v2_(
                     current_corners[:num].reshape(num, 4, 2), box_corners
                 )
                 for i in range(num):  # remove self-coll
-                    coll_mat[i, idx : idx + num] = False
+                    coll_mat[i, idx: idx + num] = False
                 if not coll_mat.any():
                     for i in range(num):
                         success_mask[i + idx] = j
                         box_corners[i + idx] = current_corners[i]
-                        loc_noises[i + idx, j, :2] += dst_pos[i] - boxes[i + idx, :2]
+                        loc_noises[i + idx, j, :2] += dst_pos[i] - \
+                            boxes[i + idx, :2]
                         rot_noises[i + idx, j] += dst_grot[i] - current_grot[i]
                     break
         idx += num
@@ -392,10 +399,12 @@ def noise_per_box_v2_(boxes, valid_mask, loc_noises, rot_noises, global_rot_nois
                 rot_mat_T[1, 0] = rot_sin
                 rot_mat_T[1, 1] = rot_cos
                 current_corners[:] = (
-                    current_box[0, 2:4] * corners_norm @ rot_mat_T + current_box[0, :2]
+                    current_box[0, 2:4] *
+                    corners_norm @ rot_mat_T + current_box[0, :2]
                 )
                 current_corners -= current_box[0, :2]
-                _rotation_box2d_jit_(current_corners, rot_noises[i, j], rot_mat_T)
+                _rotation_box2d_jit_(
+                    current_corners, rot_noises[i, j], rot_mat_T)
                 current_corners += current_box[0, :2] + loc_noises[i, j, :2]
                 coll_mat = box_collision_test(
                     current_corners.reshape(1, 4, 2), box_corners
@@ -424,7 +433,7 @@ def points_transform_(
             if valid_mask[j]:
                 if point_masks[i, j] == 1:
                     points[i, :3] -= centers[j, :3]
-                    points[i : i + 1, :3] = points[i : i + 1, :3] @ rot_mat_T[j]
+                    points[i: i + 1, :3] = points[i: i + 1, :3] @ rot_mat_T[j]
                     points[i, :3] += centers[j, :3]
                     points[i, :3] += loc_transform[j]
                     break  # only apply first box's transform
@@ -440,7 +449,8 @@ def box3d_transform_(boxes, loc_transform, rot_transform, valid_mask):
 
 
 def _select_transform(transform, indices):
-    result = np.zeros((transform.shape[0], *transform.shape[2:]), dtype=transform.dtype)
+    result = np.zeros(
+        (transform.shape[0], *transform.shape[2:]), dtype=transform.dtype)
     for i in range(transform.shape[0]):
         if indices[i] != -1:
             result[i] = transform[i, indices[i]]
@@ -583,8 +593,9 @@ def random_flip(gt_boxes, probability=0.5):
             gt_boxes[:, 7] = -gt_boxes[:, 7]
     return gt_boxes
 
+
 def random_flip_both(gt_boxes, probability=0.5, flip_coor=None):
-    # x flip 
+    # x flip
     enable = np.random.choice(
         [False, True], replace=False, p=[1 - probability, probability]
     )
@@ -593,8 +604,8 @@ def random_flip_both(gt_boxes, probability=0.5, flip_coor=None):
         gt_boxes[:, -1] = -gt_boxes[:, -1] + np.pi
         if gt_boxes.shape[1] > 7:  # y axis: x, y, z, w, h, l, vx, vy, r
             gt_boxes[:, 7] = -gt_boxes[:, 7]
-    
-    # y flip 
+
+    # y flip
     enable = np.random.choice(
         [False, True], replace=False, p=[1 - probability, probability]
     )
@@ -604,11 +615,11 @@ def random_flip_both(gt_boxes, probability=0.5, flip_coor=None):
         else:
             gt_boxes[:, 0] = flip_coor * 2 - gt_boxes[:, 0]
 
-        gt_boxes[:, -1] = -gt_boxes[:, -1] + 2*np.pi  # TODO: CHECK THIS 
-        
+        gt_boxes[:, -1] = -gt_boxes[:, -1] + 2*np.pi  # TODO: CHECK THIS
+
         if gt_boxes.shape[1] > 7:  # y axis: x, y, z, w, h, l, vx, vy, r
             gt_boxes[:, 6] = -gt_boxes[:, 6]
-    
+
     return gt_boxes
 
 
@@ -685,8 +696,10 @@ def box_collision_test(boxes, qboxes, clockwise=True):
                                 vec = boxes[i, k] - boxes[i, (k + 1) % 4]
                                 if clockwise:
                                     vec = -vec
-                                cross = vec[1] * (boxes[i, k, 0] - qboxes[j, l, 0])
-                                cross -= vec[0] * (boxes[i, k, 1] - qboxes[j, l, 1])
+                                cross = vec[1] * \
+                                    (boxes[i, k, 0] - qboxes[j, l, 0])
+                                cross -= vec[0] * \
+                                    (boxes[i, k, 1] - qboxes[j, l, 1])
                                 if cross >= 0:
                                     box_overlap_qbox = False
                                     break
@@ -700,8 +713,10 @@ def box_collision_test(boxes, qboxes, clockwise=True):
                                     vec = qboxes[j, k] - qboxes[j, (k + 1) % 4]
                                     if clockwise:
                                         vec = -vec
-                                    cross = vec[1] * (qboxes[j, k, 0] - boxes[i, l, 0])
-                                    cross -= vec[0] * (qboxes[j, k, 1] - boxes[i, l, 1])
+                                    cross = vec[1] * \
+                                        (qboxes[j, k, 0] - boxes[i, l, 0])
+                                    cross -= vec[0] * \
+                                        (qboxes[j, k, 1] - boxes[i, l, 1])
                                     if cross >= 0:  #
                                         qbox_overlap_box = False
                                         break
@@ -715,9 +730,9 @@ def box_collision_test(boxes, qboxes, clockwise=True):
 
 
 def global_translate_(gt_boxes, noise_translate_std):
-    """
+    '''
     Apply global translation to gt_boxes and points.
-    """
+    '''
 
     if not isinstance(noise_translate_std, (list, tuple, np.ndarray)):
         noise_translate_std = np.array(
@@ -738,7 +753,7 @@ def global_translate_(gt_boxes, noise_translate_std):
     return gt_boxes
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     bboxes = np.array(
         [
             [0.0, 0.0, 0.5, 0.5],

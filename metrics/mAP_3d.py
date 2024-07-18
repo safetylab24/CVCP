@@ -1,12 +1,13 @@
 import torch
 from torchmetrics import Metric
 
+
 class MAP3D(Metric):
     def __init__(self, iou_threshold=0.1, dist_sync_on_step=False):
         super().__init__(dist_sync_on_step=dist_sync_on_step)
         self.iou_threshold = iou_threshold
-        self.add_state("map", default=torch.tensor(0.0), dist_reduce_fx="mean")
-        self.add_state("total", default=torch.tensor(0), dist_reduce_fx="sum")
+        self.add_state('map', default=torch.tensor(0.0), dist_reduce_fx='mean')
+        self.add_state('total', default=torch.tensor(0), dist_reduce_fx='sum')
 
     def update(self, preds: torch.Tensor, target: torch.Tensor):
         # Compute IoU for 3D bounding boxes
