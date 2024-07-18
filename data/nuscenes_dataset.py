@@ -57,8 +57,9 @@ class NuScenesGeneratedDataset(torch.utils.data.Dataset):
         self.return_original_label = return_original_label
         self.version = version
         # metadata
-        self.samples = json.loads(
-            (Path(nuscenes_metadata_path) / f'{scene_name}.json').read_text())
+        
+        with open((Path(nuscenes_metadata_path) / f'{scene_name}.pkl'), 'rb') as f:
+            self.samples = pickle.load(f)
         # labels
         with open((Path(bbox_label_path) / f'{scene_name}.pkl'), 'rb') as f:
             self.labels = pickle.load(f)
@@ -127,7 +128,7 @@ class NuScenesGeneratedDataset(torch.utils.data.Dataset):
             'extrinsics': torch.tensor(np.float32(inputs['extrinsics'])),
             'labels': labels_out,
         }
-        if self.return_original_label:
-            data['original_labels'] = load_annotations(labels)
+        #if self.return_original_label:
+        # data['labels_original'] = labels # TODO: add custom collate_fn so that this is loaded correctly
 
         return data

@@ -294,8 +294,9 @@ class CenterHead(nn.Module):
         return rets_merged
 
     @torch.no_grad()
-    def predict(self, label, preds_dicts, test_cfg, **kwargs):
+    def predict(self, preds_dicts, test_cfg, **kwargs):
         '''decode, nms, then return the detection result. Additionaly support double flip testing
+        Each box consists of [x, y, z, w, l, h, vel_x, vel_y, rot]
         '''
         # get loss info
         rets = []
@@ -338,13 +339,6 @@ class CenterHead(nn.Module):
                         preds_dict[k][:, 2], dims=[2])
                     preds_dict[k][:, 3] = torch.flip(
                         preds_dict[k][:, 3], dims=[1, 2])
-
-            if 'metadata' not in label or len(label['metadata']) == 0:
-                meta_list = [None] * batch_size
-            else:
-                meta_list = label['metadata']
-                if double_flip:
-                    meta_list = meta_list[:4*int(batch_size):4]
 
             batch_hm = torch.sigmoid(preds_dict['hm'])
 
@@ -483,7 +477,7 @@ class CenterHead(nn.Module):
             scores = scores[mask]
             labels = labels[mask]
 
-            boxes_for_nms = box_preds[:, [0, 1, 2, 3, 4, 5, -1]]
+            boxes_for_nms = box_preds[:, [0, 1, 2, 3, 4, 5, -1]] # we only need xyz, wlh, rot
             nms_cfg = test_cfg.get('nms')
             if test_cfg.get('circular_nms', False):
                 centers = boxes_for_nms[:, [0, 1]]

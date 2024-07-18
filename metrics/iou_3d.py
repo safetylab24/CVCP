@@ -21,6 +21,7 @@ class IoU3D(Metric):
         self.labels = labels
 
     def compute(self):
+        # TODO: figure out how to account for length mismatch between preds and labels
         # calculate iou for each class, then sum them up
         for i, (pred, label) in enumerate(zip(self.preds, self.labels)):
             iou = self.compute_iou_3d(pred, label)
@@ -30,13 +31,14 @@ class IoU3D(Metric):
 
     def compute_iou_3d(self, pred_bbox, label_bbox):
         origin = (0.5, 1.0, 0.5)
+        # TODO: make sure the order of the bbox is correct
         gt_box_corners_pred = center_to_corner_box3d(
             pred_bbox[:, :3], pred_bbox[:,
-                                        3:6], pred_bbox[:, 6], origin=origin, axis=2
+                                        3:6], pred_bbox[:, 6], origin=origin, axis=1
         )
         gt_box_corners_label = center_to_corner_box3d(
             label_bbox[:, :3], label_bbox[:,
-                                          3:6], label_bbox[:, 6], origin=origin, axis=2
+                                          3:6], label_bbox[:, 6], origin=origin, axis=1
         )
         _, iou = box3d_overlap(gt_box_corners_pred, gt_box_corners_label)
         return iou

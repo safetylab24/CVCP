@@ -1,13 +1,13 @@
 epochs: 30
 num_workers: 7
-batch_size: 8
+batch_size: 4
 resize_shape: [128, 128]
 
 log_dir: ./logs
 dataset_dir: ./nuscenes
 nuscenes_metadata_path: ./nuscenes_metadata
 bbox_label_path: ./labels
-ckpt_path: /home/vrb230004/CombinedModels/lightning_logs/version_0/checkpoints/epoch=28-step=25462.ckpt
+#ckpt_path: /home/vrb230004/CombinedModels/lightning_logs/version_0/checkpoints/epoch=28-step=25462.ckpt
 
 devices: [0,1,2,3]
 version: 'v1.0-trainval'

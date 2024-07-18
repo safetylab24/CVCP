@@ -86,14 +86,13 @@ class CVCPModel(L.LightningModule):
                      prog_bar=True, on_step=True, logger=True)
 
         # TODO: fix this
-        prediction = self.head_model.predict(
-            batch['labels'], preds, self.cfg['test'])
-        for task in prediction:
-            if task['scores'].max() > self.max_conf_val:
-                self.max_conf_val = task['scores'].max().item()
-        self.iou.update(prediction, batch['labels_original'])
+        #prediction = self.head_model.predict(batch['labels'], preds, self.cfg['test'])
+        #for task in prediction:
+         #   if task['scores'].max() > self.max_conf_val:
+          #      self.max_conf_val = task['scores'].max().item()
+        #self.iou.update(prediction, batch['labels_original'])
         # self.mAP.update(prediction, batch['labels_original'])
-        self.iou.compute()
+        #self.iou.compute()
 
         return loss
 
@@ -104,8 +103,7 @@ class CVCPModel(L.LightningModule):
             cvt_out, size=self.resize_shape, mode='bilinear', align_corners=False)
         preds_raw = self.head_model(cvt_out)
 
-        preds_final = self.head_model.predict(
-            batch['labels'], preds_raw, self.cfg['test'])
+        preds_final = self.head_model.predict(preds_raw, self.cfg['test'])
 
         self.iou.update(preds_final, batch['labels_original'])
         self.log('iou', self.iou.compute())

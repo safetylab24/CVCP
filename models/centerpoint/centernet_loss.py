@@ -17,10 +17,6 @@ class RegLoss(nn.Module):
         super(RegLoss, self).__init__()
 
     def forward(self, output, mask, ind, target):
-        # output = output.cpu()
-        # mask = mask.cuda()
-        # ind = ind.cuda()
-        # target = target.cuda()
         pred = _transpose_and_gather_feat(output, ind)
         mask = mask.float().unsqueeze(2)
 
@@ -40,10 +36,6 @@ class FastFocalLoss(nn.Module):
         super(FastFocalLoss, self).__init__()
 
     def forward(self, out, target, ind, mask, cat):
-        # target = target.cuda()
-        # ind = ind.cuda()
-        # mask = mask.cuda()
-        # cat = cat.cuda()
         '''
         Arguments:
           out, target: B x C x H x W
