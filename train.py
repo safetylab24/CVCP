@@ -56,7 +56,8 @@ def main():
         nuscenes_metadata_path=config['nuscenes_metadata_path'],
         bbox_label_path=config['bbox_label_path'],
         tasks=centerpoint_config['tasks'],
-        config=config)  # for data loading
+        config=config,
+        dataset_dir=config['dataset_dir'])  # for data loading
 
     logger = TensorBoardLogger(
         save_dir=config['log_dir'],

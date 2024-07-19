@@ -129,6 +129,8 @@ class NuScenesGeneratedDataset(torch.utils.data.Dataset):
             'labels': labels_out,
         }
         #if self.return_original_label:
-        # data['labels_original'] = labels # TODO: add custom collate_fn so that this is loaded correctly
+        orig_label = preprocess(load_annotations(labels), tasks)['annotations']
+        del orig_label['gt_names']
+        data['labels_original'] = orig_label # TODO: add custom collate_fn so that this is loaded correctly
 
         return data
