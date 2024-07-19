@@ -70,12 +70,11 @@ class RoIHead(RoIHeadTemplate):
         :return:
         """
         batch_dict['batch_size'] = len(batch_dict['rois'])
-        if training:
-            targets_dict = self.assign_targets(batch_dict)
-            batch_dict['rois'] = targets_dict['rois']
-            batch_dict['roi_labels'] = targets_dict['roi_labels']
-            batch_dict['roi_features'] = targets_dict['roi_features']
-            batch_dict['roi_scores'] = targets_dict['roi_scores']
+        targets_dict = self.assign_targets(batch_dict)
+        batch_dict['rois'] = targets_dict['rois']
+        batch_dict['roi_labels'] = targets_dict['roi_labels']
+        batch_dict['roi_features'] = targets_dict['roi_features']
+        batch_dict['roi_scores'] = targets_dict['roi_scores']
 
         # RoI aware pooling
         if self.add_box_param:
@@ -96,17 +95,15 @@ class RoIHead(RoIHeadTemplate):
         rcnn_reg = self.reg_layers(shared_features).transpose(
             1, 2).contiguous().squeeze(dim=1)  # (B, C)
 
-        if not training:
-            batch_cls_preds, batch_box_preds = self.generate_predicted_boxes(
-                batch_size=batch_dict['batch_size'], rois=batch_dict['rois'], cls_preds=rcnn_cls, box_preds=rcnn_reg
-            )
-            batch_dict['batch_cls_preds'] = batch_cls_preds
-            batch_dict['batch_box_preds'] = batch_box_preds
-            batch_dict['cls_preds_normalized'] = False
-        else:
-            targets_dict['rcnn_cls'] = rcnn_cls
-            targets_dict['rcnn_reg'] = rcnn_reg
+        batch_cls_preds, batch_box_preds = self.generate_predicted_boxes(
+            batch_size=batch_dict['batch_size'], rois=batch_dict['rois'], cls_preds=rcnn_cls, box_preds=rcnn_reg
+        )
+        batch_dict['batch_cls_preds'] = batch_cls_preds
+        batch_dict['batch_box_preds'] = batch_box_preds
+        batch_dict['cls_preds_normalized'] = False
+        targets_dict['rcnn_cls'] = rcnn_cls
+        targets_dict['rcnn_reg'] = rcnn_reg
 
-            self.forward_ret_dict = targets_dict
+        self.forward_ret_dict = targets_dict
 
         return batch_dict
