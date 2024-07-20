@@ -6,39 +6,73 @@ from models.centerpoint.utils.box_torch_ops import center_to_corner_box3d
 from models.centerpoint.ops.iou3d_nms.iou3d_nms_utils import to_pcdet
 from models.centerpoint.ops.iou3d_nms import iou3d_nms_cuda
 
+
 class IoU3D(Metric):
+    """
+    Intersection over Union (IoU) metric for 3D object detection.
+
+    Args:
+        num_classes (int): Number of classes.
+        dist_sync_on_step (bool): Whether to synchronize metric state across processes during training. Default is False.
+    """
+
     def __init__(self, num_classes, dist_sync_on_step=False):
         super().__init__(dist_sync_on_step=dist_sync_on_step)
         self.num_classes = num_classes
         self.num_samples = 0
         self.iou_sum = 0
-        self.add_state('preds', default=[], dist_reduce_fx='cat')
-        self.add_state('labels', default=[], dist_reduce_fx='cat')
+        self.add_state('pred_boxes', default=torch.tensor([]),
+                       dist_reduce_fx='cat')
+        self.add_state('pred_classes', default=torch.tensor([]),
+                       dist_reduce_fx='cat')
+        self.add_state('label_boxes', default=torch.tensor([]),
+                       dist_reduce_fx='cat')
+        self.add_state('label_classes', default=torch.tensor([]),
+                       dist_reduce_fx='cat')
 
     def update(self, pred_boxes, pred_classes, label_boxes, label_classes):
-        self.preds.append((pred_boxes, pred_classes))
-        self.labels.append((label_boxes, label_classes))
+        """
+        Update the metric state with predicted and label boxes and classes.
+
+        Args:
+            pred_boxes (torch.Tensor): Predicted bounding boxes.
+            pred_classes (torch.Tensor): Predicted class labels.
+            label_boxes (torch.Tensor): Label bounding boxes.
+            label_classes (torch.Tensor): Label class labels.
+        """
+        self.pred_boxes = pred_boxes
+        self.pred_classes = pred_classes
+        self.label_boxes = label_boxes
+        self.label_classes = label_classes
 
     def compute(self):
-        '''
-        Sum every class-level single intersection matrix and 
-        '''
-        for (pred_boxes, pred_classes), (label_boxes, label_classes) in zip(self.preds, self.labels):
-            intersections = []
-            unions = []
-            for k in range(pred_classes.min().item(), pred_classes.max().item() + 1):
-                pred_boxes_mask = (pred_classes == k)
-                label_boxes_mask = (label_classes == k)
-                if pred_boxes_mask.sum() > 0 and label_boxes_mask.sum() > 0:
-                    cur_pred = pred_boxes[pred_boxes_mask]
-                    cur_label = label_boxes[label_boxes_mask]
-                    
-                    intersection, union = boxes_iou3d_gpu(cur_pred, cur_label) # (M, N)
-                    intersections.append(intersection.sum())
-                    unions.append(union.sum())
-                    
-        return sum(intersections) / sum(unions)
-    
+        """
+        Computes the Complete Intersection over Union (CIoU) metric for 3D bounding boxes.
+
+        Returns:
+            torch.Tensor: The computed IoU metric.
+        """
+        pred_boxes = self.pred_boxes
+        pred_classes = self.pred_classes
+        label_boxes = self.label_boxes
+        label_classes = self.label_classes
+
+        intersections = []
+        unions = []
+        for k in label_classes.unique():
+            pred_boxes_mask = (pred_classes == k)
+            label_boxes_mask = (label_classes == k)
+            if pred_boxes_mask.sum() > 0 and label_boxes_mask.sum() > 0:
+                cur_pred = pred_boxes[pred_boxes_mask]
+                cur_label = label_boxes[label_boxes_mask]
+
+            intersection, union = boxes_iou3d_gpu(
+                cur_pred, cur_label)  # (M, N)
+            intersections.append(intersection.sum())
+            unions.append(union.sum())
+
+        return sum(intersections) / sum(unions) if unions else torch.tensor(0.0)
+
 
 def boxes_iou3d_gpu(boxes_a, boxes_b):
     '''
@@ -62,7 +96,8 @@ def boxes_iou3d_gpu(boxes_a, boxes_b):
     boxes_b_height_min = (boxes_b[:, 2] - boxes_b[:, 5] / 2).view(1, -1)
 
     # bev overlap
-    overlaps_bev = torch.zeros(size=(boxes_a.shape[0], boxes_b.shape[0]), dtype=torch.float, device='cuda')  # (N, M)
+    overlaps_bev = torch.zeros(size=(
+        boxes_a.shape[0], boxes_b.shape[0]), dtype=torch.float, device='cuda')  # (N, M)
     iou3d_nms_cuda.boxes_overlap_bev_gpu(
         boxes_a.contiguous(), boxes_b.contiguous(), overlaps_bev)
 

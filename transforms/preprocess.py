@@ -80,6 +80,22 @@ def flatten(box):
 
 def assign_label(result, tasks, gaussian_overlap=0.1, max_objs=500, min_radius=2, out_size_factor=4, voxel_size=(0.2, 0.2, 8),
                  pc_range=(-51.2, -51.2, -5.0, 51.2, 51.2, 3.0)):
+    """
+    Assigns labels to the given result based on the specified tasks.
+
+    Args:
+        result (dict): The result dictionary containing annotations.
+        tasks (list): A list of dictionaries representing the tasks.
+        gaussian_overlap (float, optional): The minimum overlap required for Gaussian radius calculation. Defaults to 0.1.
+        max_objs (int, optional): The maximum number of objects. Defaults to 500.
+        min_radius (int, optional): The minimum radius for Gaussian radius calculation. Defaults to 2.
+        out_size_factor (int, optional): The output size factor. Defaults to 4.
+        voxel_size (tuple, optional): The voxel size. Defaults to (0.2, 0.2, 8).
+        pc_range (tuple, optional): The point cloud range. Defaults to (-51.2, -51.2, -5.0, 51.2, 51.2, 3.0).
+
+    Returns:
+        dict: The labels dictionary containing heatmaps, annotation boxes, indices, masks, categories, and number of objects.
+    """
     class_names_by_task = [t['class_names'] for t in tasks]
     num_classes_by_task = [t['num_class'] for t in tasks]
 

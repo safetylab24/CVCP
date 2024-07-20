@@ -1,6 +1,5 @@
 from models.centerpoint.utils import box_torch_ops
 import torch
-from torch import nn
 
 num_point = 5
 NMS_POST_MAXSIZE = 500

@@ -253,12 +253,17 @@ class CrossViewAttention(nn.Module):
             e_inv: torch.FloatTensor,
     ):
         '''
-        x: (b, c, H, W)
-        feature: (b, n, dim_in, h, w)
-        I_inv: (b, n, 3, 3)
-        E_inv: (b, n, 4, 4)
+        Forward pass of the CrossViewAttention module.
 
-        Returns: (b, d, H, W)
+        Args:
+            x (torch.FloatTensor): Input tensor of shape (b, c, H, W).
+            bev (BEVEmbedding): Bird's Eye View embedding.
+            feature (torch.FloatTensor): Feature tensor of shape (b, n, dim_in, h, w).
+            i_inv (torch.FloatTensor): Inverse of the intrinsic camera matrix of shape (b, n, 3, 3).
+            e_inv (torch.FloatTensor): Inverse of the extrinsic camera matrix of shape (b, n, 4, 4).
+
+        Returns:
+            torch.FloatTensor: Output tensor of shape (b, d, H, W).
         '''
         b, n, _, _, _ = feature.shape
 

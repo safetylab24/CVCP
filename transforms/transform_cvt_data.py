@@ -6,6 +6,45 @@ import numpy as np
 
 
 class LoadDataTransform(torchvision.transforms.ToTensor):
+    """
+    Custom data transformation class for loading and preprocessing data.
+
+    Args:
+        dataset_dir (str): Directory path of the dataset.
+        labels_dir (str): Directory path of the labels.
+        image_config (dict): Configuration parameters for image processing.
+        num_classes (int): Number of classes in the dataset.
+        augment (str, optional): Type of augmentation to apply. Defaults to 'none'.
+
+    Attributes:
+        dataset_dir (Path): Path object representing the dataset directory.
+        labels_dir (Path): Path object representing the labels directory.
+        image_config (dict): Configuration parameters for image processing.
+        num_classes (int): Number of classes in the dataset.
+        img_transform (ToTensor): Image transformation object for converting images to tensors.
+        to_tensor (callable): Callable object for converting data to tensors.
+
+    Methods:
+        get_cameras: Crops, resizes, and augments images.
+        decode: Decodes the image.
+        get_bev: Retrieves the bird's eye view (BEV) image.
+        __call__: Applies the data transformation.
+
+    """
+
+    def __init__(self, dataset_dir, labels_dir, image_config, num_classes, augment='none'):
+        super().__init__()
+
+        self.dataset_dir = pathlib.Path(dataset_dir)
+        self.labels_dir = pathlib.Path(labels_dir)
+        self.image_config = image_config
+        self.num_classes = num_classes
+
+        self.img_transform = torchvision.transforms.ToTensor()
+        self.to_tensor = super().__call__
+
+    # Rest of the code...
+class LoadDataTransform(torchvision.transforms.ToTensor):
     def __init__(self, dataset_dir, labels_dir, image_config, num_classes, augment='none'):
         super().__init__()
 

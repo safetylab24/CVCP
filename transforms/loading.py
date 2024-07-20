@@ -2,6 +2,18 @@ import numpy as np
 
 
 def load_annotations(info: dict):
+    """
+    Load annotations from the given info dictionary.
+
+    Args:
+        info (dict): The dictionary containing the annotations.
+
+    Returns:
+        dict: The loaded annotations.
+
+    Raises:
+        ValueError: If 'gt_boxes' is not present in info or if it is None.
+    """
     result = {}
     if 'gt_boxes' in info and info['gt_boxes'] is not None:
         gt_boxes = np.array(info['gt_boxes']).astype(np.float32)

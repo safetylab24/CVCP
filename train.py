@@ -20,6 +20,24 @@ def load_config(config_file):
 
 
 def main():
+    """
+    Main function for training the CVCP model.
+
+    This function performs the following steps:
+    1. Enables the faulthandler and clears the CUDA cache.
+    2. Loads the configuration from the command line argument or the default configuration file.
+    3. Instantiates the CVT encoder and the head segmentation model.
+    4. Defines the resize shape for images.
+    5. Instantiates the combined CVCP model.
+    6. Sets up the data module for NuScenes dataset.
+    7. Sets up the logger for TensorBoard.
+    8. Logs the hyperparameters.
+    9. Sets up the learning rate monitor and model checkpoint.
+    10. Sets up the trainer with GPU acceleration and distributed training.
+    11. Prints training information.
+    12. Starts the training process.
+    13. Prints training completion message.
+    """
     faulthandler.enable()
     torch.cuda.empty_cache()
 

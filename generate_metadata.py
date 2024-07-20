@@ -48,6 +48,18 @@ def parse_pose(record, *args, **kwargs):
 
 
 def parse_sample_record(sample_record, camera_rig, scene_name, nusc):
+    """
+    Parses a sample record and generates metadata for each camera in the camera rig.
+
+    Args:
+        sample_record (dict): The sample record containing information about the sample.
+        camera_rig (list): The list of camera indices in the camera rig.
+        scene_name (str): The name of the scene.
+        nusc (NuScenes): The NuScenes dataset object.
+
+    Returns:
+        dict: A dictionary containing the parsed metadata for each camera in the camera rig.
+    """
     lidar_record = nusc.get('sample_data', sample_record['data']['LIDAR_TOP'])
     egolidar = nusc.get('ego_pose', lidar_record['ego_pose_token'])
 

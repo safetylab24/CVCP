@@ -9,6 +9,16 @@ import numpy as np
 
 class NuScenesDataModule(L.LightningDataModule):
     def __init__(self, nuscenes_metadata_path, bbox_label_path, tasks, config, dataset_dir):
+        """
+        Data module for NuScenes dataset.
+
+        Args:
+            nuscenes_metadata_path (str): Path to the NuScenes metadata file.
+            bbox_label_path (str): Path to the bounding box label file.
+            tasks (dict): Dictionary specifying the tasks to be performed.
+            config (dict): Configuration parameters for the data module.
+            dataset_dir (str): Directory path where the dataset is located.
+        """
         super().__init__()
         self.dataset_dir = Path(dataset_dir)
         self.nuscenes_metadata_path = Path(nuscenes_metadata_path)
@@ -17,6 +27,12 @@ class NuScenesDataModule(L.LightningDataModule):
         self.config = config
 
     def setup(self, stage: str) -> None:
+        """
+        Setup method to prepare the data for training, validation, or testing.
+
+        Args:
+            stage (str): The stage of the data module (fit, test, or predict).
+        """
         if stage == 'fit':
             self.data_train: ConcatDataset = get_dataset(
                 dataset_dir=self.dataset_dir,
@@ -48,7 +64,16 @@ class NuScenesDataModule(L.LightningDataModule):
 
     @staticmethod
     def pad_tensor_list(tensor_list, pad_value=0):
-        """Pads a list of tensors to the same shape."""
+        """
+        Pads a list of tensors to the same shape.
+
+        Args:
+            tensor_list (list): List of tensors to be padded.
+            pad_value (int): Value to be used for padding.
+
+        Returns:
+            torch.Tensor: Padded tensor list.
+        """
         max_shape = np.array(
             [tensor.shape for tensor in tensor_list]).max(axis=0)
         padded_tensors = []
@@ -62,6 +87,15 @@ class NuScenesDataModule(L.LightningDataModule):
 
     @staticmethod
     def custom_collate_fn(batch):
+        """
+        Custom collate function for creating batches.
+
+        Args:
+            batch (list): List of samples to be collated.
+
+        Returns:
+            dict: Collated batch.
+        """
         # Separate 'labels_original' from the rest of the batch
         batch_no_labels_original = []
         labels_original_list = []
@@ -96,6 +130,12 @@ class NuScenesDataModule(L.LightningDataModule):
         return collated_batch
 
     def train_dataloader(self):
+        """
+        Returns the data loader for training.
+
+        Returns:
+            torch.utils.data.DataLoader: Data loader for training.
+        """
         return DataLoader(
             dataset=self.data_train,
             batch_size=self.config['batch_size'],
@@ -107,6 +147,12 @@ class NuScenesDataModule(L.LightningDataModule):
         )
 
     def val_dataloader(self):
+        """
+        Returns the data loader for validation.
+
+        Returns:
+            torch.utils.data.DataLoader: Data loader for validation.
+        """
         return DataLoader(
             dataset=self.data_val,
             batch_size=self.config['batch_size'],
@@ -119,6 +165,12 @@ class NuScenesDataModule(L.LightningDataModule):
         )
 
     def test_dataloader(self):
+        """
+        Returns the data loader for testing.
+
+        Returns:
+            torch.utils.data.DataLoader: Data loader for testing.
+        """
         return DataLoader(
             dataset=self.data_test,
             batch_size=1,

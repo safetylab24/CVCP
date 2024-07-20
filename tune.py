@@ -4,7 +4,7 @@ from models.cvcp_model import CVCPModel, head
 from models.cvt.encoder import CVTEncoder
 import yaml
 from pathlib import Path
-from datasets.datamodule import NuScenesDataModule
+from data.datamodule import NuScenesDataModule
 import sys
 from lightning import Trainer
 from lightning.pytorch.callbacks import ModelCheckpoint, LearningRateMonitor

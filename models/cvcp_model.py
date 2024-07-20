@@ -73,6 +73,36 @@ model_cfg = dict(
 
 
 class CVCPModel(L.LightningModule):
+    """
+    CVCPModel is a LightningModule subclass that represents the CVCP model.
+
+    Args:
+        cvt_encoder (CVTEncoder): The CVT encoder model.
+        center_head_model (CenterHead): The center head model.
+        resize_shape (tuple): The shape to resize the output of the CVT model.
+        cfg (dict): The configuration dictionary.
+
+    Attributes:
+        cvt_encoder (CVTEncoder): The CVT encoder model.
+        center_head (CenterHead): The center head model.
+        resize_shape (tuple): The shape to resize the output of the CVT model.
+        cfg (dict): The configuration dictionary.
+        max_conf_val (int): The maximum confidence value.
+        roi_head (RoIHead): The RoI head model.
+        bev_feature_extractor (BEVFeatureExtractor): The BEV feature extractor model.
+        iou (IoU3D): The IoU3D metric.
+
+    Methods:
+        _forward_stage_one: Performs the forward pass for stage one of the model.
+        _forward_stage_two: Performs the forward pass for stage two of the model.
+        training_step: Defines the training step for the model.
+        validation_step: Defines the validation step for the model.
+        test_step: Defines the test step for the model.
+        configure_optimizers: Configures the optimizers for the model.
+        parse_second_losses: Parses the second losses for logging.
+
+    """
+
     def __init__(self, cvt_encoder: CVTEncoder, center_head_model: CenterHead, resize_shape, cfg):
         super().__init__()
         self.cvt_encoder = cvt_encoder
@@ -88,17 +118,22 @@ class CVCPModel(L.LightningModule):
         # self.mAP = MAP3D(iou_threshold=0.1)
 
     def _forward_stage_one(self, batch):
-        # (1, 128, 25, 25), (B, dim, H, W)
+        """
+        Performs the forward pass for stage one of the model.
+
+        Args:
+            batch (dict): The input batch.
+
+        Returns:
+            tuple: A tuple containing the predicted boxes, the output of the CVT model, and the loss.
+
+        """
         cvt_out = self.cvt_encoder(
             batch['images'], batch['intrinsics'], batch['extrinsics'])
-        # Resize the output of cvt_model
         cvt_out = F.interpolate(
             cvt_out, size=self.resize_shape, mode='bilinear', align_corners=False)
-        # Pass the resized output through the head model
-        # Returns predictions for each task
         preds = self.center_head(cvt_out)
 
-        # manual deepcopy because deepcopy does not work
         new_preds = []
         for pred in preds:
             new_pred = {}
@@ -113,6 +148,19 @@ class CVCPModel(L.LightningModule):
         return boxes, cvt_out, loss
 
     def _forward_stage_two(self, stage_one_boxes, bev, batch, train=False):
+        """
+        Performs the forward pass for stage two of the model.
+
+        Args:
+            stage_one_boxes: The predicted boxes from stage one.
+            bev: The BEV input.
+            batch: The input batch.
+            train (bool): Whether to perform training or not.
+
+        Returns:
+            tuple: A tuple containing the ROI loss, the tensorboard dictionary.
+
+        """
         centers_vehicle_frame = utils.get_box_center(stage_one_boxes)
         feature = self.bev_feature_extractor.forward(
             centers_vehicle_frame, num_point=5, bev=bev)
@@ -130,8 +178,18 @@ class CVCPModel(L.LightningModule):
         else:
             return pred_stage_two, roi_loss, tb_dict
 
-    # expects data as dict of images, intrinsics, extrinsics, labels
     def training_step(self, batch, batch_idx):
+        """
+        Defines the training step for the model.
+
+        Args:
+            batch: The input batch.
+            batch_idx: The index of the current batch.
+
+        Returns:
+            float: The loss value.
+
+        """
         stage_one_boxes, bev, stage_one_loss = self._forward_stage_one(batch)
         roi_loss, tb_dict = self._forward_stage_two(
             stage_one_boxes, bev, batch, train=True)
@@ -145,6 +203,17 @@ class CVCPModel(L.LightningModule):
         return loss_out
 
     def validation_step(self, batch, batch_idx):
+        """
+        Defines the validation step for the model.
+
+        Args:
+            batch: The input batch.
+            batch_idx: The index of the current batch.
+
+        Returns:
+            float: The loss value.
+
+        """
         stage_one_boxes, bev, stage_one_loss = self._forward_stage_one(batch)
         preds_final, roi_loss, tb_dict = self._forward_stage_two(
             stage_one_boxes, bev, batch)
@@ -164,16 +233,22 @@ class CVCPModel(L.LightningModule):
             self.log('train_loss', loss_out, sync_dist=True,
                      prog_bar=True, on_step=True, logger=True)
             
-        # Calculate iou and mAP metrics
         self.log('iou', self.iou, on_step=True, on_epoch=True, prog_bar=True)
         
         return loss_out
 
-    # def on_validation_epoch_end(self) -> None:
-    #     self.log('iou_epoch', self.iou, on_step=False, on_epoch=True)
-        
-
     def test_step(self, batch, batch_idx):
+        """
+        Defines the test step for the model.
+
+        Args:
+            batch: The input batch.
+            batch_idx: The index of the current batch.
+
+        Returns:
+            float: The loss value.
+
+        """
         stage_one_boxes, bev, stage_one_loss = self._forward_stage_one(batch)
         boxes_final, roi_loss, tb_dict = self._forward_stage_two(
             stage_one_boxes, bev, batch)
@@ -188,6 +263,13 @@ class CVCPModel(L.LightningModule):
         return loss_out
 
     def configure_optimizers(self):
+        """
+        Configures the optimizers for the model.
+
+        Returns:
+            dict: A dictionary containing the optimizer and the learning rate scheduler.
+
+        """
         optimizer = torch.optim.AdamW(
             self.parameters(), lr=self.cfg['lr'], weight_decay=self.cfg['weight_decay'])
         return {
@@ -206,6 +288,16 @@ class CVCPModel(L.LightningModule):
         }
 
     def parse_second_losses(self, losses):
+        """
+        Parses the second losses for logging.
+
+        Args:
+            losses: The losses to parse.
+
+        Returns:
+            tuple: A tuple containing the total loss and the log variables.
+
+        """
         log_vars = OrderedDict()
         loss = sum(losses['loss'])
         for loss_name, loss_value in losses.items():

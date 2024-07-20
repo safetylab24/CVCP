@@ -1,4 +1,3 @@
-import json
 import pickle
 from pathlib import Path
 import torch
@@ -41,6 +40,19 @@ def get_dataset(
 
 
 class NuScenesGeneratedDataset(torch.utils.data.Dataset):
+    """
+    A dataset class for NuScenes generated data.
+
+    Args:
+        scene_name (str): The name of the scene.
+        nuscenes_metadata_path (Path): The path to the NuScenes metadata.
+        bbox_label_path (Path): The path to the bounding box labels.
+        dataset_dir (Path): The directory of the dataset.
+        tasks (dict): The tasks to be performed on the dataset.
+        return_original_label (bool, optional): Whether to return the original labels. Defaults to False.
+        version (str, optional): The version of the dataset. Defaults to "train".
+    """
+
     def __init__(
             self,
             scene_name: str,
@@ -50,6 +62,18 @@ class NuScenesGeneratedDataset(torch.utils.data.Dataset):
             tasks: dict,
             return_original_label=False,
             version="train"):
+        """
+        Initializes the NuScenesGeneratedDataset.
+
+        Args:
+            scene_name (str): The name of the scene.
+            nuscenes_metadata_path (Path): The path to the NuScenes metadata.
+            bbox_label_path (Path): The path to the bounding box labels.
+            dataset_dir (Path): The directory of the dataset.
+            tasks (dict): The tasks to be performed on the dataset.
+            return_original_label (bool, optional): Whether to return the original labels. Defaults to False.
+            version (str, optional): The version of the dataset. Defaults to "train".
+        """
 
         self.scene_name = scene_name
         self.tasks = tasks
@@ -79,14 +103,43 @@ class NuScenesGeneratedDataset(torch.utils.data.Dataset):
         assert len(self.samples) == len(self.labels)
 
     def __len__(self):
+        """
+        Returns the length of the dataset.
+
+        Returns:
+            int: The length of the dataset.
+        """
         return len(self.samples)
 
     def __getitem__(self, idx):
+        """
+        Retrieves the item at the given index.
+
+        Args:
+            idx (int): The index of the item to retrieve.
+
+        Returns:
+            dict: The parsed data.
+        """
         inputs = self.samples[idx]
         labels = self.labels[idx]
         return self.parse_data(inputs, labels, self.tasks, dataset_dir=Path(self.dataset_dir))
 
     def parse_inputs(self, inputs: dict, dataset_dir: Path, h=224, w=480, top_crop=24, img_transform=ToTensor()) -> dict:
+        """
+        Parses the inputs.
+
+        Args:
+            inputs (dict): The input data.
+            dataset_dir (Path): The directory of the dataset.
+            h (int, optional): The height of the resized image. Defaults to 224.
+            w (int, optional): The width of the resized image. Defaults to 480.
+            top_crop (int, optional): The amount to crop from the top of the image. Defaults to 24.
+            img_transform (torchvision.transforms, optional): The image transformation. Defaults to ToTensor().
+
+        Returns:
+            tuple: A tuple containing the parsed images and intrinsics.
+        """
         images = list()
         intrinsics = list()
 
@@ -112,12 +165,38 @@ class NuScenesGeneratedDataset(torch.utils.data.Dataset):
         return images, intrinsics
 
     def parse_labels(self, labels: dict, tasks) -> dict:
+        """
+        Parses the labels.
+
+        Args:
+            labels (dict): The label data.
+            tasks (dict): The tasks to be performed on the dataset.
+
+        Returns:
+            dict: The parsed labels.
+        """
         loaded = load_annotations(labels)
         preprocessed = preprocess(loaded, tasks)
         labels_out = assign_label(preprocessed, tasks)
         return labels_out
 
     def parse_data(self, inputs: dict, labels: dict, tasks, dataset_dir: Path, h=224, w=480, top_crop=24, img_transform=ToTensor()) -> dict:
+        """
+        Parses the data.
+
+        Args:
+            inputs (dict): The input data.
+            labels (dict): The label data.
+            tasks (dict): The tasks to be performed on the dataset.
+            dataset_dir (Path): The directory of the dataset.
+            h (int, optional): The height of the resized image. Defaults to 224.
+            w (int, optional): The width of the resized image. Defaults to 480.
+            top_crop (int, optional): The amount to crop from the top of the image. Defaults to 24.
+            img_transform (torchvision.transforms, optional): The image transformation. Defaults to ToTensor().
+
+        Returns:
+            dict: The parsed data.
+        """
         images, intrinsics = self.parse_inputs(
             inputs, dataset_dir, h, w, top_crop, img_transform)
         labels_out = self.parse_labels(labels, tasks)

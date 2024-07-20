@@ -32,6 +32,12 @@ cd ./models/centerpoint/ops/iou3d_nms
 python setup.py build_ext --inplace
 ```
 
+# Create metadata (intrinsics, extrinsics, image paths) and labels
+```bash
+python generate_labels.py
+python generate_metadata.py
+```
+
 # Ready to train/test!
 ```bash
 python train.py <config_file_path>

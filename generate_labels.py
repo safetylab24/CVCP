@@ -124,7 +124,6 @@ def _fill_trainval_infos(nusc, test=False, filter_zero=True):
 
     Args:
         nusc (NuScenes): The NuScenes dataset object.
-        train_scenes (list): List of scene tokens for training.
         test (bool, optional): Flag indicating whether the function is called for testing. Defaults to False.
         filter_zero (bool, optional): Flag indicating whether to filter out samples with zero lidar and radar points. Defaults to True.
 
