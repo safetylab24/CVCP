@@ -4,10 +4,12 @@ import pickle
 from pyquaternion import Quaternion
 import numpy as np
 import os
+import sys
+import yaml
+from tqdm import tqdm
 
-CAMERAS = ['CAM_FRONT_LEFT', 'CAM_FRONT', 'CAM_FRONT_RIGHT', 'CAM_BACK_LEFT', 'CAM_BACK', 'CAM_BACK_RIGHT']
-
-nusc = NuScenes(version='v1.0-trainval', dataroot='CVCP/nuscenes', verbose=True)
+CAMERAS = ['CAM_FRONT_LEFT', 'CAM_FRONT', 'CAM_FRONT_RIGHT',
+           'CAM_BACK_LEFT', 'CAM_BACK', 'CAM_BACK_RIGHT']
 
 # generate pkl for each scene
 # each pkl will have the following structure:
@@ -19,6 +21,7 @@ nusc = NuScenes(version='v1.0-trainval', dataroot='CVCP/nuscenes', verbose=True)
 #     "images": [image_path1, image_path2, image_path3, image_path4, image_path5, image_path6},
 # }, ...]
 
+
 def get_transformation_matrix(R, t, inv=False):
     pose = np.eye(4, dtype=np.float32)
     pose[:3, :3] = R if not inv else R.T
@@ -26,10 +29,12 @@ def get_transformation_matrix(R, t, inv=False):
 
     return pose
 
+
 def get_pose(rotation, translation, inv=False, flat=False):
     if flat:
         yaw = Quaternion(rotation).yaw_pitch_roll[0]
-        R = Quaternion(scalar=np.cos(yaw / 2), vector=[0, 0, np.sin(yaw / 2)]).rotation_matrix
+        R = Quaternion(scalar=np.cos(yaw / 2),
+                       vector=[0, 0, np.sin(yaw / 2)]).rotation_matrix
     else:
         R = Quaternion(rotation).rotation_matrix
 
@@ -37,75 +42,103 @@ def get_pose(rotation, translation, inv=False, flat=False):
 
     return get_transformation_matrix(R, t, inv=inv)
 
+
 def parse_pose(record, *args, **kwargs):
     return get_pose(record['rotation'], record['translation'], *args, **kwargs)
 
-def parse_sample_record(sample_record, camera_rig, scene_name):
-        lidar_record = nusc.get('sample_data', sample_record['data']['LIDAR_TOP'])
-        egolidar = nusc.get('ego_pose', lidar_record['ego_pose_token'])
 
-        world_from_egolidarflat = parse_pose(egolidar, flat=True)
-        egolidarflat_from_world = parse_pose(egolidar, flat=True, inv=True)
+def parse_sample_record(sample_record, camera_rig, scene_name, nusc):
+    lidar_record = nusc.get('sample_data', sample_record['data']['LIDAR_TOP'])
+    egolidar = nusc.get('ego_pose', lidar_record['ego_pose_token'])
 
-        cam_channels = []
-        images = []
-        intrinsics = []
-        extrinsics = []
+    world_from_egolidarflat = parse_pose(egolidar, flat=True)
+    egolidarflat_from_world = parse_pose(egolidar, flat=True, inv=True)
 
-        for cam_idx in camera_rig:
-            cam_channel = CAMERAS[cam_idx]
-            cam_token = sample_record['data'][cam_channel]
+    cam_channels = []
+    images = []
+    intrinsics = []
+    extrinsics = []
 
-            cam_record = nusc.get('sample_data', cam_token)
-            egocam = nusc.get('ego_pose', cam_record['ego_pose_token'])
-            cam = nusc.get('calibrated_sensor', cam_record['calibrated_sensor_token'])
+    for cam_idx in camera_rig:
+        cam_channel = CAMERAS[cam_idx]
+        cam_token = sample_record['data'][cam_channel]
 
-            cam_from_egocam = parse_pose(cam, inv=True)
-            egocam_from_world = parse_pose(egocam, inv=True)
+        cam_record = nusc.get('sample_data', cam_token)
+        egocam = nusc.get('ego_pose', cam_record['ego_pose_token'])
+        cam = nusc.get('calibrated_sensor',
+                       cam_record['calibrated_sensor_token'])
 
-            E = cam_from_egocam @ egocam_from_world @ world_from_egolidarflat
-            I = cam['camera_intrinsic']
+        cam_from_egocam = parse_pose(cam, inv=True)
+        egocam_from_world = parse_pose(egocam, inv=True)
 
-            full_path = Path(nusc.get_sample_data_path(cam_token))
-            image_path = str(full_path.relative_to(nusc.dataroot))
+        E = cam_from_egocam @ egocam_from_world @ world_from_egolidarflat
+        I = cam['camera_intrinsic']
 
-            # cam_channels.append(cam_channel)
-            intrinsics.append(I)
-            extrinsics.append(E.tolist())
-            images.append(image_path)
+        full_path = Path(nusc.get_sample_data_path(cam_token))
+        image_path = str(full_path.relative_to(nusc.dataroot))
 
-        return {
-            'scene': scene_name,
-            'token': sample_record['token'],
+        # cam_channels.append(cam_channel)
+        intrinsics.append(I)
+        extrinsics.append(E.tolist())
+        images.append(image_path)
 
-            'pose': world_from_egolidarflat.tolist(),
-            'pose_inverse': egolidarflat_from_world.tolist(),
+    return {
+        'scene': scene_name,
+        'token': sample_record['token'],
 
-            'cam_ids': list(camera_rig),
-            'cam_channels': cam_channels,
-            'intrinsics': intrinsics,
-            'extrinsics': extrinsics,
-            'images': images,
-        }
+        'pose': world_from_egolidarflat.tolist(),
+        'pose_inverse': egolidarflat_from_world.tolist(),
 
-def parse_scene(scene_record, camera_rigs=[[0, 1, 2, 3, 4, 5]]):
-        data = []
-        sample_token = scene_record['first_sample_token']
-
-        while sample_token:
-            sample_record = nusc.get('sample', sample_token)
-
-            for camera_rig in camera_rigs:
-                data.append(parse_sample_record(sample_record, camera_rig, scene_record['name']))
-
-            sample_token = sample_record['next']
-
-        return data
+        'cam_ids': list(camera_rig),
+        'cam_channels': cam_channels,
+        'intrinsics': intrinsics,
+        'extrinsics': extrinsics,
+        'images': images,
+    }
 
 
-for scene in nusc.scene:
-    data = parse_scene(scene)
-    os.makedirs('CVCP/nuscenes_metadata', exist_ok=True)
-    with open(f'CVCP/nuscenes_metadata/{scene["name"]}.pkl', 'wb') as f:
-        pickle.dump(data, f)
-    print(f'Generated {scene["name"]}.pkl')
+def parse_scene(scene_record, nusc, camera_rigs=[[0, 1, 2, 3, 4, 5]]):
+    data = []
+    sample_token = scene_record['first_sample_token']
+
+    while sample_token:
+        sample_record = nusc.get('sample', sample_token)
+
+        for camera_rig in camera_rigs:
+            data.append(parse_sample_record(sample_record,
+                        camera_rig, scene_record['name'], nusc))
+
+        sample_token = sample_record['next']
+
+    return data
+
+
+def load_config(config_file):
+    with open(config_file, 'r') as file:
+        return yaml.safe_load(file)
+
+
+def main():
+    default_config_path = Path(
+        __file__).parents[0] / 'configs/config_generate_metadata.yaml'
+    try:
+        config = load_config(sys.argv[1])
+    except IndexError:
+        config = load_config(default_config_path)
+
+    dataset_dir = config['dataset_dir']
+    version = config['version']
+    out_dir = config['out_dir']
+
+    nusc = NuScenes(version=version, dataroot=dataset_dir, verbose=True)
+
+    for scene in tqdm(nusc.scene):
+        data = parse_scene(scene, nusc)
+        os.makedirs(out_dir, exist_ok=True)
+        with open(Path(out_dir) / f'{scene["name"]}.pkl', 'wb') as f:
+            pickle.dump(data, f)
+    
+    print('Metadata generation complete!')
+
+if __name__ == '__main__':
+    main()

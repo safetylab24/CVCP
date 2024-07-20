@@ -9,7 +9,7 @@ from torchvision.models.resnet import Bottleneck
 
 from models.cvt.efficientnet import EfficientNetExtractor
 
-torch.inverse(torch.ones((0, 0), device='cuda:3'))
+torch.inverse(torch.ones((0, 0), device='cuda:0'))
 
 
 def ResNetBottleNeck(c):

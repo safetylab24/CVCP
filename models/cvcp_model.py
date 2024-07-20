@@ -146,21 +146,32 @@ class CVCPModel(L.LightningModule):
 
     def validation_step(self, batch, batch_idx):
         stage_one_boxes, bev, stage_one_loss = self._forward_stage_one(batch)
-        boxes_final, roi_loss, tb_dict = self._forward_stage_two(
+        preds_final, roi_loss, tb_dict = self._forward_stage_two(
             stage_one_boxes, bev, batch)
 
-        boxes_out = utils.post_process(boxes_final)
+        boxes_out = utils.post_process(preds_final)
         loss_out = utils.combine_loss(stage_one_loss, roi_loss, tb_dict)
 
+        self.iou(
+            preds_final['rois'][..., :7],
+            preds_final['roi_labels'],
+            preds_final['gt_boxes_and_cls'][..., :7],
+            preds_final['gt_boxes_and_cls'][..., -1]
+        )
+        
         loss_out, log_vars = self.parse_second_losses(loss_out)
         if (batch_idx + 1) % self.cfg['log_every_n_steps'] == 0:
             self.log('train_loss', loss_out, sync_dist=True,
                      prog_bar=True, on_step=True, logger=True)
             
         # Calculate iou and mAP metrics
-        
+        self.log('iou', self.iou, on_step=True, on_epoch=True, prog_bar=True)
         
         return loss_out
+
+    # def on_validation_epoch_end(self) -> None:
+    #     self.log('iou_epoch', self.iou, on_step=False, on_epoch=True)
+        
 
     def test_step(self, batch, batch_idx):
         stage_one_boxes, bev, stage_one_loss = self._forward_stage_one(batch)

@@ -197,7 +197,7 @@ def _fill_trainval_infos(nusc, test=False, filter_zero=True):
             if (len(info['gt_boxes']) == 0) and filter_zero:
                 continue
             scene_infos[scene_token].append((sample['token'], info))
-
+                    
     return scene_infos
 
 
@@ -271,7 +271,7 @@ def load_config(config_file):
 
 if __name__ == '__main__':
     default_config_path = Path(
-        __file__).parents[0] / 'configs/config_genlabels.yaml'
+        __file__).parents[0] / 'configs/config_generate_labels.yaml'
     try:
         config = load_config(sys.argv[1])
     except IndexError:
@@ -294,15 +294,14 @@ if __name__ == '__main__':
         scene_rec = nusc.get('scene', scene_token)
         scene_name = scene_rec['name']
 
-        if create_json:
-            scene_path_json = os.path.join(out_dir, scene_name + '.json')
-            scene_path_pkl = os.path.join(out_dir, scene_name + '.pkl')
-            # reformat infos so that scene_token is part of infos
-            ref_infos = []
-            for i in range(len(infos)):
-                ref_info = infos[i][1]
-                ref_info['token'] = infos[i][0]
-                ref_infos.append(ref_info)
+        scene_path_json = os.path.join(out_dir, scene_name + '.json')
+        scene_path_pkl = os.path.join(out_dir, scene_name + '.pkl')
+        # reformat infos so that scene_token is part of infos
+        ref_infos = []
+        for i in range(len(infos)):
+            ref_info = infos[i][1]
+            ref_info['token'] = infos[i][0]
+            ref_infos.append(ref_info)
 
             if np.array(ref_infos[0]['gt_names']).shape[0] == np.array(ref_infos[0]['gt_boxes']).shape[0] \
                     and np.array(ref_infos[0]['gt_boxes']).shape[0] != 0:

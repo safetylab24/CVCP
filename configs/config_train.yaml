@@ -1,16 +1,16 @@
 epochs: 10
-num_workers: 7
-batch_size: 8
+num_workers: 1
+batch_size: 2
 resize_shape: [128, 128]
 
 log_dir: ./logs
 dataset_dir: ./nuscenes
 nuscenes_metadata_path: ./nuscenes_metadata
-bbox_label_path: ./labels
+bbox_label_path: ./nuscenes_labels
 #ckpt_path: /home/vrb230004/CombinedModels/lightning_logs/version_0/checkpoints/epoch=28-step=25462.ckpt
 
-devices: [0,1,2,3]
-version: 'v1.0-trainval'
+devices: [0]
+version: 'v1.0-mini'
 
 log_every_n_steps: 25
 limit_train_batches: 1.0
@@ -18,7 +18,7 @@ limit_val_batches: 1.0
 limit_test_batches: 1.0
 check_val_every_n_epoch: 1
 val_check_interval: 1.0
-num_sanity_val_steps: 0
+num_sanity_val_steps: 1
 
 lr: 0.0003
 weight_decay: 0.01

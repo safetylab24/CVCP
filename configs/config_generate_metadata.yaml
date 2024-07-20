@@ -1,0 +1,3 @@
+dataset_dir: ./nuscenes
+out_dir: ./nuscenes_metadata
+version: 'v1.0-trainval'
