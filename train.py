@@ -79,7 +79,8 @@ def main():
 
     logger = TensorBoardLogger(
         save_dir=config['log_dir'],
-        name='train'
+        name='train',
+        default_hp_metric=False,
     )
 
     hyperparameters = {

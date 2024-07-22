@@ -66,10 +66,10 @@ class IoU3D(Metric):
                 cur_pred = pred_boxes[pred_boxes_mask]
                 cur_label = label_boxes[label_boxes_mask]
 
-            intersection, union = boxes_iou3d_gpu(
-                cur_pred, cur_label)  # (M, N)
-            intersections.append(intersection.sum())
-            unions.append(union.sum())
+                intersection, union = boxes_iou3d_gpu(
+                    cur_pred, cur_label)  # (M, N)
+                intersections.append(intersection.sum())
+                unions.append(union.sum())
 
         return sum(intersections) / sum(unions) if unions else torch.tensor(0.0)
 

@@ -17,3 +17,6 @@ numba
 
 # label generation dependencies
 nuscenes-devkit
+
+# fix tensorboard
+protobuf==4.25.3

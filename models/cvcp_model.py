@@ -233,7 +233,7 @@ class CVCPModel(L.LightningModule):
             self.log('train_loss', loss_out, sync_dist=True,
                      prog_bar=True, on_step=True, logger=True)
             
-        self.log('iou', self.iou, on_step=True, on_epoch=True, prog_bar=True)
+        self.log('iou', self.iou, on_step=True, on_epoch=False, prog_bar=True)
         
         return loss_out
 
