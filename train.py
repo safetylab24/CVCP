@@ -1,6 +1,6 @@
 from models.cvcp_model import CVCPModel, head
 from models.cvt.encoder import CVTEncoder
-
+from models.model_module import CVCPModule
 import yaml
 from pathlib import Path
 from data.datamodule import NuScenesDataModule
@@ -70,6 +70,8 @@ def main():
 
     # Instantiate the combined model
     model = CVCPModel(cvt_encoder, head_seg, resize_shape, config)
+    
+    modelmodule = CVCPModule(model, config)
 
     datamodule = NuScenesDataModule(
         nuscenes_metadata_path=config['nuscenes_metadata_path'],
@@ -133,7 +135,7 @@ def main():
     print(Style.RESET_ALL)
 
     trainer.fit(
-        model=model,
+        model=modelmodule,
         datamodule=datamodule,
         ckpt_path=config.get('ckpt_path', None)
     )

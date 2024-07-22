@@ -6,7 +6,7 @@ import lightning as L
 
 from metrics.iou_3d import IoU3D
 from models.cvcp_model import CVCPModel
-from .centerpoint.two_stage_detector import TwoStageDetectorUtils as utils
+from .centerpoint.second_stage.two_stage_detector import TwoStageDetectorUtils as utils
 
 class CVCPModule(L.LightningModule):
     """
@@ -59,7 +59,7 @@ class CVCPModule(L.LightningModule):
             float: The loss value.
 
         """
-        preds, loss = self.model(batch, train=True)
+        preds, loss = self.model(batch)
         
         self.iou(
             preds['rois'][..., :7],
@@ -87,7 +87,7 @@ class CVCPModule(L.LightningModule):
             float: The loss value.
 
         """
-        preds, loss = self.model(batch, train=False)
+        preds, loss = self.model(batch)
         
         self.iou(
             preds['rois'][..., :7],

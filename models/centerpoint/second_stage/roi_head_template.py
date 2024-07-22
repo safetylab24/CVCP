@@ -8,7 +8,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from .utils import box_torch_ops
+from ..utils import box_torch_ops
 from .proposal_target_layer import ProposalTargetLayer
 
 def limit_period(val, offset=0.5, period=np.pi):

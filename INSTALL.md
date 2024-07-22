@@ -11,7 +11,7 @@ conda install -y cuda-toolkit
 mkdir ./downloads && cd ./downloads
 for i in $(seq -w 01 10); do wget "https://d36yt3mvayqw5m.cloudfront.net/public/v1.0/v1.0-trainval${i}_keyframes.tgz"; done
 wget https://d36yt3mvayqw5m.cloudfront.net/public/v1.0/v1.0-mini.tgz
-wget https://d36yt3mvayqw5m.cloudfront.net/public/v1.0/v1.0-trainval.tgz
+wget https://d36yt3mvayqw5m.cloudfront.net/public/v1.0/v1.0-trainval_meta.tgz
 wget https://d36yt3mvayqw5m.cloudfront.net/public/v1.0/nuScenes-map-expansion-v1.3.zip
 
 # Extract dataset

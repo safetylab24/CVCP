@@ -5,11 +5,11 @@
 # Licensed under the MIT License
 # ------------------------------------------------------------------------------
 
-from models.centerpoint.utils.box_torch_ops import rotate_nms_pcdet  # needs cuda build
-from models.centerpoint.utils.weight_init import kaiming_init
-from models.centerpoint.utils.circle_nms_jit import circle_nms
-from models.centerpoint.centernet_loss import FastFocalLoss, RegLoss
-from models.centerpoint.utils.misc import Sequential
+from ..utils.box_torch_ops import rotate_nms_pcdet  # needs cuda build
+from ..utils.weight_init import kaiming_init
+from ..utils.circle_nms_jit import circle_nms
+from .centernet_loss import FastFocalLoss, RegLoss
+from ..utils.misc import Sequential
 
 from collections import defaultdict
 import logging

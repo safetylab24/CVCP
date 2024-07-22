@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from models.centerpoint.utils.center_utils import _transpose_and_gather_feat
+from ..utils.center_utils import _transpose_and_gather_feat
 
 
 class RegLoss(nn.Module):

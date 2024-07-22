@@ -1,4 +1,4 @@
-from models.centerpoint.utils import box_torch_ops
+from ..utils import box_torch_ops
 import torch
 
 num_point = 5

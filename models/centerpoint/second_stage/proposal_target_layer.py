@@ -8,7 +8,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 
-from .ops.iou3d_nms.iou3d_nms_utils import boxes_iou3d_gpu
+from ..ops.iou3d_nms.iou3d_nms_utils import boxes_iou3d_gpu
 
 
 class ProposalTargetLayer(nn.Module):

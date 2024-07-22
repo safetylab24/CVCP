@@ -64,7 +64,7 @@ class RoIHead(RoIHeadTemplate):
                     nn.init.constant_(m.bias, 0)
         nn.init.normal_(self.reg_layers[-1].weight, mean=0, std=0.001)
 
-    def forward(self, batch_dict, training=True):
+    def forward(self, batch_dict):
         """
         :param input_data: input dict
         :return:

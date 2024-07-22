@@ -1,5 +1,5 @@
 import logging
-from models.centerpoint.center_head import CenterHead
+from models.centerpoint.first_stage.center_head import CenterHead
 
 import torch
 import torch.nn.functional as F
@@ -9,9 +9,9 @@ from models.cvt.encoder import CVTEncoder
 from collections import OrderedDict
 
 from metrics.iou_3d import IoU3D
-from .centerpoint.two_stage_detector import TwoStageDetectorUtils as utils
-from .centerpoint.roi_head import RoIHead
-from .centerpoint.BEVFeatureExtractor import BEVFeatureExtractor
+from .centerpoint.second_stage.two_stage_detector import TwoStageDetectorUtils as utils
+from .centerpoint.second_stage.roi_head import RoIHead
+from .centerpoint.second_stage.BEVFeatureExtractor import BEVFeatureExtractor
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import torch.nn as nn
@@ -147,7 +147,7 @@ class CVCPModel(nn.Module):
 
         return boxes, cvt_out, loss
 
-    def _forward_stage_two(self, stage_one_boxes, bev, batch, train=False):
+    def _forward_stage_two(self, stage_one_boxes, bev, batch):
         """
         Performs the forward pass for stage two of the model.
 
@@ -170,7 +170,7 @@ class CVCPModel(nn.Module):
         label = utils.reorder_first_stage_pred_and_feature(
             first_pred=stage_one_boxes, label=batch['labels'], features=features)
 
-        pred_stage_two = self.roi_head(label, training=train)
+        pred_stage_two = self.roi_head(label)
         roi_loss, tb_dict = self.roi_head.get_loss()
 
         # if train: 
@@ -191,7 +191,7 @@ class CVCPModel(nn.Module):
         """
         boxes, cvt_out, loss = self._forward_stage_one(batch)
         pred_stage_two, roi_loss, tb_dict = self._forward_stage_two(
-            boxes, cvt_out, batch, train=True)
+            boxes, cvt_out, batch)
         
         loss = utils.combine_loss(loss, roi_loss, tb_dict)
         loss, log_vars = self.parse_second_losses(loss)
@@ -235,8 +235,8 @@ class CVCPModel(nn.Module):
         # Plot each pred bounding box
         for bbox in pred_boxes_2d:
             center_x, center_y, width, length = bbox
-            lower_left_x = center_x - width / 2
-            lower_left_y = center_y - length / 2
+            lower_left_x = center_x - length / 2
+            lower_left_y = center_y - width / 2
             rect = patches.Rectangle((lower_left_x.cpu().item(), lower_left_y.cpu().item()), length.cpu().item(), width.cpu().item(), linewidth=1, edgecolor='r', facecolor='none')
             ax.add_patch(rect)
         
@@ -253,8 +253,8 @@ class CVCPModel(nn.Module):
         ax.plot(0, 0, 'bo')  # blue dot
 
         # Set plot limits
-        ax.set_xlim(-10, 10)
-        ax.set_ylim(-10, 10)
+        ax.set_xlim(-50, 50)
+        ax.set_ylim(-50, 50)
 
         # Set labels and title
         ax.set_xlabel('X position')
