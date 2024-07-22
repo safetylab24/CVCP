@@ -2,19 +2,19 @@ import logging
 from models.centerpoint.center_head import CenterHead
 
 import torch
-import torch.nn as nn
 import torch.nn.functional as F
-import lightning as L
 
 from models.cvt.encoder import CVTEncoder
 
 from collections import OrderedDict
 
 from metrics.iou_3d import IoU3D
-from metrics.mAP_3d import MAP3D
 from .centerpoint.two_stage_detector import TwoStageDetectorUtils as utils
 from .centerpoint.roi_head import RoIHead
 from .centerpoint.BEVFeatureExtractor import BEVFeatureExtractor
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
+import torch.nn as nn
 
 torch.set_float32_matmul_precision('high')
 
@@ -72,9 +72,9 @@ model_cfg = dict(
 )
 
 
-class CVCPModel(L.LightningModule):
+class CVCPModel(nn.Module):
     """
-    CVCPModel is a LightningModule subclass that represents the CVCP model.
+    CVCPModel is a Module subclass that represents the CVCP model.
 
     Args:
         cvt_encoder (CVTEncoder): The CVT encoder model.
@@ -173,119 +173,30 @@ class CVCPModel(L.LightningModule):
         pred_stage_two = self.roi_head(label, training=train)
         roi_loss, tb_dict = self.roi_head.get_loss()
 
-        if train: 
-            return roi_loss, tb_dict
-        else:
-            return pred_stage_two, roi_loss, tb_dict
-
-    def training_step(self, batch, batch_idx):
+        # if train: 
+        #     return roi_loss, tb_dict
+        # else:
+        return pred_stage_two, roi_loss, tb_dict
+    
+    def forward(self, batch):
         """
-        Defines the training step for the model.
+        Performs the forward pass for the model.
 
         Args:
             batch: The input batch.
-            batch_idx: The index of the current batch.
 
         Returns:
-            float: The loss value.
+            dict: The predicted boxes.
 
         """
-        stage_one_boxes, bev, stage_one_loss = self._forward_stage_one(batch)
-        roi_loss, tb_dict = self._forward_stage_two(
-            stage_one_boxes, bev, batch, train=True)
-
-        loss_out = utils.combine_loss(stage_one_loss, roi_loss, tb_dict)
-
-        loss_out, log_vars = self.parse_second_losses(loss_out)
-        if (batch_idx + 1) % self.cfg['log_every_n_steps'] == 0:
-            self.log('train_loss', loss_out, sync_dist=True,
-                     prog_bar=True, on_step=True, logger=True)
-        return loss_out
-
-    def validation_step(self, batch, batch_idx):
-        """
-        Defines the validation step for the model.
-
-        Args:
-            batch: The input batch.
-            batch_idx: The index of the current batch.
-
-        Returns:
-            float: The loss value.
-
-        """
-        stage_one_boxes, bev, stage_one_loss = self._forward_stage_one(batch)
-        preds_final, roi_loss, tb_dict = self._forward_stage_two(
-            stage_one_boxes, bev, batch)
-
-        boxes_out = utils.post_process(preds_final)
-        loss_out = utils.combine_loss(stage_one_loss, roi_loss, tb_dict)
-
-        self.iou(
-            preds_final['rois'][..., :7],
-            preds_final['roi_labels'],
-            preds_final['gt_boxes_and_cls'][..., :7],
-            preds_final['gt_boxes_and_cls'][..., -1]
-        )
+        boxes, cvt_out, loss = self._forward_stage_one(batch)
+        pred_stage_two, roi_loss, tb_dict = self._forward_stage_two(
+            boxes, cvt_out, batch, train=True)
         
-        loss_out, log_vars = self.parse_second_losses(loss_out)
-        if (batch_idx + 1) % self.cfg['log_every_n_steps'] == 0:
-            self.log('train_loss', loss_out, sync_dist=True,
-                     prog_bar=True, on_step=True, logger=True)
-            
-        self.log('iou', self.iou, on_step=True, on_epoch=False, prog_bar=True)
-        
-        return loss_out
+        loss = utils.combine_loss(loss, roi_loss, tb_dict)
+        loss, log_vars = self.parse_second_losses(loss)
 
-    def test_step(self, batch, batch_idx):
-        """
-        Defines the test step for the model.
-
-        Args:
-            batch: The input batch.
-            batch_idx: The index of the current batch.
-
-        Returns:
-            float: The loss value.
-
-        """
-        stage_one_boxes, bev, stage_one_loss = self._forward_stage_one(batch)
-        boxes_final, roi_loss, tb_dict = self._forward_stage_two(
-            stage_one_boxes, bev, batch)
-
-        boxes_out = utils.post_process(boxes_final)
-        loss_out = utils.combine_loss(stage_one_loss, roi_loss, tb_dict)
-        
-        loss_out, log_vars = self.parse_second_losses(loss_out)
-        if (batch_idx + 1) % self.cfg['log_every_n_steps'] == 0:
-            self.log('train_loss', loss_out, sync_dist=True,
-                     prog_bar=True, on_step=True, logger=True)
-        return loss_out
-
-    def configure_optimizers(self):
-        """
-        Configures the optimizers for the model.
-
-        Returns:
-            dict: A dictionary containing the optimizer and the learning rate scheduler.
-
-        """
-        optimizer = torch.optim.AdamW(
-            self.parameters(), lr=self.cfg['lr'], weight_decay=self.cfg['weight_decay'])
-        return {
-            'optimizer': optimizer,
-            'lr_scheduler': {
-                'scheduler': torch.optim.lr_scheduler.OneCycleLR(
-                    optimizer,
-                    max_lr=self.cfg['lr'],
-                    total_steps=self.trainer.estimated_stepping_batches,
-                    max_momentum=self.cfg['max_momentum'],
-                    base_momentum=self.cfg['base_momentum']),
-                'monitor': 'val_loss',
-                'frequency': 1,
-                'interval': 'step',
-            }
-        }
+        return pred_stage_two, loss
 
     def parse_second_losses(self, losses):
         """
@@ -308,3 +219,47 @@ class CVCPModel(L.LightningModule):
                 log_vars[loss_name] = [i.item() for i in loss_value]
 
         return loss, log_vars
+
+    def visualize(self, pred_boxes_3d, label_boxes_3d):
+        pred_boxes_2d = []
+        label_boxes_2d = []
+        for box in pred_boxes_3d:
+            x, y, z, w, l, h, vel_x, vel_y, yaw = box
+            pred_boxes_2d.append((x, y, w, l))
+        for box in label_boxes_3d:
+            x, y, z, w, l, h, vel_x, vel_y, yaw = box
+            label_boxes_2d.append((x, y, w, l))
+        # Create a plot
+        fig, ax = plt.subplots()
+
+        # Plot each pred bounding box
+        for bbox in pred_boxes_2d:
+            center_x, center_y, width, length = bbox
+            lower_left_x = center_x - width / 2
+            lower_left_y = center_y - length / 2
+            rect = patches.Rectangle((lower_left_x.cpu().item(), lower_left_y.cpu().item()), length.cpu().item(), width.cpu().item(), linewidth=1, edgecolor='r', facecolor='none')
+            ax.add_patch(rect)
+        
+        # Plot each label bounding box
+        for bbox in label_boxes_2d:
+            center_x, center_y, width, length = bbox
+            lower_left_x = center_x - width / 2
+            lower_left_y = center_y - length / 2
+            rect = patches.Rectangle((lower_left_x.cpu().item(), lower_left_y.cpu().item()), length.cpu().item(), width.cpu().item(), linewidth=1, edgecolor='g', facecolor='none')
+            ax.add_patch(rect)
+        
+
+        # Plot the ego vehicle at the origin
+        ax.plot(0, 0, 'bo')  # blue dot
+
+        # Set plot limits
+        ax.set_xlim(-10, 10)
+        ax.set_ylim(-10, 10)
+
+        # Set labels and title
+        ax.set_xlabel('X position')
+        ax.set_ylabel('Y position')
+        ax.set_title('2D Bounding Boxes Relative to Ego Vehicle')
+
+        # Save the plot as an image
+        plt.savefig('bounding_boxes_plot.png')

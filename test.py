@@ -1,5 +1,6 @@
 from models.cvcp_model import CVCPModel, head
 from models.cvt.encoder import CVTEncoder
+from models.model_module import CVCPModule
 
 import yaml
 from pathlib import Path
@@ -9,8 +10,8 @@ from lightning import Trainer
 from lightning.pytorch.callbacks import ModelCheckpoint, LearningRateMonitor
 from lightning.pytorch.strategies import DDPStrategy
 from lightning.pytorch.loggers import TensorBoardLogger
-import torch
-import faulthandler
+import os
+os.environ['CUDA_LAUNCH_BLOCKING'] = "1"
 from colorama import Fore, Style
 
 
@@ -20,11 +21,30 @@ def load_config(config_file):
 
 
 def main():
-    faulthandler.enable()
-    torch.cuda.empty_cache()
+    
+    """
+    Main function for training the CVCP model.
+
+    This function performs the following steps:
+    1. Enables the faulthandler and clears the CUDA cache.
+    2. Loads the configuration from the command line argument or the default configuration file.
+    3. Instantiates the CVT encoder and the head segmentation model.
+    4. Defines the resize shape for images.
+    5. Instantiates the combined CVCP model.
+    6. Sets up the data module for NuScenes dataset.
+    7. Sets up the logger for TensorBoard.
+    8. Logs the hyperparameters.
+    9. Sets up the learning rate monitor and model checkpoint.
+    10. Sets up the trainer with GPU acceleration and distributed training.
+    11. Prints training information.
+    12. Starts the training process.
+    13. Prints training completion message.
+    """
+    # faulthandler.enable()
+    # torch.cuda.empty_cache()
 
     default_config_path = Path(
-        __file__).parents[0] / 'configs/config_test.yaml'
+        __file__).parents[0] / 'configs/config_train.yaml'
     try:
         config = load_config(sys.argv[1])
     except IndexError:
@@ -51,12 +71,21 @@ def main():
 
     # Instantiate the combined model
     model = CVCPModel(cvt_encoder, head_seg, resize_shape, config)
+    
+    modelmodule = CVCPModule(model, config)
 
     datamodule = NuScenesDataModule(
         nuscenes_metadata_path=config['nuscenes_metadata_path'],
         bbox_label_path=config['bbox_label_path'],
         tasks=centerpoint_config['tasks'],
-        config=config)  # for data loading
+        config=config,
+        dataset_dir=config['dataset_dir'])  # for data loading
+
+    logger = TensorBoardLogger(
+        save_dir=config['log_dir'],
+        name='train',
+        default_hp_metric=False,
+    )
 
     hyperparameters = {
         'epochs': config['epochs'],
@@ -67,11 +96,6 @@ def main():
         'weight_decay': config['weight_decay'],
         'num_workers': config['num_workers'],
     }
-
-    logger = TensorBoardLogger(
-        save_dir=config['log_dir'],
-        name='test'
-    )
 
     logger.log_hyperparams(hyperparameters)
 
@@ -94,26 +118,22 @@ def main():
         accelerator='gpu',
         devices=1,
         num_nodes=1,
-        max_epochs=config['epochs'],
         strategy=DDPStrategy(),
         logger=logger,
-        log_every_n_steps=config['log_every_n_steps'],
         callbacks=[checkpointer, lr_monitor],
-        num_sanity_val_steps=config['num_sanity_val_steps'],
-        limit_test_batches=config['limit_test_batches'],
+        limit_test_batches=config['limit_test_batches']
     )
 
-    print(Fore.GREEN + 'Testing starting.')
+    print(Fore.GREEN + 'Testing started.')
     print('Hyperparameters:', hyperparameters)
     print('Logger version:', logger.version)
     print('Log dir:', logger.log_dir)
     print(Style.RESET_ALL)
 
     trainer.test(
+        model=modelmodule,
         datamodule=datamodule,
-        model=model,
-        verbose=True,
-        ckpt_path=config['ckpt_path']
+        ckpt_path=config.get('ckpt_path', None)
     )
 
     print('\n=========================')

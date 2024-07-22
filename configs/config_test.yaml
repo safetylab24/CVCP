@@ -1,5 +1,5 @@
 epochs: 15
-num_workers: 7
+num_workers: 2
 batch_size: 1
 resize_shape: [128, 128]
 
@@ -20,7 +20,7 @@ check_val_every_n_epoch: 1
 val_check_interval: 1.0
 num_sanity_val_steps: 1
 
-lr: 0.0003
+lr: 0.001
 weight_decay: 0.01
 base_momentum: 0.85
 max_momentum: 0.95

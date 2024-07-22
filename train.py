@@ -9,8 +9,8 @@ from lightning import Trainer
 from lightning.pytorch.callbacks import ModelCheckpoint, LearningRateMonitor
 from lightning.pytorch.strategies import DDPStrategy
 from lightning.pytorch.loggers import TensorBoardLogger
-import torch
-import faulthandler
+import os
+os.environ['CUDA_LAUNCH_BLOCKING'] = "1"
 from colorama import Fore, Style
 
 
@@ -20,6 +20,7 @@ def load_config(config_file):
 
 
 def main():
+    
     """
     Main function for training the CVCP model.
 
@@ -38,8 +39,8 @@ def main():
     12. Starts the training process.
     13. Prints training completion message.
     """
-    faulthandler.enable()
-    torch.cuda.empty_cache()
+    # faulthandler.enable()
+    # torch.cuda.empty_cache()
 
     default_config_path = Path(
         __file__).parents[0] / 'configs/config_train.yaml'

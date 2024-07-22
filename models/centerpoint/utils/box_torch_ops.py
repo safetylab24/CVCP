@@ -269,7 +269,7 @@ def rotate_nms_pcdet(boxes, scores, thresh, pre_maxsize=None, post_max_size=None
     else:
         num_out = iou3d_nms_cuda.nms_gpu(boxes, keep, thresh)
 
-    selected = order[keep[:num_out].cuda()].contiguous()
+    selected = order[keep[:num_out].to('cuda')].contiguous()
 
     if post_max_size is not None:
         selected = selected[:post_max_size]
