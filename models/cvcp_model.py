@@ -91,6 +91,7 @@ class CVCPModel(nn.Module):
         roi_head (RoIHead): The RoI head model.
         bev_feature_extractor (BEVFeatureExtractor): The BEV feature extractor model.
         iou (IoU3D): The IoU3D metric.
+        
 
     Methods:
         _forward_stage_one: Performs the forward pass for stage one of the model.
@@ -106,6 +107,9 @@ class CVCPModel(nn.Module):
     def __init__(self, cvt_encoder: CVTEncoder, center_head_model: CenterHead, resize_shape, cfg):
         super().__init__()
         self.cvt_encoder = cvt_encoder
+        # 3D Backbone and the Neck
+        # self.backbone = VoxelNet(reader=cfg['VoxelNet']['reader'], backbone=cfg['VoxelNet']['backbone'], neck=cfg['VoxelNet']['neck'], bbox_head=cfg['VoxelNet']['bbox_head'])
+        # self.neck = RPN(layer_nums=cfg['VoxelNet']['neck']['layer_nums'], ds_layer_strides=['VoxelNet']['neck']['ds_layer_strides'], ds_num_filters=['VoxelNet']['neck']['ds_num_filters'], us_layer_strides=['VoxelNet']['neck']['us_layer_strides'], us_num_filters=['VoxelNet']['neck']['us_num_filters'], num_input_features=['VoxelNet']['neck']['num_input_features'])
         self.center_head = center_head_model
         self.resize_shape = resize_shape
         self.cfg = cfg
@@ -172,11 +176,35 @@ class CVCPModel(nn.Module):
 
         pred_stage_two = self.roi_head(label)
         roi_loss, tb_dict = self.roi_head.get_loss()
+        
+        # #iou loss 
+        
+        # pred_boxes = pred_stage_two['rois'][..., :7]
+        # pred_classes = pred_stage_two['roi_labels']
+        # label_boxes = pred_stage_two['gt_boxes_and_cls'][..., :7]
+        # label_classes = pred_stage_two['gt_boxes_and_cls'][..., -1]
+        
+        # intersections = []
+        # unions = []
+        # for k in label_classes.unique():
+        #     pred_boxes_mask = (pred_classes == k)
+        #     label_boxes_mask = (label_classes == k)
+        #     if pred_boxes_mask.sum() > 0 and label_boxes_mask.sum() > 0:
+        #         cur_pred = pred_boxes[pred_boxes_mask]
+        #         cur_label = label_boxes[label_boxes_mask]
 
+        #         intersection, union = boxes_iou3d_gpu(
+        #             cur_pred, cur_label)  # (M, N)
+        #         intersections.append(intersection.sum())
+        #         unions.append(union.sum())
+
+        # iou_loss = 1 - (sum(intersections) / sum(unions) if unions else torch.tensor(0.0)) # 1- IoU
+        
         # if train: 
         #     return roi_loss, tb_dict
         # else:
         return pred_stage_two, roi_loss, tb_dict
+        # return pred_stage_two, iou_loss, tb_dict
     
     def forward(self, batch):
         """

@@ -74,9 +74,16 @@ def preprocess(info, tasks,
 def flatten(box):
     return np.concatenate(box, axis=0)
 
+def merge_multi_group_label(gt_classes, num_classes_by_task): 
+    num_task = len(gt_classes)
+    flag = 0 
 
+    for i in range(num_task):
+        gt_classes[i] += flag 
+        flag += num_classes_by_task[i]
+
+    return flatten(gt_classes)
 '''Return CenterNet training labels like heatmap, height, offset'''
-
 
 def assign_label(result, tasks, gaussian_overlap=0.1, max_objs=500, min_radius=2, out_size_factor=4, voxel_size=(0.2, 0.2, 8),
                  pc_range=(-51.2, -51.2, -5.0, 51.2, 51.2, 3.0)):
@@ -118,8 +125,7 @@ def assign_label(result, tasks, gaussian_overlap=0.1, max_objs=500, min_radius=2
         task_masks.append(
             [
                 np.where(
-                    gt_dict['gt_classes'] == class_name.index(
-                        i) + 1 + flag
+                    gt_dict['gt_classes'] == class_name.index(i) + 1 + flag
                 )
                 for i in class_name
             ]
@@ -177,11 +183,9 @@ def assign_label(result, tasks, gaussian_overlap=0.1, max_objs=500, min_radius=2
             cls_id = gt_dict['gt_classes'][idx][k] - 1
 
             w, l, h = gt_dict['gt_boxes'][idx][k][3], gt_dict['gt_boxes'][idx][k][4], gt_dict['gt_boxes'][idx][k][5]
-            w, l = w / voxel_size[0] / out_size_factor, l / \
-                voxel_size[1] / out_size_factor
+            w, l = w / voxel_size[0] / out_size_factor, l / voxel_size[1] / out_size_factor
             if w > 0 and l > 0:
-                radius = gaussian_radius(
-                    (l, w), min_overlap=gaussian_overlap)
+                radius = gaussian_radius((l, w), min_overlap=gaussian_overlap)
                 radius = max(min_radius, int(radius))
 
                 # be really careful for the coordinate system of your box annotation.
@@ -219,7 +223,6 @@ def assign_label(result, tasks, gaussian_overlap=0.1, max_objs=500, min_radius=2
         inds.append(ind)
         cats.append(cat)
 
-    labels.update({'hm': hms, 'anno_box': anno_boxs,
-                    'ind': inds, 'mask': masks, 'cat': cats, 'num_objs': num_objs})
+    labels.update({'hm': hms, 'anno_box': anno_boxs, 'ind': inds, 'mask': masks, 'cat': cats, 'num_objs': num_objs})
 
     return labels
