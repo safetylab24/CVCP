@@ -252,8 +252,7 @@ class CenterHead(nn.Module):
             # heatmap focal loss
             preds_dict['hm'] = self._sigmoid(preds_dict['hm'])
 
-            hm_loss = self.crit(preds_dict['hm'], label['hm'][task_id], label['ind']
-                                [task_id], label['mask'][task_id], label['cat'][task_id])
+            hm_loss = self.crit(preds_dict['hm'], label['hm'][task_id], label['ind'][task_id], label['mask'][task_id], label['cat'][task_id])
 
             target_box = label['anno_box'][task_id]  # (4,500,10)
             # reconstruct the anno_box from multiple reg heads

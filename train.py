@@ -1,8 +1,10 @@
+import faulthandler
 from colorama import Fore, Style
 from models.cvcp_model import CVCPModel, head
 from models.cvt.encoder import CVTEncoder
 from models.model_module import CVCPModule
 import yaml
+import torch
 from pathlib import Path
 from data.datamodule import NuScenesDataModule
 import sys
@@ -40,8 +42,8 @@ def main():
     12. Starts the training process.
     13. Prints training completion message.
     """
-    # faulthandler.enable()
-    # torch.cuda.empty_cache()
+    faulthandler.enable()
+    torch.cuda.empty_cache()
 
     default_config_path = Path(
         __file__).parents[0] / 'configs/config_train.yaml'
@@ -54,8 +56,6 @@ def main():
 
     # Instantiate cvt_model and head_model
     cvt_encoder = CVTEncoder()
-    cvt_encoder.load_state_dict(torch.load(config['encoder_ckpt_path']))
-    cvt_encoder.requires_grad_(False)
 
     head_seg = head(
         in_channels=centerpoint_config['in_channels'],
@@ -73,6 +73,7 @@ def main():
 
     # Instantiate the combined model
     model = CVCPModel(cvt_encoder, head_seg, resize_shape, config)
+
 
     modelmodule = CVCPModule(model, config)
 
@@ -122,10 +123,10 @@ def main():
         accelerator='gpu',
         devices=config['devices'],
         max_epochs=config['epochs'],
-        strategy=DDPStrategy(),
+        strategy=DDPStrategy(find_unused_parameters=True),
         logger=logger,
         log_every_n_steps=config['log_every_n_steps'],
-        callbacks=[checkpointer, lr_monitor, model_summary],
+        callbacks=[checkpointer, lr_monitor],
         num_sanity_val_steps=config['num_sanity_val_steps'],
         limit_train_batches=config['limit_train_batches'],
         limit_val_batches=config['limit_val_batches'],
