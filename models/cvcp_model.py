@@ -15,7 +15,6 @@ from .centerpoint.second_stage.BEVFeatureExtractor import BEVFeatureExtractor
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import torch.nn as nn
-
 torch.set_float32_matmul_precision('high')
 
 # creates CenterHead part of the model
@@ -106,8 +105,9 @@ class CVCPModel(nn.Module):
     def __init__(self, cvt_encoder: CVTEncoder, center_head_model: CenterHead, resize_shape, cfg):
         super().__init__()
         self.cvt_encoder = cvt_encoder
-        self.center_head = center_head_model
+        self.mlp = _MLP()
         self.resize_shape = resize_shape
+        self.center_head = center_head_model
         self.cfg = cfg
         self.max_conf_val = 0
         self.roi_head = RoIHead(
@@ -130,8 +130,12 @@ class CVCPModel(nn.Module):
         """
         cvt_out = self.cvt_encoder(
             batch['images'], batch['intrinsics'], batch['extrinsics'])
+        # print(cvt_out.shape)
+        cvt_out = self.mlp(cvt_out)
+        # print(cvt_out.shape)
         cvt_out = F.interpolate(
             cvt_out, size=self.resize_shape, mode='bilinear', align_corners=False)
+        # print(cvt_out.shape)
         preds = self.center_head(cvt_out)
 
         new_preds = []
@@ -173,11 +177,11 @@ class CVCPModel(nn.Module):
         pred_stage_two = self.roi_head(label)
         roi_loss, tb_dict = self.roi_head.get_loss()
 
-        # if train: 
+        # if train:
         #     return roi_loss, tb_dict
         # else:
         return pred_stage_two, roi_loss, tb_dict
-    
+
     def forward(self, batch):
         """
         Performs the forward pass for the model.
@@ -192,7 +196,7 @@ class CVCPModel(nn.Module):
         boxes, cvt_out, loss = self._forward_stage_one(batch)
         pred_stage_two, roi_loss, tb_dict = self._forward_stage_two(
             boxes, cvt_out, batch)
-        
+
         loss = utils.combine_loss(loss, roi_loss, tb_dict)
         loss, log_vars = self.parse_second_losses(loss)
 
@@ -237,17 +241,18 @@ class CVCPModel(nn.Module):
             center_x, center_y, width, length = bbox
             lower_left_x = center_x - length / 2
             lower_left_y = center_y - width / 2
-            rect = patches.Rectangle((lower_left_x.cpu().item(), lower_left_y.cpu().item()), length.cpu().item(), width.cpu().item(), linewidth=1, edgecolor='r', facecolor='none')
+            rect = patches.Rectangle((lower_left_x.cpu().item(), lower_left_y.cpu().item()), length.cpu(
+            ).item(), width.cpu().item(), linewidth=1, edgecolor='r', facecolor='none')
             ax.add_patch(rect)
-        
+
         # Plot each label bounding box
         for bbox in label_boxes_2d:
             center_x, center_y, width, length = bbox
             lower_left_x = center_x - width / 2
             lower_left_y = center_y - length / 2
-            rect = patches.Rectangle((lower_left_x.cpu().item(), lower_left_y.cpu().item()), length.cpu().item(), width.cpu().item(), linewidth=1, edgecolor='g', facecolor='none')
+            rect = patches.Rectangle((lower_left_x.cpu().item(), lower_left_y.cpu().item()), length.cpu(
+            ).item(), width.cpu().item(), linewidth=1, edgecolor='g', facecolor='none')
             ax.add_patch(rect)
-        
 
         # Plot the ego vehicle at the origin
         ax.plot(0, 0, 'bo')  # blue dot
@@ -263,3 +268,40 @@ class CVCPModel(nn.Module):
 
         # Save the plot as an image
         plt.savefig('bounding_boxes_plot.png')
+
+
+import torch
+import torch.nn as nn
+
+class MLP(nn.Module):
+    def __init__(self, input_size, hidden_size, output_size):
+        super(MLP, self).__init__()
+        self.fc1 = nn.Linear(input_size, hidden_size)
+        self.fc2 = nn.Linear(hidden_size, output_size)
+        self.activation = nn.ReLU()
+    
+    def forward(self, x):
+        x = self.fc1(x)
+        x = self.activation(x)
+        x = self.fc2(x)
+        return x
+
+class _MLP(nn.Module):
+    def __init__(self):
+        from torchvision.ops import MLP
+        super().__init__()
+        self.mlp = MLP(in_channels=128, hidden_channels=[128, 128])
+        self.upsample = nn.Sequential(
+            nn.ConvTranspose2d(128, 128, kernel_size=4, stride=4, padding=0, output_padding=0),
+            nn.ReLU()
+        )
+    
+    def forward(self, x):
+        B, C, H, W = x.shape
+        # Flatten the spatial dimensions: Bx128x625
+        x = x.view(B, C, H * W).permute(0, 2, 1)  # Bx625x128
+        x = self.mlp(x)  # Apply MLP: Bx625x128
+        x = x.permute(0, 2, 1).view(B, 128, H, W)  # Bx128x25x25
+        # Upsample spatial dimensions to 128x128
+        # x = self.upsample(x)
+        return x

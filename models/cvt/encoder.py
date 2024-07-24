@@ -9,12 +9,9 @@ from torchvision.models.resnet import Bottleneck
 
 from models.cvt.efficientnet import EfficientNetExtractor
 
-torch.inverse(torch.ones((0, 0), device='cuda:0'))
+# torch.inverse(torch.ones((0, 0), device='cuda:0'))
 
-
-def ResNetBottleNeck(c):
-    return Bottleneck(c, c // 4)
-
+ResNetBottleNeck = lambda c: Bottleneck(c, c // 4)
 
 H = 224
 W = 480
@@ -389,9 +386,7 @@ class CVTEncoder(nn.Module):
         I_inv = torch.inverse(intrinsics)  # b n 3 3
         E_inv = torch.inverse(extrinsics)  # b n 4 4
 
-        image = self.norm(image)
-
-        features = [self.down(y) for y in self.backbone(image)]
+        features = [self.down(y) for y in self.backbone(self.norm(image))]
 
         x = self.bev_embedding.get_prior()  # d H W
         x = repeat(x, '... -> b ...', b=b)  # b d H W
@@ -404,4 +399,5 @@ class CVTEncoder(nn.Module):
             x = layer(x)
             atts.append(att)
 
-        return torch.softmax(x, dim=1)
+        # return torch.softmax(x, dim=1)
+        return x

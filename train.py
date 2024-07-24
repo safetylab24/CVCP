@@ -1,17 +1,19 @@
+import faulthandler
+from colorama import Fore, Style
 from models.cvcp_model import CVCPModel, head
 from models.cvt.encoder import CVTEncoder
 from models.model_module import CVCPModule
 import yaml
+import torch
 from pathlib import Path
 from data.datamodule import NuScenesDataModule
 import sys
 from lightning import Trainer
-from lightning.pytorch.callbacks import ModelCheckpoint, LearningRateMonitor
+from lightning.pytorch.callbacks import ModelCheckpoint, LearningRateMonitor, ModelSummary
 from lightning.pytorch.strategies import DDPStrategy
 from lightning.pytorch.loggers import TensorBoardLogger
 import os
 os.environ['CUDA_LAUNCH_BLOCKING'] = "1"
-from colorama import Fore, Style
 
 
 def load_config(config_file):
@@ -20,7 +22,6 @@ def load_config(config_file):
 
 
 def main():
-    
     """
     Main function for training the CVCP model.
 
@@ -39,8 +40,8 @@ def main():
     12. Starts the training process.
     13. Prints training completion message.
     """
-    # faulthandler.enable()
-    # torch.cuda.empty_cache()
+    faulthandler.enable()
+    torch.cuda.empty_cache()
 
     default_config_path = Path(
         __file__).parents[0] / 'configs/config_train.yaml'
@@ -53,6 +54,9 @@ def main():
 
     # Instantiate cvt_model and head_model
     cvt_encoder = CVTEncoder()
+    cvt_encoder.load_state_dict(torch.load('encoder.pth'))
+    for param in cvt_encoder.parameters():
+        param.requires_grad = False
 
     head_seg = head(
         in_channels=centerpoint_config['in_channels'],
@@ -70,7 +74,7 @@ def main():
 
     # Instantiate the combined model
     model = CVCPModel(cvt_encoder, head_seg, resize_shape, config)
-    
+
     modelmodule = CVCPModule(model, config)
 
     datamodule = NuScenesDataModule(
@@ -117,10 +121,10 @@ def main():
         accelerator='gpu',
         devices=config['devices'],
         max_epochs=config['epochs'],
-        strategy=DDPStrategy(),
+        strategy=DDPStrategy(find_unused_parameters=True),
         logger=logger,
         log_every_n_steps=config['log_every_n_steps'],
-        callbacks=[checkpointer, lr_monitor],
+        callbacks=[checkpointer, lr_monitor, ModelSummary(max_depth=3)],
         num_sanity_val_steps=config['num_sanity_val_steps'],
         limit_train_batches=config['limit_train_batches'],
         limit_val_batches=config['limit_val_batches'],
