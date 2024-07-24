@@ -13,6 +13,8 @@ from lightning.pytorch.callbacks import ModelCheckpoint, LearningRateMonitor, Mo
 from lightning.pytorch.strategies import DDPStrategy
 from lightning.pytorch.loggers import TensorBoardLogger
 import os
+import torch
+
 os.environ['CUDA_LAUNCH_BLOCKING'] = "1"
 
 
@@ -54,9 +56,6 @@ def main():
 
     # Instantiate cvt_model and head_model
     cvt_encoder = CVTEncoder()
-    cvt_encoder.load_state_dict(torch.load('encoder.pth'))
-    for param in cvt_encoder.parameters():
-        param.requires_grad = False
 
     head_seg = head(
         in_channels=centerpoint_config['in_channels'],
@@ -74,6 +73,7 @@ def main():
 
     # Instantiate the combined model
     model = CVCPModel(cvt_encoder, head_seg, resize_shape, config)
+
 
     modelmodule = CVCPModule(model, config)
 
@@ -117,6 +117,8 @@ def main():
         every_n_epochs=1,
     )
 
+    model_summary = ModelSummary(max_depth=5)
+
     trainer = Trainer(
         accelerator='gpu',
         devices=config['devices'],
@@ -124,7 +126,7 @@ def main():
         strategy=DDPStrategy(find_unused_parameters=True),
         logger=logger,
         log_every_n_steps=config['log_every_n_steps'],
-        callbacks=[checkpointer, lr_monitor, ModelSummary(max_depth=3)],
+        callbacks=[checkpointer, lr_monitor],
         num_sanity_val_steps=config['num_sanity_val_steps'],
         limit_train_batches=config['limit_train_batches'],
         limit_val_batches=config['limit_val_batches'],

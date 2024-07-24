@@ -8,6 +8,7 @@ dataset_dir: ./nuscenes
 nuscenes_metadata_path: ./nuscenes_metadata
 bbox_label_path: ./nuscenes_labels
 # ckpt_path: /home/rxr230031/CombinedModels/lightning_logs/version_0/checkpoints/epoch=28-step=25462.ckpt
+encoder_ckpt_path: ./encoder.pth
 
 devices: [0,1,2,3]
 version: 'v1.0-trainval'
@@ -20,7 +21,7 @@ check_val_every_n_epoch: 1
 val_check_interval: 1.0
 num_sanity_val_steps: 1
 
-lr: 0.001
+lr: 0.00003
 weight_decay: 0.01
 base_momentum: 0.85
 max_momentum: 0.95
@@ -57,6 +58,39 @@ centerpoint:
     'vel': [2, 2]
   share_conv_channel: 64
   dcn_head: False
+  # VoxelNet:
+  #   reader:
+  #     type: "DynamicVoxelEncoder"
+  #     pc_range: [-54, -54, -5.0, 54, 54, 3.0]
+  #     voxel_size: [0.075, 0.075, 0.2]
+  #   backbone:
+  #     type: "SpMiddleResNetFHD"
+  #     num_input_features: 5
+  #     ds_factor: 8
+  #   neck:
+  #     type: "RPN"
+  #     layer_nums: [5, 5]
+  #     ds_layer_strides: [1, 2]
+  #     ds_num_filters: [128, 256]
+  #     us_layer_strides: [1, 2]
+  #     us_num_filters: [256, 256]
+  #     num_input_features: 256
+  #     logger: !!python/name:logging.getLogger ['RPN']
+  #   bbox_head:
+  #     type: "CenterHead"
+  #     in_channels: 512
+  #     tasks: !!python/variable:tasks
+  #     dataset: "nuscenes"
+  #     weight: 0.25
+  #     code_weights: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.2, 0.2, 1.0, 1.0]
+  #     common_heads:
+  #       reg: [2, 2]
+  #       height: [1, 2]
+  #       dim: [3, 2]
+  #       rot: [2, 2]
+  #       vel: [2, 2]
+
+
 
 test:
   ckpt_path: /home/vrb230004/CombinedModels/lightning_logs/version_0/checkpoints/epoch=28-step=25462.ckpt
