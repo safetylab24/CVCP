@@ -117,7 +117,7 @@ def main():
         every_n_epochs=1,
     )
 
-    model_summary = ModelSummary(max_depth=5)
+    model_summary = ModelSummary(max_depth=4)
 
     trainer = Trainer(
         accelerator='gpu',
@@ -126,7 +126,7 @@ def main():
         strategy=DDPStrategy(find_unused_parameters=True),
         logger=logger,
         log_every_n_steps=config['log_every_n_steps'],
-        callbacks=[checkpointer, lr_monitor],
+        callbacks=[checkpointer, lr_monitor, model_summary],
         num_sanity_val_steps=config['num_sanity_val_steps'],
         limit_train_batches=config['limit_train_batches'],
         limit_val_batches=config['limit_val_batches'],

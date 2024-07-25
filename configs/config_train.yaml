@@ -10,7 +10,7 @@ bbox_label_path: ./nuscenes_labels
 # ckpt_path: /home/rxr230031/CombinedModels/lightning_logs/version_0/checkpoints/epoch=28-step=25462.ckpt
 encoder_ckpt_path: ./encoder.pth
 
-devices: [0,1,2,3]
+devices: [0]
 version: 'v1.0-trainval'
 
 log_every_n_steps: 25

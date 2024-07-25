@@ -1,5 +1,6 @@
 import logging
-from models.centerpoint.first_stage.center_head import CenterHead
+from .centerpoint.first_stage.center_head import CenterHead
+from .MLP import MLP
 
 import torch
 import torch.nn.functional as F
@@ -90,7 +91,7 @@ class CVCPModel(nn.Module):
         roi_head (RoIHead): The RoI head model.
         bev_feature_extractor (BEVFeatureExtractor): The BEV feature extractor model.
         iou (IoU3D): The IoU3D metric.
-        
+
 
     Methods:
         _forward_stage_one: Performs the forward pass for stage one of the model.
@@ -106,7 +107,7 @@ class CVCPModel(nn.Module):
     def __init__(self, cvt_encoder: CVTEncoder, center_head_model: CenterHead, resize_shape, cfg):
         super().__init__()
         self.cvt_encoder = cvt_encoder
-        self.mlp = _MLP()
+        self.mlp = MLP(num_hidden=3)
         self.resize_shape = resize_shape
         self.center_head = center_head_model
         self.cfg = cfg
@@ -177,14 +178,14 @@ class CVCPModel(nn.Module):
 
         pred_stage_two = self.roi_head(label)
         roi_loss, tb_dict = self.roi_head.get_loss()
-        
-        # #iou loss 
-        
+
+        # #iou loss
+
         # pred_boxes = pred_stage_two['rois'][..., :7]
         # pred_classes = pred_stage_two['roi_labels']
         # label_boxes = pred_stage_two['gt_boxes_and_cls'][..., :7]
         # label_classes = pred_stage_two['gt_boxes_and_cls'][..., -1]
-        
+
         # intersections = []
         # unions = []
         # for k in label_classes.unique():
@@ -285,40 +286,3 @@ class CVCPModel(nn.Module):
 
         # Save the plot as an image
         plt.savefig('bounding_boxes_plot.png')
-
-
-import torch
-import torch.nn as nn
-
-class MLP(nn.Module):
-    def __init__(self, input_size, hidden_size, output_size):
-        super(MLP, self).__init__()
-        self.fc1 = nn.Linear(input_size, hidden_size)
-        self.fc2 = nn.Linear(hidden_size, output_size)
-        self.activation = nn.ReLU()
-    
-    def forward(self, x):
-        x = self.fc1(x)
-        x = self.activation(x)
-        x = self.fc2(x)
-        return x
-
-class _MLP(nn.Module):
-    def __init__(self):
-        from torchvision.ops import MLP
-        super().__init__()
-        self.mlp = MLP(in_channels=128, hidden_channels=[128, 128])
-        self.upsample = nn.Sequential(
-            nn.ConvTranspose2d(128, 128, kernel_size=4, stride=4, padding=0, output_padding=0),
-            nn.ReLU()
-        )
-    
-    def forward(self, x):
-        B, C, H, W = x.shape
-        # Flatten the spatial dimensions: Bx128x625
-        x = x.view(B, C, H * W).permute(0, 2, 1)  # Bx625x128
-        x = self.mlp(x)  # Apply MLP: Bx625x128
-        x = x.permute(0, 2, 1).view(B, 128, H, W)  # Bx128x25x25
-        # Upsample spatial dimensions to 128x128
-        # x = self.upsample(x)
-        return x

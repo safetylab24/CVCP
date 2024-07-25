@@ -11,7 +11,9 @@ from models.cvt.efficientnet import EfficientNetExtractor
 
 # torch.inverse(torch.ones((0, 0), device='cuda:0'))
 
-ResNetBottleNeck = lambda c: Bottleneck(c, c // 4)
+
+def ResNetBottleNeck(c): return Bottleneck(c, c // 4)
+
 
 H = 224
 W = 480
@@ -144,27 +146,6 @@ class CrossAttention(nn.Module):
         self.mlp = nn.Sequential(
             nn.Linear(dim, 2 * dim), nn.GELU(), nn.Linear(2 * dim, dim))
         self.postnorm = norm(dim)
-
-class MLP_Block(nn.Module):
-    def __init__(self, h_sizes, out_size):
-        super(MLP_Block, self).__init__()
-
-        # Hidden layers
-        self.hidden = []
-        for k in range(len(h_sizes)-1):
-            self.hidden.append(nn.Linear(h_sizes[k], h_sizes[k+1]))
-
-        # Output layer
-        self.out = nn.Linear(h_sizes[-1], out_size)
-
-    def forward(self, x):
-
-        # Feedforward
-        for layer in self.hidden:
-            x = F.relu(layer(x))
-        output = F.softmax(self.out(x), dim=1)
-
-        return output
 
     def forward(self, q, k, v, skip=None):
         '''
