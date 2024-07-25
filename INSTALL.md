@@ -2,7 +2,7 @@
 ```bash
 conda create -y -n cvcp python=3.8
 conda activate cvcp
-conda install -y pytorch torchvision pytorch-cuda=12.1 -c pytorch -c nvidia
+conda install -y pytorch torchvision pytorch-cuda -c pytorch -c nvidia
 conda install -y cuda-toolkit
 ```
 # Download the nuscenes dataset
