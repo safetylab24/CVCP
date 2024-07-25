@@ -56,6 +56,9 @@ def main():
 
     # Instantiate cvt_model and head_model
     cvt_encoder = CVTEncoder()
+    cvt_encoder.load_state_dict(torch.load('encoder.pth'))
+    for param in cvt_encoder.parameters():
+        param.requires_grad = False
 
     head_seg = head(
         in_channels=centerpoint_config['in_channels'],
@@ -123,7 +126,7 @@ def main():
         accelerator='gpu',
         devices=config['devices'],
         max_epochs=config['epochs'],
-        strategy=DDPStrategy(find_unused_parameters=True),
+        strategy=DDPStrategy(find_unused_parameters=False),
         logger=logger,
         log_every_n_steps=config['log_every_n_steps'],
         callbacks=[checkpointer, lr_monitor, model_summary],

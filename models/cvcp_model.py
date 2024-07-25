@@ -124,7 +124,7 @@ class CVCPModel(nn.Module):
         Performs the forward pass for stage one of the model.
 
         Args:
-            batch (dict): The input batch.
+            batch (dict): Mg5g41BfR5mRThe input batch.
 
         Returns:
             tuple: A tuple containing the predicted boxes, the output of the CVT model, and the loss.
@@ -256,20 +256,20 @@ class CVCPModel(nn.Module):
 
         # Plot each pred bounding box
         for bbox in pred_boxes_2d:
-            center_x, center_y, width, length = bbox
-            lower_left_x = center_x - length / 2
-            lower_left_y = center_y - width / 2
-            rect = patches.Rectangle((lower_left_x.cpu().item(), lower_left_y.cpu().item()), length.cpu(
-            ).item(), width.cpu().item(), linewidth=1, edgecolor='r', facecolor='none')
+            c_x, c_y, w, l = bbox
+            lower_left_x = c_x - l / 2
+            lower_left_y = c_y - w / 2
+            rect = patches.Rectangle((lower_left_x.cpu().item(), lower_left_y.cpu().item()), l.cpu(
+            ).item(), w.cpu().item(), linewidth=1, edgecolor='r', facecolor='none')
             ax.add_patch(rect)
 
         # Plot each label bounding box
         for bbox in label_boxes_2d:
-            center_x, center_y, width, length = bbox
-            lower_left_x = center_x - width / 2
-            lower_left_y = center_y - length / 2
-            rect = patches.Rectangle((lower_left_x.cpu().item(), lower_left_y.cpu().item()), length.cpu(
-            ).item(), width.cpu().item(), linewidth=1, edgecolor='g', facecolor='none')
+            c_x, c_y, w, l = bbox
+            lower_left_x = c_x - w / 2
+            lower_left_y = c_y - l / 2
+            rect = patches.Rectangle((lower_left_x.cpu().item(), lower_left_y.cpu().item()), l.cpu(
+            ).item(), w.cpu().item(), linewidth=1, edgecolor='g', facecolor='none')
             ax.add_patch(rect)
 
         # Plot the ego vehicle at the origin
@@ -286,3 +286,4 @@ class CVCPModel(nn.Module):
 
         # Save the plot as an image
         plt.savefig('bounding_boxes_plot.png')
+        plt.close()

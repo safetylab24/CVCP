@@ -1,6 +1,6 @@
-epochs: 30
-num_workers: 2
-batch_size: 2
+epochs: 20
+num_workers: 7
+batch_size: 8
 resize_shape: [128, 128]
 
 log_dir: ./logs
@@ -10,7 +10,7 @@ bbox_label_path: ./nuscenes_labels
 # ckpt_path: /home/rxr230031/CombinedModels/lightning_logs/version_0/checkpoints/epoch=28-step=25462.ckpt
 encoder_ckpt_path: ./encoder.pth
 
-devices: [0]
+devices: [0,1,2,3]
 version: 'v1.0-trainval'
 
 log_every_n_steps: 25
@@ -21,13 +21,13 @@ check_val_every_n_epoch: 1
 val_check_interval: 1.0
 num_sanity_val_steps: 1
 
-lr: 0.00003
+lr: 0.001
 weight_decay: 0.01
 base_momentum: 0.85
 max_momentum: 0.95
 
 centerpoint:
-  in_channels: [128, ]
+  in_channels: [512, ]
   dataset: 'nuscenes'
   weight: 0.25
   tasks: # these are the tasks tracked by nuscenes leaderboard
