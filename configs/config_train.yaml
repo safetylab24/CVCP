@@ -25,6 +25,8 @@ lr: 0.001
 weight_decay: 0.01
 base_momentum: 0.85
 max_momentum: 0.95
+div_factor: 3.0
+pct_start: 0.05
 
 centerpoint:
   in_channels: [512, ]
