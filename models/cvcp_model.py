@@ -13,6 +13,7 @@ from metrics.iou_3d import IoU3D
 from .centerpoint.second_stage.two_stage_detector import TwoStageDetectorUtils as utils
 from .centerpoint.second_stage.roi_head import RoIHead
 from .centerpoint.second_stage.BEVFeatureExtractor import BEVFeatureExtractor
+from .cvt.cvt import CrossViewTransformer
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import torch.nn as nn
@@ -104,19 +105,13 @@ class CVCPModel(nn.Module):
 
     """
 
-    def __init__(self, cvt_encoder: CVTEncoder, center_head_model: CenterHead, resize_shape, cfg):
+    def __init__(self, cvt: CrossViewTransformer, center_head_model: CenterHead, resize_shape, cfg):
         super().__init__()
-        self.cvt_encoder = cvt_encoder
-        self.mlp = MLP(num_hidden=3)
+        self.cvt = cvt
         self.resize_shape = resize_shape
         self.center_head = center_head_model
         self.cfg = cfg
-        self.max_conf_val = 0
-        self.roi_head = RoIHead(
-            input_channels=650, model_cfg=model_cfg, code_size=9, add_box_param=True)
-        self.bev_feature_extractor = BEVFeatureExtractor()
 
-        self.iou = IoU3D(num_classes=len(cfg['centerpoint']['tasks']))
         # self.mAP = MAP3D(iou_threshold=0.1)
 
     def _forward_stage_one(self, batch):
@@ -124,20 +119,16 @@ class CVCPModel(nn.Module):
         Performs the forward pass for stage one of the model.
 
         Args:
-            batch (dict): Mg5g41BfR5mRThe input batch.
+            batch (dict): The input batch.
 
         Returns:
             tuple: A tuple containing the predicted boxes, the output of the CVT model, and the loss.
 
         """
-        cvt_out = self.cvt_encoder(
+        cvt_out = self.cvt(
             batch['images'], batch['intrinsics'], batch['extrinsics'])
-        # print(cvt_out.shape)
-        cvt_out = self.mlp(cvt_out)
-        # print(cvt_out.shape)
         cvt_out = F.interpolate(
             cvt_out, size=self.resize_shape, mode='bilinear', align_corners=False)
-        # print(cvt_out.shape)
         preds = self.center_head(cvt_out)
 
         new_preds = []
@@ -212,13 +203,13 @@ class CVCPModel(nn.Module):
 
         """
         boxes, cvt_out, loss = self._forward_stage_one(batch)
-        pred_stage_two, roi_loss, tb_dict = self._forward_stage_two(
-            boxes, cvt_out, batch)
+        # pred_stage_two, roi_loss, tb_dict = self._forward_stage_two(
+        #     boxes, cvt_out, batch)
 
-        loss = utils.combine_loss(loss, roi_loss, tb_dict)
+        # loss = utils.combine_loss(loss, roi_loss, tb_dict)
         loss, log_vars = self.parse_second_losses(loss)
 
-        return pred_stage_two, loss
+        return boxes, loss
 
     def parse_second_losses(self, losses):
         """

@@ -1,6 +1,6 @@
 epochs: 20
-num_workers: 7
-batch_size: 8
+num_workers: 4
+batch_size: 4
 resize_shape: [128, 128]
 
 log_dir: ./logs
@@ -27,27 +27,27 @@ base_momentum: 0.85
 max_momentum: 0.95
 
 centerpoint:
-  in_channels: [512, ]
+  in_channels: [64, ]
   dataset: 'nuscenes'
-  weight: 0.25
+  weight: 0.75
   tasks: # these are the tasks tracked by nuscenes leaderboard
     - num_class: 1
       class_names: ['car']
     
-    - num_class: 2
-      class_names: ['truck', 'construction vehicle']
+    # - num_class: 2
+    #   class_names: ['truck', 'construction vehicle']
     
-    - num_class: 2
-      class_names: ['bus', 'trailer']
+    # - num_class: 2
+    #   class_names: ['bus', 'trailer']
     
-    - num_class: 1
-      class_names: ['barrier']
+    # - num_class: 1
+    #   class_names: ['barrier']
     
-    - num_class: 2
-      class_names: ['motorcycle', 'bicycle']
+    # - num_class: 2
+    #   class_names: ['motorcycle', 'bicycle']
     
-    - num_class: 2
-      class_names: ['pedestrian', 'traffic cone']
+    # - num_class: 2
+    #   class_names: ['pedestrian', 'traffic cone']
 
   code_weights: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.2, 0.2, 1.0, 1.0]
   common_heads: # (output_channel, num_conv)

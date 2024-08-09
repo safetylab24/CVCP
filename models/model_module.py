@@ -1,7 +1,11 @@
 
 import torch
 import lightning as L
-
+import torch.optim as optim
+import torch.optim.lr_scheduler as lr_scheduler
+from torch.optim import Adam
+from torch.optim.lr_scheduler import OneCycleLR
+from torch.optim.swa_utils import AveragedModel, SWALR
 
 
 from metrics.iou_3d import IoU3D
@@ -44,7 +48,7 @@ class CVCPModule(L.LightningModule):
         self.model = model
         self.cfg = cfg
 
-        self.iou = IoU3D(num_classes=len(self.cfg['centerpoint']['tasks']))
+        # self.iou = IoU3D(num_classes=len(self.cfg['centerpoint']['tasks']))
         # self.mAP = MAP3D(iou_threshold=0.1)
 
     def training_step(self, batch, batch_idx):
@@ -61,23 +65,23 @@ class CVCPModule(L.LightningModule):
         """
         preds, loss = self.model(batch)
         
-        self.iou(
-            preds['rois'][..., :7],
-            preds['roi_labels'],
-            preds['gt_boxes_and_cls'][..., :7],
-            preds['gt_boxes_and_cls'][..., -1]
-        )
+        # self.iou(
+        #     preds['rois'][..., :7],
+        #     preds['roi_labels'],
+        #     preds['gt_boxes_and_cls'][..., :7],
+        #     preds['gt_boxes_and_cls'][..., -1]
+        # )
         
         
         self.log('train_loss', loss, sync_dist=True,
                     prog_bar=True, on_step=True, logger=True)
-        self.log('train_iou', self.iou, on_step=True, on_epoch=False, prog_bar=True)
+        # self.log('train_iou', self.iou, on_step=True, on_epoch=False, prog_bar=True)
 
         return loss
 
     def validation_step(self, batch, batch_idx):
         """
-        Defines the validation step for the model.
+        Defines the valdation step for the model.
 
         Args:
             batch: The input batch.
@@ -89,50 +93,50 @@ class CVCPModule(L.LightningModule):
         """
         preds, loss = self.model(batch)
         
-        self.iou(
-            preds['rois'][..., :7],
-            preds['roi_labels'],
-            preds['gt_boxes_and_cls'][..., :7],
-            preds['gt_boxes_and_cls'][..., -1]
-        )
+        # self.iou(
+        #     preds['rois'][..., :7],
+        #     preds['roi_labels'],
+        #     preds['gt_boxes_and_cls'][..., :7],
+        #     preds['gt_boxes_and_cls'][..., -1]
+        # )
         
         
         self.log('val_loss', loss, sync_dist=True,
                     prog_bar=True, on_step=True, logger=True)
-        self.log('val_iou', self.iou, on_step=True, on_epoch=False, prog_bar=True)
+        # self.log('train_iou', self.iou, on_step=True, on_epoch=False, prog_bar=True)
 
         return loss
 
-    def test_step(self, batch, batch_idx):
-        """
-        Defines the test step for the model.
+    # def test_step(self, batch, batch_idx):
+    #     """
+    #     Defines the test step for the model.
 
-        Args:
-            batch: The input batch.
-            batch_idx: The index of the current batch.
+    #     Args:
+    #         batch: The input batch.
+    #         batch_idx: The index of the current batch.
 
-        Returns:
-            float: The loss value.
+    #     Returns:
+    #         float: The loss value.
 
-        """
-        preds, loss = self.model(batch)
+    #     """
+    #     preds, loss = self.model(batch)
         
-        self.iou(
-            preds['rois'][..., :7],
-            preds['roi_labels'],
-            preds['gt_boxes_and_cls'][..., :7],
-            preds['gt_boxes_and_cls'][..., -1]
-        )
+    #     self.iou(
+    #         preds['rois'][..., :7],
+    #         preds['roi_labels'],
+    #         preds['gt_boxes_and_cls'][..., :7],
+    #         preds['gt_boxes_and_cls'][..., -1]
+    #     )
         
-        boxes_processed = utils.post_process(preds)        
+    #     boxes_processed = utils.post_process(preds)        
         
-        self.log('test_loss', loss, sync_dist=True,
-                    prog_bar=True, on_step=True, logger=True)
-        self.log('test_iou', self.iou, on_step=True, on_epoch=False, prog_bar=True)
+    #     self.log('test_loss', loss, sync_dist=True,
+    #                 prog_bar=True, on_step=True, logger=True)
+    #     self.log('test_iou', self.iou, on_step=True, on_epoch=False, prog_bar=True)
 
-        self.model.visualize(pred_boxes_3d=boxes_processed[0]['box3d_lidar'], label_boxes_3d=preds['gt_boxes_and_cls'][0, :, :-1])
+    #     self.model.visualize(pred_boxes_3d=boxes_processed[0]['box3d_lidar'], label_boxes_3d=preds['gt_boxes_and_cls'][0, :, :-1])
         
-        return loss
+    #     return loss
 
     def configure_optimizers(self):
         """
@@ -140,21 +144,16 @@ class CVCPModule(L.LightningModule):
 
         Returns:
             dict: A dictionary containing the optimizer and the learning rate scheduler.
-
         """
-        optimizer = torch.optim.AdamW(
-            self.parameters(), lr=self.cfg['lr'], weight_decay=self.cfg['weight_decay'])
+        optimizer = Adam(self.parameters(), lr=self.cfg['lr'], weight_decay=self.cfg['weight_decay']) 
+        scheduler = OneCycleLR(optimizer, max_lr=self.cfg['lr'], total_steps=self.trainer.estimated_stepping_batches)
+
         return {
-            'optimizer': optimizer,
-            'lr_scheduler': {
-                'scheduler': torch.optim.lr_scheduler.OneCycleLR(
-                    optimizer,
-                    max_lr=self.cfg['lr'],
-                    total_steps=self.trainer.estimated_stepping_batches,
-                    max_momentum=self.cfg['max_momentum'],
-                    base_momentum=self.cfg['base_momentum']),
-                'monitor': 'val_loss',
-                'frequency': 1,
-                'interval': 'step',
-            }
+        'optimizer': optimizer,
+        'lr_scheduler': {
+            'scheduler': scheduler,
+            'monitor': 'val_loss',
+            'frequency': 1,
+            'interval': 'step',
         }
+    }

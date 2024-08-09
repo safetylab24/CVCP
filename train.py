@@ -1,7 +1,9 @@
 import faulthandler
 from colorama import Fore, Style
 from models.cvcp_model import CVCPModel, head
+from models.cvt.cvt import CrossViewTransformer
 from models.cvt.encoder import CVTEncoder
+from models.cvt.decoder import Decoder
 from models.model_module import CVCPModule
 import yaml
 import torch
@@ -55,10 +57,10 @@ def main():
     centerpoint_config = config['centerpoint']
 
     # Instantiate cvt_model and head_model
-    cvt_encoder = CVTEncoder()
-    cvt_encoder.load_state_dict(torch.load('encoder.pth'))
-    for param in cvt_encoder.parameters():
-        param.requires_grad = False
+    cvt = CrossViewTransformer(CVTEncoder(), Decoder(dim=128, blocks=[128, 128, 64]))
+    # cvt_encoder.load_state_dict(torch.load('encoder.pth'))
+    # for param in cvt_encoder.parameters():
+    #     param.requires_grad = False
 
     head_seg = head(
         in_channels=centerpoint_config['in_channels'],
@@ -75,7 +77,7 @@ def main():
     resize_shape = tuple(config['resize_shape'])
 
     # Instantiate the combined model
-    model = CVCPModel(cvt_encoder, head_seg, resize_shape, config)
+    model = CVCPModel(cvt, head_seg, resize_shape, config)
 
 
     modelmodule = CVCPModule(model, config)

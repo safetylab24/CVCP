@@ -166,7 +166,7 @@ class DCNSepHead(nn.Module):
 class CenterHead(nn.Module):
     def __init__(
         self,
-        in_channels=[512,],
+        in_channels=[64,],
         tasks=[],
         dataset='nuscenes',
         weight=0.25,
